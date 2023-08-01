@@ -3,13 +3,15 @@
 namespace Ametrin.Utils;
 
 [DataContract]
-public sealed class TrackChangeValue<T> : IComparable<TrackChangeValue<T>>, IComparable {
+public sealed class TrackChangeValue<T> : IComparable<TrackChangeValue<T>>, IComparable, IComparable<T> {
     [DataMember(Name = "value")] private T _Value;
+    public T? OldValue { get; private set; }
 
     public T Value {
         get => _Value;
         set {
             if(EqualityComparer<T>.Default.Equals(_Value, value)) return;
+            OldValue = _Value;
             _Value = value;
             HasChanged = true;
         }
@@ -19,16 +21,14 @@ public sealed class TrackChangeValue<T> : IComparable<TrackChangeValue<T>>, ICom
 
     public TrackChangeValue(T value) {
         _Value = value;
-        HasChanged = false;
+        Forget();
     }
 
     public void Forget() {
         HasChanged = false;
     }
 
-    public override string ToString() {
-        return Value?.ToString()!;
-    }
+    public override string ToString() => Value?.ToString()!;
 
     public override bool Equals(object? obj) {
         return obj is TrackChangeValue<T> other &&
@@ -57,15 +57,13 @@ public sealed class TrackChangeValue<T> : IComparable<TrackChangeValue<T>>, ICom
     }
 
     public int CompareTo(T? other) {
-        if(Value is null && other is null) return 0;
-        if(other is null) return 1;
-        if(Value is null) return -1;
+        if(Value is null) return other is null ? 0 : -1;
 
         if(Value is IComparable<T> comparable1) return comparable1.CompareTo(other);
         if(Value is IComparable<T?> comparable2) return comparable2.CompareTo(other);
         if(Value is IComparable comparable3) return comparable3.CompareTo(other);
 
-        throw new InvalidOperationException("The type of Value does not implement the IComparable interface.");
+        throw new InvalidOperationException("T does not implement the IComparable interface.");
     }
 
     public int CompareTo(object? other) {

@@ -104,7 +104,7 @@ public static class GraphSerializer{
     }
 
     public static Result<Graph<TNode, TValue>> Deserialize<TNode, TValue>(string path) where TNode : INode<TValue> where TValue : notnull {
-        if(!File.Exists(path)) return ResultStatus.PathDoesNotExist;
+        if(!File.Exists(path)) return ResultStatus.NotFound;
         using var stream = new FileStream(path, FileMode.Open);
         var serializer = new DataContractSerializer(typeof(Graph<TNode, TValue>));
 

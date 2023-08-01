@@ -26,50 +26,32 @@ public sealed class Result<T> {
             failed?.Invoke(Status);
             return;
         }
+
         success(Value!);
-        return;
     }
     
-    public bool Resolve(out T result) {
-        if(HasFailed()) {
-            result = default!;
-            return false;
-        }
+    public bool TryResolve(out T result) {
         result = Value!;
-        return true;
+        return !HasFailed();
     }
 
-    public TReturn Resolve<TReturn>(Func<T, TReturn> success, Func<ResultStatus, TReturn> failed) {
-        if(HasFailed()) {
-            return failed(Status);
-        }
+    public TReturn Resolve<TReturn>(Func<T, TReturn> success, Func<ResultStatus, TReturn> failed) => HasFailed() ? failed(Status) : success(Value!);
 
-        return success(Value!);
+    public TReturn Resolve<TReturn>(Func<T, TReturn> success, TReturn @default) => HasFailed() ? @default : success(Value!);
+
+    public Result<TReturn> IfPresent<TReturn>(Func<T, TReturn> operation) => HasFailed() ? Result<TReturn>.Failed(Status) : (Result<TReturn>) operation(Value!);
+
+    public T Get() {
+        if(Value is null) throw new InvalidDataException("Trying to read a failed result! Validate or use GetOrDefault");
+        return Value;
     }
 
-    public TReturn Resolve<TReturn>(Func<T, TReturn> success, TReturn @default) {
-        if(HasFailed()) {
-            return @default;
-        }
-        return success(Value!);
-    }
-
-    public Result<TReturn> IfPresent<TReturn>(Func<T, TReturn> operation) {
-        if(HasFailed()) {
-            return Status;
-        }
-        return operation(Value!);
-    }
-
-    public T GetOrDefault() => Value!;
+    public T? GetOrDefault() => Value;
     public T GetOrDefault(T @default) => Value ?? @default;
     public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);
 
     public static implicit operator Result<T>(ResultStatus status) => Result<T>.Failed(status);
-    public static implicit operator Result<T>(T? value) {
-        if(value is null) return Result<T>.Failed(ResultStatus.ResultNull);
-        return Result<T>.Succeeded(value);
-    }
+    public static implicit operator Result<T>(T? value) => value is null ? Result<T>.Failed(ResultStatus.ResultNull) : Result<T>.Succeeded(value);
 }
 
 public sealed class Result {
@@ -87,24 +69,13 @@ public sealed class Result {
 
         success();
     }
-    
-    public TReturn Resolve<TReturn>(Func<TReturn> success, Func<ResultStatus, TReturn> failed) {
-        if(HasFailed()) {
-            return failed(Status);
-        }
 
-        return success();
-    }
-    
-    public TReturn Resolve<TReturn>(Func<TReturn> success, TReturn @default) {
-        if(HasFailed()) {
-            return @default;
-        }
+    public TReturn Resolve<TReturn>(Func<TReturn> success, Func<ResultStatus, TReturn> failed) => HasFailed() ? failed(Status) : success();
 
-        return success();
-    }
+    public TReturn Resolve<TReturn>(Func<TReturn> success, TReturn @default) => HasFailed() ? @default : success();
 
     public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);
+    public bool IsSuccess() => Status is ResultStatus.Succeeded;
 
     public static Result Of(ResultStatus status) => new(status);
 
@@ -113,14 +84,14 @@ public sealed class Result {
 
 [Flags] //for fails first bit must be 1
 public enum ResultStatus {
-    Succeeded           = 0b00000,
-    Failed              = 0b10000,
-    InvalidArgument     = 0b10001,
-    IOError             = 0b10010,
-    PathDoesNotExist    = 0b10011,
-    ResultNull          = 0b10100,
-    //ValueDoesNotExist   = 0b10101, //??
-    AlreadyExists       = 0b10110,
-    Canceled            = 0b10111,
-    OutOfRange          = 0b11000
+    Succeeded           = 0b0000000000000000000000000000000,
+    Failed              = 0b1000000000000000000000000000000,
+    InvalidArgument     = 0b1000000000000000000000000000001,
+    IOError             = 0b1000000000000000000000000000010,
+    NotFound            = 0b1000000000000000000000000000100,
+    ResultNull          = 0b1000000000000000000000000001000,
+    ConnectionFailed    = 0b1000000000000000000000000010000,
+    AlreadyExists       = 0b1000000000000000000000000100000,
+    Canceled            = 0b1000000000000000000000001000000,
+    OutOfRange          = 0b1000000000000000000000010000000
 }

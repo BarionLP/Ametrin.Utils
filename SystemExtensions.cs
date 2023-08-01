@@ -1,14 +1,17 @@
-﻿using System.Net.Sockets;
-using System.Net;
+﻿using System.Net;
 
 namespace Ametrin.Utils;
 
 public static class SystemExtensions {
-    public static Result<string> LocalIPAddress() {
-        using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0);
-        socket.Connect("8.8.8.8", 65530);
-        if(socket.LocalEndPoint is not IPEndPoint endPoint) return ResultStatus.Failed;
-
-        return endPoint.Address.ToString();
+    public static Result<IPAddress> LocalIPAddress() {
+        var addresses = Dns.GetHostAddresses(Dns.GetHostName());
+        if(addresses.Length == 0) return ResultStatus.ConnectionFailed;
+        return addresses[0];
+    }
+    
+    public static async Task<Result<IPAddress>> LocalIPAddressAsync() {
+        var addresses = await Dns.GetHostAddressesAsync(Dns.GetHostName());
+        if(addresses.Length == 0) return ResultStatus.ConnectionFailed;
+        return addresses[0];
     }
 }
