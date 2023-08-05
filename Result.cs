@@ -21,6 +21,9 @@ public sealed class Result<T> {
         return new(status);
     }
 
+    public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);
+    public bool IsSuccess() => Status is ResultStatus.Succeeded;
+
     public void Resolve(Action<T> success, Action<ResultStatus>? failed = null) {
         if(HasFailed()) {
             failed?.Invoke(Status);
@@ -36,19 +39,19 @@ public sealed class Result<T> {
     }
 
     public TReturn Resolve<TReturn>(Func<T, TReturn> success, Func<ResultStatus, TReturn> failed) => HasFailed() ? failed(Status) : success(Value!);
-
     public TReturn Resolve<TReturn>(Func<T, TReturn> success, TReturn @default) => HasFailed() ? @default : success(Value!);
-
     public Result<TReturn> IfPresent<TReturn>(Func<T, TReturn> operation) => HasFailed() ? Result<TReturn>.Failed(Status) : (Result<TReturn>) operation(Value!);
+    public void Catch(Action<ResultStatus> operation){
+        if (HasFailed()) operation(Status);
+    }
 
     public T Get() {
-        if(Value is null) throw new InvalidDataException("Trying to read a failed result! Validate or use GetOrDefault");
+        if(Value is null) throw new NullReferenceException("Trying to read a failed result! Validate or use GetOrDefault");
         return Value;
     }
 
-    public T? GetOrDefault() => Value;
+    public T? GetOrDefault() => Value ?? default;
     public T GetOrDefault(T @default) => Value ?? @default;
-    public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);
 
     public static implicit operator Result<T>(ResultStatus status) => Result<T>.Failed(status);
     public static implicit operator Result<T>(T? value) => value is null ? Result<T>.Failed(ResultStatus.ResultNull) : Result<T>.Succeeded(value);
@@ -61,6 +64,9 @@ public sealed class Result {
         Status = status;
     }
 
+    public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);
+    public bool IsSuccess() => Status is ResultStatus.Succeeded;
+
     public void Resolve(Action success, Action<ResultStatus>? failed = null) {
         if(HasFailed()) {
             failed?.Invoke(Status);
@@ -71,14 +77,12 @@ public sealed class Result {
     }
 
     public TReturn Resolve<TReturn>(Func<TReturn> success, Func<ResultStatus, TReturn> failed) => HasFailed() ? failed(Status) : success();
-
     public TReturn Resolve<TReturn>(Func<TReturn> success, TReturn @default) => HasFailed() ? @default : success();
-
-    public bool HasFailed() => Status.HasFlag(ResultStatus.Failed);
-    public bool IsSuccess() => Status is ResultStatus.Succeeded;
+    public void Catch(Action<ResultStatus> operation){
+        if (HasFailed()) operation(Status);
+    }
 
     public static Result Of(ResultStatus status) => new(status);
-
     public static implicit operator Result(ResultStatus status) => Of(status);
 }
 

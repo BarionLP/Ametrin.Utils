@@ -1,57 +1,59 @@
-﻿using System.Runtime.Serialization;
+﻿namespace Ametrin.Utils;
 
-namespace Ametrin.Utils;
+public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComparable<T> {
+    public event Action? OnChanged;
 
-[DataContract]
-public sealed class TrackChangeValue<T> : IComparable<TrackChangeValue<T>>, IComparable, IComparable<T> {
-    [DataMember(Name = "value")] private T _Value;
+    private T _Value;
     public T? OldValue { get; private set; }
 
-    public T Value {
-        get => _Value;
-        set {
-            if(EqualityComparer<T>.Default.Equals(_Value, value)) return;
-            OldValue = _Value;
-            _Value = value;
-            HasChanged = true;
-        }
-    }
-
+    public T Value => _Value;
     public bool HasChanged { get; private set; } = false;
 
-    public TrackChangeValue(T value) {
+    public TrackedValue(T value) {
         _Value = value;
         Forget();
     }
 
-    public void Forget() {
-        HasChanged = false;
+    public void Set(T value) {
+        if(EqualityComparer<T>.Default.Equals(_Value, value)) return;
+        SetSilent(value);
+        HasChanged = true;
+        OnChanged?.Invoke();
+    }
+    
+    public void SetSilent(T value) {
+        OldValue = _Value;
+        _Value = value;
     }
 
-    public override string ToString() => Value?.ToString()!;
+    public void Forget() {
+        HasChanged = false;
+        OldValue = default;
+    }
+
+    public override string ToString() => Value?.ToString() ?? "Empty";
 
     public override bool Equals(object? obj) {
-        return obj is TrackChangeValue<T> other &&
+        return obj is TrackedValue<T> other &&
                EqualityComparer<T>.Default.Equals(Value, other.Value) &&
                HasChanged == other.HasChanged;
     }
 
-    public static bool operator ==(TrackChangeValue<T> A, TrackChangeValue<T> B) {
+    public static bool operator ==(TrackedValue<T> A, TrackedValue<T> B) {
         if(A is null) return B is null;
         return A.Equals(B);
     }
 
-    public static bool operator !=(TrackChangeValue<T> A, TrackChangeValue<T> B) {
+    public static bool operator !=(TrackedValue<T> A, TrackedValue<T> B) {
         if(A is null) return B is not null;
         return !A.Equals(B);
     }
 
-    public static implicit operator T(TrackChangeValue<T> value) => value.Value;
-    public static implicit operator TrackChangeValue<T>(T value) => new(value);
+    public static implicit operator T(TrackedValue<T> value) => value.Value;
 
     public override int GetHashCode() => Value!.GetHashCode();
 
-    public int CompareTo(TrackChangeValue<T>? other) {
+    public int CompareTo(TrackedValue<T>? other) {
         if(other is null) return 1;
         return CompareTo(other.Value);
     }
@@ -69,7 +71,7 @@ public sealed class TrackChangeValue<T> : IComparable<TrackChangeValue<T>>, ICom
     public int CompareTo(object? other) {
         if(other is null) return 1;
 
-        if(other is TrackChangeValue<T> trackedValue) return CompareTo(trackedValue.Value);
+        if(other is TrackedValue<T> trackedValue) return CompareTo(trackedValue.Value);
         if(other is T t) return CompareTo(t);
 
         throw new InvalidOperationException($"Cannot compare {typeof(T).FullName} to {other.GetType().FullName}");
