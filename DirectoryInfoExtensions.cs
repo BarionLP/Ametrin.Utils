@@ -10,7 +10,41 @@ public static class DirectoryInfoExtensions {
         return new(directoryInfo.FullName + " - Copy");
     }
 
-    //public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo directoryInfo) {
-    //    return directoryInfo.EnumerateFiles();
-    //}
+    public static void ForeachFile(this DirectoryInfo directoryInfo, Action<FileInfo> action, IProgress<(float, string)>? progress, SearchOption searchOption = SearchOption.AllDirectories, string pattern = "*") {
+        if(progress is null) {
+            directoryInfo.ForeachFile(action);
+            return;
+        }
+
+        var files = directoryInfo.GetFiles(pattern, searchOption);
+        float totalFiles = files.Length;
+        var processed = 0;
+        foreach(var file in files) {
+            action(file);
+            processed++;
+            progress.Report((processed / totalFiles, file.FullName));
+        }
+    }
+
+    public static void ForeachFile(this DirectoryInfo directoryInfo, Action<FileInfo> action, IProgress<float>? progress, SearchOption searchOption = SearchOption.AllDirectories, string pattern = "*") {
+        if(progress is null) {
+            directoryInfo.ForeachFile(action);
+            return;
+        }
+
+        var files = directoryInfo.GetFiles(pattern, searchOption);
+        float totalFiles = files.Length;
+        var processed = 0;
+        foreach(var file in files) {
+            action(file);
+            processed++;
+            progress.Report(processed / totalFiles);
+        }
+    }
+
+    public static void ForeachFile(this DirectoryInfo directoryInfo, Action<FileInfo> action, SearchOption searchOption = SearchOption.AllDirectories, string pattern = "*") {
+        foreach(var file in directoryInfo.GetFiles(pattern, searchOption)) {
+            action(file);
+        }
+    }
 }
