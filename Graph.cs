@@ -13,7 +13,7 @@ public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValu
     public Result<TNode> TryGet(TValue value) {
         if(value is null) return ResultStatus.InvalidArgument;
         var result = Nodes.FirstOrDefault(entry => entry.Value.Equals(value));
-        if(result is null) return ResultStatus.ResultNull;
+        if(result is null) return ResultStatus.Null;
         return result;
     }
 
@@ -104,12 +104,12 @@ public static class GraphSerializer{
     }
 
     public static Result<Graph<TNode, TValue>> Deserialize<TNode, TValue>(string path) where TNode : INode<TValue> where TValue : notnull {
-        if(!File.Exists(path)) return ResultStatus.NotFound;
+        if(!File.Exists(path)) return ResultStatus.PathNotFound;
         using var stream = new FileStream(path, FileMode.Open);
         var serializer = new DataContractSerializer(typeof(Graph<TNode, TValue>));
 
         try{
-            if(serializer.ReadObject(stream) is not Graph<TNode, TValue> result) return ResultStatus.ResultNull;
+            if(serializer.ReadObject(stream) is not Graph<TNode, TValue> result) return ResultStatus.Null;
             return result;
         } catch(Exception) {
             return ResultStatus.Failed;

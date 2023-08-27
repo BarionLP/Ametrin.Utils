@@ -34,6 +34,14 @@ public static partial class StringExtensions {
     public static string ToXMLFriendly(this string input, string replacement = "") => ValidXMLCharacters().Replace(input, replacement);
     public static bool ContainsInvalidXmlChars(string input) => ValidXMLCharacters().IsMatch(input);
 
+    public static bool StartsWith(this string str, ReadOnlySpan<char> value) {
+        if(str == null || value.Length > str.Length) {
+            return false;
+        }
+
+        return str.AsSpan()[..value.Length].SequenceEqual(value);
+    }
+
 
     [GeneratedRegex("[.,]", RegexOptions.Compiled)]
     private static partial Regex DecimalRegex();

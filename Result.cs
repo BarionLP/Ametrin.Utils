@@ -54,7 +54,7 @@ public sealed class Result<T> {
     public T GetOrDefault(T @default) => Value ?? @default;
 
     public static implicit operator Result<T>(ResultStatus status) => Result<T>.Failed(status);
-    public static implicit operator Result<T>(T? value) => value is null ? Result<T>.Failed(ResultStatus.ResultNull) : Result<T>.Succeeded(value);
+    public static implicit operator Result<T>(T? value) => value is null ? Result<T>.Failed(ResultStatus.Null) : Result<T>.Succeeded(value);
 }
 
 public sealed class Result {
@@ -92,10 +92,14 @@ public enum ResultStatus {
     Failed              = 0b1000000000000000000000000000000,
     InvalidArgument     = 0b1000000000000000000000000000001,
     IOError             = 0b1000000000000000000000000000010,
-    NotFound            = 0b1000000000000000000000000000100,
-    ResultNull          = 0b1000000000000000000000000001000,
+    WebError            = 0b1000000000000000000000000000100,
+    Null                = 0b1000000000000000000000000001000,
     ConnectionFailed    = 0b1000000000000000000000000010000,
     AlreadyExists       = 0b1000000000000000000000000100000,
     Canceled            = 0b1000000000000000000000001000000,
-    OutOfRange          = 0b1000000000000000000000010000000
+    OutOfRange          = 0b1000000000000000000000010000000,
+    AccessDenied        = 0b1000000000000000000001000000000,
+    PathNotFound        = IOError | Null,
+    PathAlreadyExists   = IOError | AlreadyExists,
+    NoInternet          = WebError | ConnectionFailed,
 }
