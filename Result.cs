@@ -78,8 +78,9 @@ public sealed class Result {
 
     public TReturn Resolve<TReturn>(Func<TReturn> success, Func<ResultStatus, TReturn> failed) => HasFailed() ? failed(Status) : success();
     public TReturn Resolve<TReturn>(Func<TReturn> success, TReturn @default) => HasFailed() ? @default : success();
-    public void Catch(Action<ResultStatus> operation){
+    public bool Catch(Action<ResultStatus> operation){
         if (HasFailed()) operation(Status);
+        return HasFailed();
     }
 
     public static Result Of(ResultStatus status) => new(status);

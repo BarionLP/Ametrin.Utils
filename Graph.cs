@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using System.Xml;
 
 namespace Ametrin.Utils;
 
-[DataContract(IsReference = true)]
+[DataContract(Namespace = "Ametrin.Utils", IsReference = true)]
 public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValue : notnull{
     [DataMember(Name = "nodes")]
     private readonly HashSet<TNode> Nodes = new();
@@ -97,20 +98,28 @@ public interface INode<T> where T : notnull{
 }
 
 public static class GraphSerializer{
-    public static void Serialize<TNode, TValue>(Graph<TNode, TValue> graph, string path) where TNode : INode<TValue> where TValue : notnull {
-        using var stream = new FileStream(path, FileMode.Create);
-        var serializer = new DataContractSerializer(typeof(Graph<TNode, TValue>));
-        serializer.WriteObject(stream, graph);
+    public static readonly DataContractSerializerSettings DataContractSettings = new() { };
+
+    public static void Serialize<TNode, TValue>(Graph<TNode, TValue> graph, FileInfo target, bool indent = false) where TNode : INode<TValue> where TValue : notnull {
+        using var stream = target.Create();
+        var serializer = new DataContractSerializer(typeof(Graph<TNode, TValue>), DataContractSettings);
+        var settings = new XmlWriterSettings {
+            Indent = indent,
+        };
+        using var writer = XmlWriter.Create(stream, settings);
+        serializer.WriteObject(writer, graph);
     }
 
-    public static Result<Graph<TNode, TValue>> Deserialize<TNode, TValue>(string path) where TNode : INode<TValue> where TValue : notnull {
-        if(!File.Exists(path)) return ResultStatus.PathNotFound;
-        using var stream = new FileStream(path, FileMode.Open);
+    public static Result<Graph<TNode, TValue>> Deserialize<TNode, TValue>(FileInfo target) where TNode : INode<TValue> where TValue : notnull {
+        if(!target.Exists) return ResultStatus.PathNotFound;
+        using var stream = target.OpenRead();
         var serializer = new DataContractSerializer(typeof(Graph<TNode, TValue>));
 
         try{
             if(serializer.ReadObject(stream) is not Graph<TNode, TValue> result) return ResultStatus.Null;
             return result;
+        } catch(IOException) {
+            return ResultStatus.IOError;
         } catch(Exception) {
             return ResultStatus.Failed;
         }
