@@ -1,6 +1,10 @@
 ﻿namespace Ametrin.Utils;
 
 public static class RangeExtensions {
+    public static bool Contains(this Range range, float value) =>  value >= range.Start.Value && value <= range.End.Value;
+    public static bool Contains(this Range range, int value) =>  value >= range.Start.Value && value <= range.End.Value;
+    public static bool Contains(this Range range, short value) =>  value >= range.Start.Value && value <= range.End.Value;
+
     public static RangeEnumerator GetEnumerator(this Range range) => new(range);
 
     public ref struct RangeEnumerator {
