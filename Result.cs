@@ -50,6 +50,8 @@ public sealed class Result<T> {
         return Value;
     }
 
+    public T GetOr(Func<ResultStatus, T> operation) => Value ?? operation(Status);
+    public T GetOr(Func<T> operation) => Value ?? operation();
     public T? GetOrDefault() => Value ?? default;
     public T GetOrDefault(T @default) => Value ?? @default;
 

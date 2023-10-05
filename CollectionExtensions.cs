@@ -16,20 +16,17 @@ public static class CollectionExtensions {
         from.RemoveAt(idx);
     }
 
-    public static string Join(this IEnumerable<string> source, char separator) {
+    public static string Dump(this IEnumerable<string> source, char separator) {
         return string.Join(separator, source);
     }
-    public static string Join(this IEnumerable<string> source, string separator) {
+    public static string Dump(this IEnumerable<string> source, string separator) {
         return string.Join(separator, source);
     }
 
-    public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> items) {
-        if(collection == null) throw new ArgumentNullException(nameof(collection));
-
-        if(items == null) throw new ArgumentNullException(nameof(items)); 
-
-        foreach(var item in items) {
-            collection.Add(item);
+    public static bool Contains<T>(this ICollection<T> values, IEnumerable<T> contains){
+        foreach(var contain in contains){
+            if(!values.Contains(contain)) return false;
         }
+        return true;
     }
 }
