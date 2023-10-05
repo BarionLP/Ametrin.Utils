@@ -86,6 +86,7 @@ public sealed class Result {
     }
 
     public static Result Of(ResultStatus status) => new(status);
+    public static Result<T> Of<T>(T value) => Result<T>.Succeeded(value);
     public static implicit operator Result(ResultStatus status) => Of(status);
 }
 
