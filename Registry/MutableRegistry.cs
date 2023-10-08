@@ -33,7 +33,9 @@ public class MutableRegistry<TKey, TValue> : IMutableRegistry<TKey, TValue> wher
 
         return ResultStatus.AlreadyExists;
     }
+    public bool ContainsKey(TKey key) => Entries.ContainsKey(key);
 
     public IEnumerator<TValue> GetEnumerator() => Entries.Values.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) Entries).GetEnumerator();
+
 }

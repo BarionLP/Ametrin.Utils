@@ -106,4 +106,5 @@ public enum ResultStatus {
     PathNotFound        = IOError | Null,
     PathAlreadyExists   = IOError | AlreadyExists,
     NoInternet          = WebError | ConnectionFailed,
+    InvalidFile         = IOError | InvalidArgument,
 }

@@ -19,7 +19,9 @@ public class Registry<TKey, TValue> : IRegistry<TKey, TValue> where TKey : notnu
         }
         return ResultStatus.Null;
     }
+    public bool ContainsKey(TKey key) => Entries.ContainsKey(key);
 
     public IEnumerator<TValue> GetEnumerator() => Entries.Values.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
 }

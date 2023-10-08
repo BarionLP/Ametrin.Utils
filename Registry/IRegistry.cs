@@ -5,6 +5,7 @@ public interface IRegistry<TKey, TValue> : IEnumerable<TValue>{
     public int Count { get; }
     public TValue this[TKey key] { get; }
     public Result<TValue> TryGet(TKey key);
+    public bool ContainsKey(TKey key);
 }
 
 public interface IMutableRegistry<TKey, TValue> : IRegistry<TKey, TValue> {
