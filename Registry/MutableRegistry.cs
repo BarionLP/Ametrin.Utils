@@ -13,7 +13,7 @@ public class MutableRegistry<TKey, TValue> : IMutableRegistry<TKey, TValue> wher
             Entries[key] = value;
         }
     }
-
+    public MutableRegistry(IEnumerable<TValue> values, Func<TValue, TKey> keyProvider) : this(values.ToDictionary(keyProvider)) { }
     public MutableRegistry(IDictionary<TKey, TValue> entries) {
         Entries = entries;
     }
