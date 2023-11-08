@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-
-namespace Ametrin.Utils;
+﻿namespace Ametrin.Utils;
 public static class CollectionExtensions {
     private static readonly Random _Random = new(DateTime.UtcNow.Millisecond);
     

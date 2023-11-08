@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 
 namespace Ametrin.Utils;
 
-public class BulkObservableCollection<T> : ObservableCollection<T>{
+public sealed class BulkObservableCollection<T> : ObservableCollection<T>{
     public void AddRange(IEnumerable<T> collection){
         if (collection is null || !collection.Any()) return;
 
