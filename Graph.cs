@@ -11,10 +11,10 @@ public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValu
 
     public int Count => Nodes.Count;
 
-    public Result<TNode> TryGet(TValue value) {
-        if(value is null) return ResultStatus.InvalidArgument;
+    public Result<TNode> TryGet(TValue value){
+        if(value is null) return ResultFlag.InvalidArgument;
         var result = Nodes.FirstOrDefault(entry => entry.Value.Equals(value));
-        if(result is null) return ResultStatus.Null;
+        if(result is null) return ResultFlag.Null;
         return result;
     }
 
@@ -22,18 +22,18 @@ public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValu
         try {
             return Nodes.ElementAt(idx);
         } catch(ArgumentOutOfRangeException) {
-            return ResultStatus.OutOfRange;
+            return ResultFlag.OutOfRange;
         } catch {
-            return ResultStatus.Failed;
+            return ResultFlag.Failed;
         }
 
     }
 
     public Result TryAdd(TNode node) {
-        if(node is null) return ResultStatus.InvalidArgument;
-        if(Exists(node.Value)) return ResultStatus.AlreadyExists;
+        if(node is null) return ResultFlag.InvalidArgument;
+        if(Exists(node.Value)) return ResultFlag.AlreadyExists;
         Nodes.Add(node);
-        return ResultStatus.Succeeded;
+        return ResultFlag.Succeeded;
     }
 
     public void Link(TNode a, TNode b) {
@@ -100,7 +100,7 @@ public interface INode<T> where T : notnull{
 public static class GraphSerializer{
     public static readonly DataContractSerializerSettings DataContractSettings = new() { };
 
-    public static void Serialize<TNode, TValue>(Graph<TNode, TValue> graph, FileInfo target, bool indent = false) where TNode : INode<TValue> where TValue : notnull {
+    public static void Serialize<TNode, TValue>(Graph<TNode, TValue> graph, FileInfo target, bool indent = false) where TNode : class, INode<TValue> where TValue : notnull {
         using var stream = target.Create();
         var serializer = new DataContractSerializer(typeof(Graph<TNode, TValue>), DataContractSettings);
         var settings = new XmlWriterSettings {
@@ -110,18 +110,18 @@ public static class GraphSerializer{
         serializer.WriteObject(writer, graph);
     }
 
-    public static Result<Graph<TNode, TValue>> Deserialize<TNode, TValue>(FileInfo target) where TNode : INode<TValue> where TValue : notnull {
-        if(!target.Exists) return ResultStatus.PathNotFound;
+    public static Result<Graph<TNode, TValue>> Deserialize<TNode, TValue>(FileInfo target) where TNode : class, INode<TValue> where TValue : notnull {
+        if(!target.Exists) return ResultFlag.PathNotFound;
         using var stream = target.OpenRead();
         var serializer = new DataContractSerializer(typeof(Graph<TNode, TValue>));
 
         try{
-            if(serializer.ReadObject(stream) is not Graph<TNode, TValue> result) return ResultStatus.Null;
+            if(serializer.ReadObject(stream) is not Graph<TNode, TValue> result) return ResultFlag.Null;
             return result;
         } catch(IOException) {
-            return ResultStatus.IOError;
+            return ResultFlag.IOError;
         } catch(Exception) {
-            return ResultStatus.Failed;
+            return ResultFlag.Failed;
         }
     }
 }

@@ -17,7 +17,7 @@ public class Registry<TKey, TValue> : IRegistry<TKey, TValue> where TKey : notnu
         if(Entries.TryGetValue(key, out var value)) {
             return value;
         }
-        return ResultStatus.Null;
+        return ResultFlag.Null;
     }
     public bool ContainsKey(TKey key) => Entries.ContainsKey(key);
 

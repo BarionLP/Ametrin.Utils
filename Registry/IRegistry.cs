@@ -1,6 +1,6 @@
 namespace Ametrin.Utils.Registry;
 
-public interface IRegistry<TKey, TValue> : IEnumerable<TValue>{
+public interface IRegistry<TKey, TValue> : IEnumerable<TValue> {
     public IEnumerable<TKey> Keys { get; }
     public int Count { get; }
     public TValue this[TKey key] { get; }

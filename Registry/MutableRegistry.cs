@@ -23,15 +23,15 @@ public class MutableRegistry<TKey, TValue> : IMutableRegistry<TKey, TValue> wher
         if(Entries.TryGetValue(key, out var value)) {
             return value;
         }
-        return ResultStatus.Null;
+        return ResultFlag.Null;
     }
 
     public Result TryRegister(TKey key, TValue value) {
         if(Entries.TryAdd(key, value)) {
-            return ResultStatus.Succeeded;
+            return ResultFlag.Succeeded;
         }
 
-        return ResultStatus.AlreadyExists;
+        return ResultFlag.AlreadyExists;
     }
     public bool ContainsKey(TKey key) => Entries.ContainsKey(key);
 
