@@ -25,7 +25,7 @@ public struct Option<T> : IEquatable<Option<T>> where T : class {
     public readonly Option<T> WhereNot(Func<T, bool> predicate) => _content is not null && !predicate(_content) ? this : Option<T>.None();
 
     public override readonly int GetHashCode() => _content?.GetHashCode() ?? 0;
-    public override bool Equals(object? other) => other is Option<T> option && Equals(option);
+    public override readonly bool Equals(object? other) => other is Option<T> option && Equals(option);
 
     public readonly bool Equals(Option<T> other) => _content is null ? other._content is null : _content.Equals(other._content);
 

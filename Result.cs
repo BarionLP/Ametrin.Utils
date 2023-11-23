@@ -74,6 +74,9 @@ public readonly struct Result<T> {
     public T Reduce(Func<ResultFlag, T> operation) => IsSuccess ? Value! : operation(Status);
     public T Reduce(Func<T> operation) => IsSuccess ? Value! : operation();
     public T Reduce(T @default) => IsSuccess ? Value! : @default;
+    public T? ReduceOrNull() => IsSuccess ? Value : default;
+    public T ReduceOrThrow() => IsSuccess ? Value! : throw new NullReferenceException($"Result was empty: {Status}");
+
 
     public static implicit operator Result<T>(ResultFlag status) => Result<T>.Failed(status);
     public static implicit operator Result<T>(T? value) => Result<T>.Of(value);
