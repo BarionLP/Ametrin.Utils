@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
+using Ametrin.Utils.Optional;
 
 namespace Ametrin.Utils;
 public static partial class StringExtensions {
@@ -15,6 +16,19 @@ public static partial class StringExtensions {
     }
     public static bool TryParse<T>(this string input, out T result, IFormatProvider? provider = null) where T : IParsable<T> {
         return T.TryParse(input, provider, out result!);
+    }
+    
+    public static Option<T> TryParse<T>(this ReadOnlySpan<char> input, IFormatProvider? provider = null) where T : class, ISpanParsable<T> {
+        if(T.TryParse(input, provider, out var result)){
+            return Option<T>.Some(result);
+        }
+        return Option<T>.None();
+    }
+    public static Option<T> TryParse<T>(this string input, IFormatProvider? provider = null) where T : class, IParsable<T> {
+        if (T.TryParse(input, provider, out var result)){
+            return Option<T>.Some(result);
+        }
+        return Option<T>.None();
     }
 
     public static T ParseOrDefault<T>(this string input, IFormatProvider? provider = null, T defaultValue = default!) where T : IParsable<T> {

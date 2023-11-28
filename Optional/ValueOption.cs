@@ -34,5 +34,7 @@ public struct ValueOption<T> : IEquatable<ValueOption<T>> where T : struct{
         : !other._content.HasValue;
 
     public static bool operator ==(ValueOption<T> a, ValueOption<T> b) => a.Equals(b);
-    public static bool operator !=(ValueOption<T> a, ValueOption<T> b) => !(a.Equals(b));
+    public static bool operator !=(ValueOption<T> a, ValueOption<T> b) => !a.Equals(b);
+
+    public static implicit operator ValueOption<T>(T value) => ValueOption<T>.Some(value);
 }
