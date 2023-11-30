@@ -1,7 +1,4 @@
-﻿using Ametrin.Utils.Optional;
-using System.Diagnostics.CodeAnalysis;
-
-namespace Ametrin.Utils;
+﻿namespace Ametrin.Utils;
 
 public readonly struct Result<T> {
     public required ResultFlag Status { get; init; }
