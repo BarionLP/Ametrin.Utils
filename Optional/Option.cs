@@ -17,6 +17,15 @@ public struct Option<T> : IEquatable<Option<T>> where T : class {
     public readonly ValueOption<TResult> Map<TResult>(Func<T, ValueOption<TResult>> map) where TResult : struct =>
         _content is not null ? map(_content) : ValueOption<TResult>.None();
 
+    public readonly Option<TResult> Cast<TResult>() where TResult : class{
+        if (_content is TResult castedContent){
+            return Option<TResult>.Some(castedContent);
+        }
+        return Option<TResult>.None();
+    }
+    public readonly Option<TResult> Convert<TResult>(Func<T, TResult> converter) where TResult : class => 
+        _content is not null ? Option<TResult>.Some(converter(_content)) : Option<TResult>.None();
+
     public readonly T Reduce(T orElse) => _content ?? orElse;
     public readonly T Reduce(Func<T> orElse) => _content ?? orElse();
 
