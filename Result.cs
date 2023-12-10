@@ -1,4 +1,6 @@
-﻿namespace Ametrin.Utils;
+﻿using Ametrin.Utils.Optional;
+
+namespace Ametrin.Utils;
 
 public readonly struct Result<T> {
     public required ResultFlag Status { get; init; }
@@ -25,8 +27,8 @@ public readonly struct Result<T> {
         return new() { Status = status };
     }
 
-    public readonly bool HasFailed => Status.HasFlag(ResultFlag.Failed);
-    public readonly bool IsSuccess => Status is ResultFlag.Succeeded;
+    public readonly bool HasFailed => Status.IsFail();
+    public readonly bool IsSuccess => Status.IsSuccess();
 
     public readonly void Resolve(Action<T> success, Action<ResultFlag>? failed = null) {
         if(HasFailed) {
@@ -43,15 +45,11 @@ public readonly struct Result<T> {
         return !HasFailed;
     }
 
-    public readonly Result<TResult> Map<TResult>(Func<T, TResult> map) where TResult : class {
-        return HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
-    }
-    public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map) where TResult : class {
-        return HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
-    }
-    public readonly Result<TResult> Map<TResult>(Func<T, TResult> map, Func<ResultFlag, TResult> error) where TResult : class {
-        return HasFailed ? error(Status) : map(Value!);
-    }
+    public readonly Result<TResult> Map<TResult>(Func<T, TResult> map) => HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
+    public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map) => HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
+    public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) where TResult : class => HasFailed ? Option<TResult>.None() : map(Value!);
+    public readonly ValueOption<TResult> Map<TResult>(Func<T, ValueOption<TResult>> map) where TResult : struct => HasFailed ? ValueOption<TResult>.None() : map(Value!);
+    public readonly Result<TResult> Map<TResult>(Func<T, TResult> map, Func<ResultFlag, TResult> error) => HasFailed ? error(Status) : map(Value!);
 
     [Obsolete] public TReturn Resolve<TReturn>(Func<T, TReturn> success, Func<ResultFlag, TReturn> failed) => HasFailed ? failed(Status) : success(Value!);
     [Obsolete] public TReturn Resolve<TReturn>(Func<T, TReturn> success, TReturn @default) => HasFailed ? @default : success(Value!);
@@ -62,11 +60,6 @@ public readonly struct Result<T> {
         if (HasFailed) operation(Status);
     }
 
-    [Obsolete]
-    public T Get() {
-        if(Value is null) throw new NullReferenceException("Trying to read a failed result! Validate or use GetOrDefault");
-        return Value;
-    }
 
     public T Reduce(Func<ResultFlag, T> operation) => IsSuccess ? Value! : operation(Status);
     public T Reduce(Func<T> operation) => IsSuccess ? Value! : operation();
@@ -79,6 +72,7 @@ public readonly struct Result<T> {
     public static implicit operator Result<T>(T? value) => Result<T>.Of(value);
 }
 
+[Obsolete]
 public sealed class Result {
     public readonly ResultFlag Status = ResultFlag.Failed;
 
@@ -109,6 +103,12 @@ public sealed class Result {
     public static Result<T> Of<T>(T value) where T : class => Result<T>.Of(value);
     public static implicit operator Result(ResultFlag status) => Of(status);
 }
+
+public static class ResultExtensions {
+    public static bool IsFail(this ResultFlag flag) => flag.HasFlag(ResultFlag.Failed);
+    public static bool IsSuccess(this ResultFlag flag) => flag is ResultFlag.Succeeded;
+}
+
 
 [Flags] //for fails first bit must be 1
 public enum ResultFlag {

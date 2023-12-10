@@ -26,7 +26,7 @@ public class MutableRegistry<TKey, TValue> : IMutableRegistry<TKey, TValue> wher
         return ResultFlag.Null;
     }
 
-    public Result TryRegister(TKey key, TValue value) {
+    public ResultFlag TryRegister(TKey key, TValue value) {
         if(Entries.TryAdd(key, value)) {
             return ResultFlag.Succeeded;
         }

@@ -10,5 +10,5 @@ public sealed class MutableTypeRegistry<TKey> : MutableRegistry<TKey, Type> wher
     public MutableTypeRegistry() {}
     public MutableTypeRegistry(IDictionary<TKey, Type> entries) : base(entries) {}
 
-    public Result TryRegister<TType>(TKey key) => TryRegister(key, typeof(TType));
+    public ResultFlag TryRegister<TType>(TKey key) => TryRegister(key, typeof(TType));
 }

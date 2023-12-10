@@ -29,7 +29,7 @@ public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValu
 
     }
 
-    public Result TryAdd(TNode node) {
+    public ResultFlag TryAdd(TNode node) {
         if(node is null) return ResultFlag.InvalidArgument;
         if(Exists(node.Value)) return ResultFlag.AlreadyExists;
         Nodes.Add(node);

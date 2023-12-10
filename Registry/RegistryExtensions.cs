@@ -8,7 +8,7 @@ public static class RegistryExtensions {
         return ResultFlag.Null;
     }
 
-    public static Result TryRegister<TType>(this MutableTypeRegistry<string> registry) {
+    public static ResultFlag TryRegister<TType>(this MutableTypeRegistry<string> registry) {
         var type = typeof(TType);
         if(type.FullName is not string name) throw new ArgumentException("Cannot register Type without name");
         return registry.TryRegister(name, type);
