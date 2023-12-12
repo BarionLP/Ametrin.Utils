@@ -1,5 +1,5 @@
 ﻿
-using System.Collections.Frozen;
+using Ametrin.Utils.Optional;
 
 namespace Ametrin.Utils.Registry;
 

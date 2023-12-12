@@ -1,11 +1,12 @@
-﻿using System.Net;
+﻿using Ametrin.Utils.Optional;
+using System.Net;
 
 namespace Ametrin.Utils;
 
 public static class SystemExtensions {
-    public static Result<IPAddress> LocalIPAddress() {
+    public static Option<IPAddress> LocalIPAddress() {
         var addresses = Dns.GetHostAddresses(Dns.GetHostName());
-        if(addresses.Length == 0) return ResultFlag.ConnectionFailed;
+        if(addresses.Length == 0) return Option<IPAddress>.None();
         return addresses[0];
     }
     

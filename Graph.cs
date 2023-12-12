@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Ametrin.Utils.Optional;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using System.Xml;
 

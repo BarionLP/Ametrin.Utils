@@ -11,7 +11,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
     }
 
 
-    public static Option<T> Some(T obj) {
+    public static Option<T> Some(T? obj) {
         if(obj is null) return None();
         return new(obj, true);
     }
@@ -51,5 +51,5 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
     public static bool operator ==(Option<T>? a, Option<T>? b) => a is null ? b is null : a.Equals(b);
     public static bool operator !=(Option<T>? a, Option<T>? b) => !(a == b);
 
-    public static implicit operator Option<T>(T value) => Option<T>.Some(value);
+    public static implicit operator Option<T>(T? value) => Option<T>.Some(value);
 }

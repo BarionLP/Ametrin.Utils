@@ -18,17 +18,17 @@ public static partial class StringExtensions {
         return T.TryParse(input, provider, out result!);
     }
     
-    public static ValueOption<T> TryParse<T>(this ReadOnlySpan<char> input, IFormatProvider? provider = null) where T : struct, ISpanParsable<T> {
+    public static Option<T> TryParse<T>(this ReadOnlySpan<char> input, IFormatProvider? provider = null) where T : ISpanParsable<T> {
         if(T.TryParse(input, provider, out var result)){
-            return ValueOption<T>.Some(result);
+            return Option<T>.Some(result);
         }
-        return ValueOption<T>.None();
+        return Option<T>.None();
     }
-    public static ValueOption<T> TryParse<T>(this string input, IFormatProvider? provider = null) where T : struct, IParsable<T> {
+    public static Option<T> TryParse<T>(this string input, IFormatProvider? provider = null) where T : IParsable<T> {
         if (T.TryParse(input, provider, out var result)){
-            return ValueOption<T>.Some(result);
+            return Option<T>.Some(result);
         }
-        return ValueOption<T>.None();
+        return Option<T>.None();
     }
 
     public static T ParseOrDefault<T>(this string input, IFormatProvider? provider = null, T defaultValue = default!) where T : IParsable<T> {
