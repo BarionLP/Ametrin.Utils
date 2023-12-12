@@ -15,7 +15,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
         if(obj is null) return None();
         return new(obj, true);
     }
-    public static Option<T> None() => new();
+    public static Option<T> None() => new(default!, false);
 
     public readonly Option<TResult> Map<TResult>(Func<T, TResult> map) where TResult : class => HasValue ? map(_content) : Option<TResult>.None();
     public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) where TResult : class => HasValue ? map(_content) : Option<TResult>.None();
