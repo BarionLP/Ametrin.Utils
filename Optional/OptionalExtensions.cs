@@ -21,13 +21,16 @@ public static class OptionalExtensions{
     public static IEnumerable<T> Reduce<T>(this IEnumerable<Option<T>> source, T @default) where T : class{
         return source.Select(s=>s.Reduce(@default));
     }
-    
+
+    [Obsolete]
     public static IEnumerable<ValueOption<T>> WhereNotEmpty<T>(this IEnumerable<ValueOption<T>> source) where T : struct{
         return source.Where(option => option.HasValue);
     }
+    [Obsolete]
     public static IEnumerable<T> ReduceFiltered<T>(this IEnumerable<ValueOption<T>> source) where T : struct{
         return source.Where(t => t.HasValue).Select(s=>s.ReduceOrThrow());
     }
+    [Obsolete]
     public static IEnumerable<T> Reduce<T>(this IEnumerable<ValueOption<T>> source, T @default) where T : struct{
         return source.Select(s=>s.Reduce(@default));
     }

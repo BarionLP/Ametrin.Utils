@@ -1,6 +1,7 @@
 namespace Ametrin.Utils.Optional;
 
 // modified from https://github.com/zoran-horvat/optional
+[Obsolete]
 public struct ValueOption<T> : IEquatable<ValueOption<T>> where T : struct{
     private T? _content;
     public readonly bool HasValue => _content.HasValue;

@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Frozen;
+
 namespace Ametrin.Utils.Registry;
 
 public sealed class TypeRegistry<TKey> : Registry<TKey, Type> where TKey : notnull{

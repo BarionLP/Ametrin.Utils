@@ -1,36 +1,39 @@
 namespace Ametrin.Utils.Optional;
 
-// modified from https://github.com/zoran-horvat/optional
-public struct Option<T> : IEquatable<Option<T>> where T : class {
-    private T? _content;
-    public readonly bool HasValue => _content is not null;
+// based on https://github.com/zoran-horvat/optional
+public readonly struct Option<T> : IEquatable<Option<T>>{
+    private readonly T _content;
+    public bool HasValue { get; private init; }
+
+    private Option(T content, bool hasValue) {
+        _content = content;
+        HasValue = hasValue;
+    }
 
 
-    public static Option<T> Some(T obj) => new() { _content = obj };
+    public static Option<T> Some(T obj) {
+        if(obj is null) return None();
+        return new(obj, true);
+    }
     public static Option<T> None() => new();
 
-    public readonly Option<TResult> Map<TResult>(Func<T, TResult> map) where TResult : class => new() { _content = _content is not null ? map(_content) : null };
-    public readonly ValueOption<TResult> MapValue<TResult>(Func<T, TResult> map) where TResult : struct => _content is not null ? ValueOption<TResult>.Some(map(_content)) : ValueOption<TResult>.None();
-
-    public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) where TResult : class => _content is not null ? map(_content) : Option<TResult>.None();
-    public readonly ValueOption<TResult> Map<TResult>(Func<T, ValueOption<TResult>> map) where TResult : struct => _content is not null ? map(_content) : ValueOption<TResult>.None();
+    public readonly Option<TResult> Map<TResult>(Func<T, TResult> map) where TResult : class => HasValue ? map(_content) : Option<TResult>.None();
+    public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) where TResult : class => HasValue ? map(_content) : Option<TResult>.None();
 
     public readonly Option<TResult> Cast<TResult>() where TResult : class{
-        if (_content is TResult castedContent){
+        if(HasValue && _content is TResult castedContent){
             return Option<TResult>.Some(castedContent);
         }
         return Option<TResult>.None();
     }
-    public readonly Option<TResult> Convert<TResult>(Func<T, TResult> converter) where TResult : class => _content is not null ? Option<TResult>.Some(converter(_content)) : Option<TResult>.None();
 
     public readonly T Reduce(T orElse) => _content ?? orElse;
     public readonly T Reduce(Func<T> orElse) => _content ?? orElse();
     public readonly T ReduceOrThrow() => HasValue ? _content! : throw new NullReferenceException($"Option was empty");
 
 
-    public readonly Option<T> Where(Func<T, bool> predicate) => _content is not null && predicate(_content) ? this : Option<T>.None();
-
-    public readonly Option<T> WhereNot(Func<T, bool> predicate) => _content is not null && !predicate(_content) ? this : Option<T>.None();
+    public readonly Option<T> Where(Func<T, bool> predicate) => HasValue && predicate(_content) ? this : Option<T>.None();
+    public readonly Option<T> WhereNot(Func<T, bool> predicate) => HasValue && !predicate(_content) ? this : Option<T>.None();
 
     public readonly void Resolve(Action<T> success, Action? failed = null) {
         if(!HasValue) {
@@ -41,9 +44,9 @@ public struct Option<T> : IEquatable<Option<T>> where T : class {
         success(_content!);
     }
 
-    public override readonly int GetHashCode() => _content?.GetHashCode() ?? 0;
+    public override readonly int GetHashCode() => HasValue ? _content!.GetHashCode() : 0;
     public override readonly bool Equals(object? other) => other is Option<T> option && Equals(option);
-    public readonly bool Equals(Option<T> other) => _content is null ? other._content is null : _content.Equals(other._content);
+    public readonly bool Equals(Option<T> other) => HasValue ? other.HasValue : _content!.Equals(other._content);
 
     public static bool operator ==(Option<T>? a, Option<T>? b) => a is null ? b is null : a.Equals(b);
     public static bool operator !=(Option<T>? a, Option<T>? b) => !(a == b);

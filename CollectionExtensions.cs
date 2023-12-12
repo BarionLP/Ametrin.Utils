@@ -1,4 +1,6 @@
-﻿namespace Ametrin.Utils;
+﻿using Ametrin.Utils.Optional;
+
+namespace Ametrin.Utils;
 public static class CollectionExtensions {
     private static readonly Random _Random = new(DateTime.UtcNow.Millisecond);
     
@@ -26,5 +28,12 @@ public static class CollectionExtensions {
             if(!values.Contains(contain)) return false;
         }
         return true;
+    }
+
+    public static Option<TValue> Get<TValue, TKey>(this IDictionary<TKey, TValue> dic, TKey key){
+        if(dic.TryGetValue(key, out var res)) {
+            return res;
+        }
+        return Option<TValue>.None();
     }
 }

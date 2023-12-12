@@ -1,19 +1,8 @@
-﻿using Ametrin.Utils.Optional;
-
-namespace Ametrin.Utils;
+﻿namespace Ametrin.Utils.Optional;
 
 public readonly struct Result<T> {
     public required ResultFlag Status { get; init; }
     private T? Value { get; init; }
-
-    [Obsolete]
-    public static Result<T> Succeeded(in T value) {
-        if(value is null) throw new ArgumentNullException(nameof(value), "Cannot succeed when result is null");
-        return new() { 
-            Status = ResultFlag.Succeeded,
-            Value = value,
-        };
-    }
 
     public static Result<T> Of(T? value) {
         if(value is null) return Failed(ResultFlag.Null);
@@ -39,27 +28,10 @@ public readonly struct Result<T> {
         success(Value!);
     }
 
-    [Obsolete]
-    public bool TryResolve(out T result) {
-        result = Value!;
-        return !HasFailed;
-    }
-
     public readonly Result<TResult> Map<TResult>(Func<T, TResult> map) => HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
     public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map) => HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
     public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) where TResult : class => HasFailed ? Option<TResult>.None() : map(Value!);
-    public readonly ValueOption<TResult> Map<TResult>(Func<T, ValueOption<TResult>> map) where TResult : struct => HasFailed ? ValueOption<TResult>.None() : map(Value!);
     public readonly Result<TResult> Map<TResult>(Func<T, TResult> map, Func<ResultFlag, TResult> error) => HasFailed ? error(Status) : map(Value!);
-
-    [Obsolete] public TReturn Resolve<TReturn>(Func<T, TReturn> success, Func<ResultFlag, TReturn> failed) => HasFailed ? failed(Status) : success(Value!);
-    [Obsolete] public TReturn Resolve<TReturn>(Func<T, TReturn> success, TReturn @default) => HasFailed ? @default : success(Value!);
-    [Obsolete] public Result<TReturn> IfPresent<TReturn>(Func<T, TReturn> operation) where TReturn : class => HasFailed ? Result<TReturn>.Failed(Status) : operation(Value!);
-
-    [Obsolete]
-    public void Catch(Action<ResultFlag> operation){
-        if (HasFailed) operation(Status);
-    }
-
 
     public T Reduce(Func<ResultFlag, T> operation) => IsSuccess ? Value! : operation(Status);
     public T Reduce(Func<T> operation) => IsSuccess ? Value! : operation();
@@ -70,38 +42,6 @@ public readonly struct Result<T> {
 
     public static implicit operator Result<T>(ResultFlag status) => Result<T>.Failed(status);
     public static implicit operator Result<T>(T? value) => Result<T>.Of(value);
-}
-
-[Obsolete]
-public sealed class Result {
-    public readonly ResultFlag Status = ResultFlag.Failed;
-
-    private Result(ResultFlag status) {
-        Status = status;
-    }
-
-    public bool HasFailed() => Status.HasFlag(ResultFlag.Failed);
-    public bool IsSuccess() => Status is ResultFlag.Succeeded;
-
-    public void Resolve(Action success, Action<ResultFlag>? failed = null) {
-        if(HasFailed()) {
-            failed?.Invoke(Status);
-            return;
-        }
-
-        success();
-    }
-
-    public TReturn Resolve<TReturn>(Func<TReturn> success, Func<ResultFlag, TReturn> failed) => HasFailed() ? failed(Status) : success();
-    public TReturn Resolve<TReturn>(Func<TReturn> success, TReturn @default) => HasFailed() ? @default : success();
-    public bool Catch(Action<ResultFlag> operation){
-        if (HasFailed()) operation(Status);
-        return HasFailed();
-    }
-
-    public static Result Of(ResultFlag status) => new(status);
-    public static Result<T> Of<T>(T value) where T : class => Result<T>.Of(value);
-    public static implicit operator Result(ResultFlag status) => Of(status);
 }
 
 public static class ResultExtensions {

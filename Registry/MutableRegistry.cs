@@ -1,9 +1,10 @@
+using Ametrin.Utils.Optional;
 using System.Collections;
 
 namespace Ametrin.Utils.Registry; 
 
-public class MutableRegistry<TKey, TValue> : IMutableRegistry<TKey, TValue> where TKey : notnull {
-    private readonly IDictionary<TKey, TValue> Entries;
+public class MutableRegistry<TKey, TValue>(IDictionary<TKey, TValue> entries) : IMutableRegistry<TKey, TValue> where TKey : notnull {
+    private readonly IDictionary<TKey, TValue> Entries = entries;
     public int Count => Entries.Count;
     public IEnumerable<TKey> Keys => Entries.Keys;
 
@@ -14,16 +15,14 @@ public class MutableRegistry<TKey, TValue> : IMutableRegistry<TKey, TValue> wher
         }
     }
     public MutableRegistry(IEnumerable<TValue> values, Func<TValue, TKey> keyProvider) : this(values.ToDictionary(keyProvider)) { }
-    public MutableRegistry(IDictionary<TKey, TValue> entries) {
-        Entries = entries;
-    }
+
     public MutableRegistry() : this(new Dictionary<TKey, TValue>()) { }
 
-    public Result<TValue> TryGet(TKey key) {
+    public Option<TValue> TryGet(TKey key) {
         if(Entries.TryGetValue(key, out var value)) {
             return value;
         }
-        return ResultFlag.Null;
+        return Option<TValue>.None();
     }
 
     public ResultFlag TryRegister(TKey key, TValue value) {
