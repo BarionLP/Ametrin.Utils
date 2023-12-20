@@ -3,24 +3,20 @@ namespace Ametrin.Utils.Optional;
 // based on https://github.com/zoran-horvat/optional
 public readonly struct Option<T> : IEquatable<Option<T>>{
     private readonly T _content;
-    public bool HasValue { get; private init; }
+    public bool HasValue { get; }
 
     private Option(T content, bool hasValue) {
         _content = content;
         HasValue = hasValue;
     }
 
-
-    public static Option<T> Some(T? obj) {
-        if(obj is null) return None();
-        return new(obj, true);
-    }
+    public static Option<T> Some(T? obj) => obj is null ? None() : new(obj, true);
     public static Option<T> None() => new(default!, false);
 
-    public readonly Option<TResult> Map<TResult>(Func<T, TResult> map) where TResult : class => HasValue ? map(_content) : Option<TResult>.None();
-    public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) where TResult : class => HasValue ? map(_content) : Option<TResult>.None();
+    public readonly Option<TResult> Map<TResult>(Func<T, TResult> map) => HasValue ? map(_content) : Option<TResult>.None();
+    public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) => HasValue ? map(_content) : Option<TResult>.None();
 
-    public readonly Option<TResult> Cast<TResult>() where TResult : class{
+    public readonly Option<TResult> Cast<TResult>(){
         if(HasValue && _content is TResult castedContent){
             return Option<TResult>.Some(castedContent);
         }
@@ -51,5 +47,5 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
     public static bool operator ==(Option<T>? a, Option<T>? b) => a is null ? b is null : a.Equals(b);
     public static bool operator !=(Option<T>? a, Option<T>? b) => !(a == b);
 
-    public static implicit operator Option<T>(T? value) => Option<T>.Some(value);
+    public static implicit operator Option<T>(T? value) => Some(value);
 }

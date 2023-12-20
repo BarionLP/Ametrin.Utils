@@ -2,17 +2,16 @@
 
 namespace Ametrin.Utils;
 public static class CollectionExtensions {
-    private static readonly Random _Random = new(DateTime.UtcNow.Millisecond);
+    private static readonly Random _random = new(DateTime.UtcNow.Millisecond);
     
-    public static T GetRandomElement<T>(this ICollection<T> enumerable){
-        return enumerable.ElementAt(_Random.Next(0, enumerable.Count));
+    public static T GetRandomElement<T>(this ICollection<T> collection){
+        return collection.ElementAt(_random.Next(0, collection.Count));
     }
 
     public static void Move<T>(this IList<T> from, int idx, ICollection<T> to){
         if (idx < 0 || idx >= from.Count) throw new IndexOutOfRangeException(nameof(idx));
 
-        var item = from[idx];
-        to.Add(item);
+        to.Add(from[idx]);
         from.RemoveAt(idx);
     }
 
@@ -36,4 +35,7 @@ public static class CollectionExtensions {
         }
         return Option<TValue>.None();
     }
+
+    public static bool StartsWith<T>(this ReadOnlySpan<T> span, T value) => !span.IsEmpty && span[0]!.Equals(value);
+    public static bool StartsWith<T>(this ICollection<T> collection, T value) => collection.Count > 0 && collection.ElementAt(0)!.Equals(value);
 }

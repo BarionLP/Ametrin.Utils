@@ -40,8 +40,8 @@ public readonly struct Result<T> {
     public T ReduceOrThrow() => IsSuccess ? Value! : throw new NullReferenceException($"Result was empty: {Status}");
 
 
-    public static implicit operator Result<T>(ResultFlag status) => Result<T>.Failed(status);
-    public static implicit operator Result<T>(T? value) => Result<T>.Of(value);
+    public static implicit operator Result<T>(ResultFlag status) => Failed(status);
+    public static implicit operator Result<T>(T? value) => Of(value);
 }
 
 public static class ResultExtensions {
