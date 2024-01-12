@@ -15,13 +15,6 @@ public static class CollectionExtensions {
         from.RemoveAt(idx);
     }
 
-    public static string Dump(this IEnumerable<string> source, char separator) {
-        return string.Join(separator, source);
-    }
-    public static string Dump(this IEnumerable<string> source, string separator) {
-        return string.Join(separator, source);
-    }
-
     public static bool Contains<T>(this ICollection<T> values, IEnumerable<T> contains){
         foreach(var contain in contains){
             if(!values.Contains(contain)) return false;
