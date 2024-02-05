@@ -1,12 +1,12 @@
 ﻿namespace Ametrin.Utils;
 
-public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComparable<T> {
+public struct TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComparable<T> {
     public event Action? OnChanged;
 
     private T _Value;
     public T? OldValue { get; private set; }
 
-    public T Value => _Value;
+    public readonly T Value => _Value;
     public bool HasChanged { get; private set; } = false;
 
     public TrackedValue(T value) {
@@ -31,44 +31,41 @@ public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable,
         OldValue = default;
     }
 
-    public override string ToString() => Value?.ToString() ?? "Empty";
+    public readonly override string ToString() => Value?.ToString() ?? "EmptyTrackedValue";
 
-    public override bool Equals(object? obj) {
+    public readonly override bool Equals(object? obj) {
         return obj is TrackedValue<T> other &&
                EqualityComparer<T>.Default.Equals(Value, other.Value) &&
                HasChanged == other.HasChanged;
     }
 
     public static bool operator ==(TrackedValue<T> A, TrackedValue<T> B) {
-        if(A is null) return B is null;
         return A.Equals(B);
     }
 
     public static bool operator !=(TrackedValue<T> A, TrackedValue<T> B) {
-        if(A is null) return B is not null;
         return !A.Equals(B);
     }
 
     public static implicit operator T(TrackedValue<T> value) => value.Value;
 
-    public override int GetHashCode() => Value!.GetHashCode();
+    public readonly override int GetHashCode() => Value?.GetHashCode() ?? 0;
 
-    public int CompareTo(TrackedValue<T>? other) {
-        if(other is null) return 1;
+    public readonly int CompareTo(TrackedValue<T> other) {
         return CompareTo(other.Value);
     }
 
-    public int CompareTo(T? other) {
+    public readonly int CompareTo(T? other) {
         if(Value is null) return other is null ? 0 : -1;
 
         if(Value is IComparable<T> comparable1) return comparable1.CompareTo(other);
         if(Value is IComparable<T?> comparable2) return comparable2.CompareTo(other);
         if(Value is IComparable comparable3) return comparable3.CompareTo(other);
 
-        throw new InvalidOperationException("T does not implement the IComparable interface.");
+        throw new InvalidOperationException($"{typeof(T).Name} does not implement the IComparable interface.");
     }
 
-    public int CompareTo(object? other) {
+    public readonly int CompareTo(object? other) {
         if(other is null) return 1;
 
         if(other is TrackedValue<T> trackedValue) return CompareTo(trackedValue.Value);

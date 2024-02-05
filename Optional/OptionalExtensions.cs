@@ -12,26 +12,21 @@ public static class OptionalExtensions{
     //public static Option<T> WhereNot<T>(this T? obj, Func<T, bool> predicate) =>
     //    obj is not null && !predicate(obj) ? Option<T>.Some(obj) : Option<T>.None();
 
-    public static IEnumerable<Option<T>> WhereNotEmpty<T>(this IEnumerable<Option<T>> source){
+    public static IEnumerable<Option<T>> WhereSome<T>(this IEnumerable<Option<T>> source){
         return source.Where(option => option.HasValue);
     }
-    public static IEnumerable<T> ReduceFiltered<T>(this IEnumerable<Option<T>> source){
+    public static IEnumerable<T> ReduceSome<T>(this IEnumerable<Option<T>> source){
         return source.Where(t => t.HasValue).Select(s => s.ReduceOrThrow());
     }
-    public static IEnumerable<T> Reduce<T>(this IEnumerable<Option<T>> source, T @default){
+    public static IEnumerable<T> ReduceAll<T>(this IEnumerable<Option<T>> source, T @default){
         return source.Select(s=>s.Reduce(@default));
+    }
+    public static IEnumerable<TResult> SelectSome<TInput, TResult>(this IEnumerable<TInput> inputs, Func<TInput, Option<TResult>> action) {
+        return inputs.Select(p => action(p)).ReduceSome();
     }
 
-    [Obsolete]
-    public static IEnumerable<ValueOption<T>> WhereNotEmpty<T>(this IEnumerable<ValueOption<T>> source) where T : struct{
-        return source.Where(option => option.HasValue);
-    }
-    [Obsolete]
-    public static IEnumerable<T> ReduceFiltered<T>(this IEnumerable<ValueOption<T>> source) where T : struct{
-        return source.Where(t => t.HasValue).Select(s=>s.ReduceOrThrow());
-    }
-    [Obsolete]
-    public static IEnumerable<T> Reduce<T>(this IEnumerable<ValueOption<T>> source, T @default) where T : struct{
-        return source.Select(s=>s.Reduce(@default));
+    public static Option<R> Map<R, T1, T2>(this (Option<T1> option1, Option<T2> option2) options, Func<T1, T2, R> map) {
+        if(!options.option1.HasValue || !options.option2.HasValue) return Option<R>.None();
+        return Option<R>.Some(map(options.option1.ReduceOrThrow(), options.option2.ReduceOrThrow()));
     }
 }
