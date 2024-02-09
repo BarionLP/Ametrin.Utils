@@ -15,7 +15,7 @@ public class MutableRegistry<TKey, TValue>(IDictionary<TKey, TValue> entries) : 
         }
     }
     public MutableRegistry(IEnumerable<TValue> values, Func<TValue, TKey> keyProvider) : this(values.ToDictionary(keyProvider)) { }
-
+    public MutableRegistry(IEnumerable<KeyValuePair<TKey, TValue>> entries) : this(entries.ToDictionary()) { }
     public MutableRegistry() : this(new Dictionary<TKey, TValue>()) { }
 
     public Option<TValue> TryGet(TKey key) {

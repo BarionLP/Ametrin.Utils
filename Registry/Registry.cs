@@ -10,7 +10,7 @@ public class Registry<TKey, TValue>(FrozenDictionary<TKey, TValue> entries) : IR
     public IEnumerable<TKey> Keys => Entries.Keys;
     public TValue this[TKey key] => Entries[key];
 
-    public Registry(IReadOnlyDictionary<TKey, TValue> entries) : this(entries.ToFrozenDictionary()) {}
+    public Registry(IEnumerable<KeyValuePair<TKey, TValue>> entries) : this(entries.ToFrozenDictionary()) {}
     public Registry(IEnumerable<TValue> values, Func<TValue, TKey> keyProvider) : this(values.ToFrozenDictionary(keyProvider)) { }
 
     public Option<TValue> TryGet(TKey key) {

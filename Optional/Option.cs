@@ -28,8 +28,8 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
     public readonly T ReduceOrThrow() => HasValue ? _content! : throw new NullReferenceException($"Option was empty");
 
 
-    public readonly Option<T> Where(Func<T, bool> predicate) => HasValue && predicate(_content) ? this : Option<T>.None();
-    public readonly Option<T> WhereNot(Func<T, bool> predicate) => HasValue && !predicate(_content) ? this : Option<T>.None();
+    public readonly Option<T> Where(Func<T, bool> predicate) => HasValue && predicate(_content) ? this : None();
+    public readonly Option<T> WhereNot(Func<T, bool> predicate) => HasValue && !predicate(_content) ? this : None();
 
     public readonly void Resolve(Action<T> success, Action? failed = null) {
         if(!HasValue) {
@@ -40,9 +40,12 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
         success(_content!);
     }
 
+    public Result<T> ToResult(ResultFlag failedStatus = ResultFlag.Failed) => HasValue ? Result<T>.Of(_content) : Result<T>.Failed(failedStatus);
+
     public override readonly int GetHashCode() => HasValue ? _content!.GetHashCode() : 0;
     public override readonly bool Equals(object? other) => other is Option<T> option && Equals(option);
     public readonly bool Equals(Option<T> other) => HasValue ? other.HasValue : _content!.Equals(other._content);
+    public override string ToString() => HasValue ? _content!.ToString() ?? "NullString" : "None";
 
     public static bool operator ==(Option<T>? a, Option<T>? b) => a is null ? b is null : a.Equals(b);
     public static bool operator !=(Option<T>? a, Option<T>? b) => !(a == b);

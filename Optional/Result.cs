@@ -30,7 +30,7 @@ public readonly struct Result<T> {
 
     public readonly Result<TResult> Map<TResult>(Func<T, TResult> map) => HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
     public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map) => HasFailed ? Result<TResult>.Failed(Status) : map(Value!);
-    public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) where TResult : class => HasFailed ? Option<TResult>.None() : map(Value!);
+    public readonly Result<TResult> Map<TResult>(Func<T, Option<TResult>> map) => HasFailed ? Result<TResult>.Failed(Status) : map(Value!).ToResult(Status);
     public readonly Result<TResult> Map<TResult>(Func<T, TResult> map, Func<ResultFlag, TResult> error) => HasFailed ? error(Status) : map(Value!);
 
     public T Reduce(Func<ResultFlag, T> operation) => IsSuccess ? Value! : operation(Status);

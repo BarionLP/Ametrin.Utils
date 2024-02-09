@@ -32,29 +32,15 @@ public struct TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComp
     }
 
     public readonly override string ToString() => Value?.ToString() ?? "EmptyTrackedValue";
-
     public readonly override bool Equals(object? obj) {
         return obj is TrackedValue<T> other &&
                EqualityComparer<T>.Default.Equals(Value, other.Value) &&
                HasChanged == other.HasChanged;
     }
 
-    public static bool operator ==(TrackedValue<T> A, TrackedValue<T> B) {
-        return A.Equals(B);
-    }
-
-    public static bool operator !=(TrackedValue<T> A, TrackedValue<T> B) {
-        return !A.Equals(B);
-    }
-
-    public static implicit operator T(TrackedValue<T> value) => value.Value;
-
     public readonly override int GetHashCode() => Value?.GetHashCode() ?? 0;
 
-    public readonly int CompareTo(TrackedValue<T> other) {
-        return CompareTo(other.Value);
-    }
-
+    public readonly int CompareTo(TrackedValue<T> other) => CompareTo(other.Value);
     public readonly int CompareTo(T? other) {
         if(Value is null) return other is null ? 0 : -1;
 
@@ -73,4 +59,9 @@ public struct TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComp
 
         throw new InvalidOperationException($"Cannot compare {typeof(T).FullName} to {other.GetType().FullName}");
     }
+
+
+    public static bool operator ==(TrackedValue<T> A, TrackedValue<T> B) => A.Equals(B);
+    public static bool operator !=(TrackedValue<T> A, TrackedValue<T> B) => !A.Equals(B);
+    public static implicit operator T(TrackedValue<T> value) => value.Value;
 }

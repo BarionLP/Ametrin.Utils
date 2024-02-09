@@ -6,12 +6,6 @@ public static class OptionalExtensions{
     public static Option<T> ToOption<T>(this T? obj) => obj is null ? Option<T>.None() : Option<T>.Some(obj);
     public static Option<T> ToOption<T>(this object? obj) => obj is T t ? Option<T>.Some(t) : Option<T>.None();
 
-    //public static Option<T> Where<T>(this T? obj, Func<T, bool> predicate) =>
-    //    obj is not null && predicate(obj) ? Option<T>.Some(obj) : Option<T>.None();
-
-    //public static Option<T> WhereNot<T>(this T? obj, Func<T, bool> predicate) =>
-    //    obj is not null && !predicate(obj) ? Option<T>.Some(obj) : Option<T>.None();
-
     public static IEnumerable<Option<T>> WhereSome<T>(this IEnumerable<Option<T>> source){
         return source.Where(option => option.HasValue);
     }
