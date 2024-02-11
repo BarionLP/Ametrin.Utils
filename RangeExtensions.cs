@@ -7,7 +7,14 @@ public static class RangeExtensions {
 
     public static RangeEnumerator GetEnumerator(this Range range) => new(range);
 
-    public ref struct RangeEnumerator {
+    // struct or ref struct (what is the performance impact?)
+    // i want this loop in yields
+    // it is just syntactical sugar...
+    // favor worse readability in performance critical situations?
+    public struct RangeEnumerator {
+        //INCLUDES THE LAST NUMBER
+        //DO NOT CHANGE
+        //was a questionable decision, but now it's to late
         private int _current;
         private readonly int _end;
         public readonly int Current => _current;

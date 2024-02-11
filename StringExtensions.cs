@@ -43,6 +43,13 @@ public static partial class StringExtensions {
         return DigitCommaRegex().Replace(input, "");
     }
 
+    public static bool All<T>(this ReadOnlySpan<T> span, Func<T, bool> condition) {
+        foreach(var element in span) {
+            if(!condition(element)) return false;
+        }
+        return true;
+    }
+
     public static string ToIntFriendly(this string input) => NonDigitRegex().Replace(input, "");
 
     public static string ToXMLFriendly(this string input, string replacement = "") => ValidXMLCharacters().Replace(input, replacement);

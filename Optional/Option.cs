@@ -15,6 +15,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
 
     public readonly Option<TResult> Map<TResult>(Func<T, TResult> map) => HasValue ? map(_content) : Option<TResult>.None();
     public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) => HasValue ? map(_content) : Option<TResult>.None();
+    public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map) => HasValue ? map(_content) : Result<TResult>.Failed();
 
     public readonly Option<TResult> Cast<TResult>(){
         if(HasValue && _content is TResult castedContent){
@@ -44,11 +45,20 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
 
     public override readonly int GetHashCode() => HasValue ? _content!.GetHashCode() : 0;
     public override readonly bool Equals(object? other) => other is Option<T> option && Equals(option);
-    public readonly bool Equals(Option<T> other) => HasValue ? other.HasValue : _content!.Equals(other._content);
+    public readonly bool Equals(Option<T> other) {
+        if(HasValue) {
+            if(other.HasValue) {
+                return _content!.Equals(other._content);
+            }
+            return false;
+        }
+        return !other.HasValue;
+    }
+
     public override string ToString() => HasValue ? _content!.ToString() ?? "NullString" : "None";
 
-    public static bool operator ==(Option<T>? a, Option<T>? b) => a is null ? b is null : a.Equals(b);
-    public static bool operator !=(Option<T>? a, Option<T>? b) => !(a == b);
+    public static bool operator ==(Option<T> a, Option<T> b) => a.Equals(b);
+    public static bool operator !=(Option<T> a, Option<T> b) => !(a == b);
 
     public static implicit operator Option<T>(T? value) => Some(value);
 }
