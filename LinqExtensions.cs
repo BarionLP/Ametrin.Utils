@@ -1,7 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Linq;
-
-namespace Ametrin.Utils; 
+﻿namespace Ametrin.Utils;
 
 public static class LinqExtensions {
     public static TimeSpan Sum<T>(this IEnumerable<T> values, Func<T, TimeSpan> selector) {

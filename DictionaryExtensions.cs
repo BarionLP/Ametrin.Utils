@@ -1,3 +1,5 @@
+using Ametrin.Utils.Optional;
+
 namespace Ametrin.Utils;
 
 public static class DictionaryExtensions{
@@ -11,6 +13,13 @@ public static class DictionaryExtensions{
 
         result = default!;
         return false;
+    }
+
+    public static Option<TValue> Get<TValue, TKey>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) {
+        if (dic.TryGetValue(key, out var res)) {
+            return res;
+        }
+        return Option<TValue>.None();
     }
 
     public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue @default){

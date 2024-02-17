@@ -1,9 +1,9 @@
 ﻿namespace Ametrin.Utils;
 
 public static class RangeExtensions {
-    public static bool Contains(this Range range, float value) =>  value >= range.Start.Value && value <= range.End.Value;
-    public static bool Contains(this Range range, int value) =>  value >= range.Start.Value && value <= range.End.Value;
-    public static bool Contains(this Range range, short value) =>  value >= range.Start.Value && value <= range.End.Value;
+    public static bool Contains(this Range range, float value) =>  value >= range.Start.Value && value < range.End.Value;
+    public static bool Contains(this Range range, int value) =>  value >= range.Start.Value && value < range.End.Value;
+    public static bool Contains(this Range range, short value) =>  value >= range.Start.Value && value < range.End.Value;
 
     public static RangeEnumerator GetEnumerator(this Range range) => new(range);
 
@@ -12,9 +12,7 @@ public static class RangeExtensions {
     // it is just syntactical sugar...
     // favor worse readability in performance critical situations?
     public struct RangeEnumerator {
-        //INCLUDES THE LAST NUMBER
-        //DO NOT CHANGE
-        //was a questionable decision, but now it's to late
+        // start INCLUSIVE - end EXCLUSIVE
         private int _current;
         private readonly int _end;
         public readonly int Current => _current;
@@ -28,7 +26,7 @@ public static class RangeExtensions {
 
         public bool MoveNext() {
             _current++;
-            return _current <= _end;
+            return _current < _end;
         }
     }
 }

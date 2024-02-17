@@ -22,13 +22,5 @@ public static class CollectionExtensions {
         return true;
     }
 
-    public static Option<TValue> Get<TValue, TKey>(this IDictionary<TKey, TValue> dic, TKey key){
-        if(dic.TryGetValue(key, out var res)) {
-            return res;
-        }
-        return Option<TValue>.None();
-    }
-
-    public static bool StartsWith<T>(this ReadOnlySpan<T> span, T value) => !span.IsEmpty && span[0]!.Equals(value);
     public static bool StartsWith<T>(this ICollection<T> collection, T value) => collection.Count > 0 && collection.ElementAt(0)!.Equals(value);
 }

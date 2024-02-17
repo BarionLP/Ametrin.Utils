@@ -41,6 +41,8 @@ public struct TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComp
     public readonly override int GetHashCode() => Value?.GetHashCode() ?? 0;
 
     public readonly int CompareTo(TrackedValue<T> other) => CompareTo(other.Value);
+    
+    //sniff sniff
     public readonly int CompareTo(T? other) {
         if(Value is null) return other is null ? 0 : -1;
 

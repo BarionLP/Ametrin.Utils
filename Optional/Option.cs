@@ -15,7 +15,7 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
 
     public readonly Option<TResult> Map<TResult>(Func<T, TResult> map) => HasValue ? map(_content) : Option<TResult>.None();
     public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) => HasValue ? map(_content) : Option<TResult>.None();
-    public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map) => HasValue ? map(_content) : Result<TResult>.Failed();
+    public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map, ResultFlag defaultFlag = ResultFlag.Failed) => HasValue ? map(_content) : Result<TResult>.Failed(defaultFlag);
 
     public readonly Option<TResult> Cast<TResult>(){
         if(HasValue && _content is TResult castedContent){
@@ -24,9 +24,9 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
         return Option<TResult>.None();
     }
 
-    public readonly T Reduce(T orElse) => _content ?? orElse;
-    public readonly T Reduce(Func<T> orElse) => _content ?? orElse();
-    public readonly T ReduceOrThrow() => HasValue ? _content! : throw new NullReferenceException($"Option was empty");
+    public readonly T Reduce(T orElse) => HasValue ? _content : orElse;
+    public readonly T Reduce(Func<T> orElse) => HasValue ? _content : orElse();
+    public readonly T ReduceOrThrow() => HasValue ? _content : throw new NullReferenceException($"Option was empty");
 
 
     public readonly Option<T> Where(Func<T, bool> predicate) => HasValue && predicate(_content) ? this : None();
