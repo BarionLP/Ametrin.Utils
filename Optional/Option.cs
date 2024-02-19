@@ -1,9 +1,9 @@
 namespace Ametrin.Utils.Optional;
 
 // based on https://github.com/zoran-horvat/optional
-public readonly struct Option<T> : IEquatable<Option<T>>{
+public readonly record struct Option<T> : IEquatable<T>, IComparable<Option<T>>, IComparable<T>, IComparable{
     private readonly T _content;
-    public bool HasValue { get; }
+    public readonly bool HasValue { get; }
 
     private Option(T content, bool hasValue) {
         _content = content;
@@ -23,6 +23,8 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
         }
         return Option<TResult>.None();
     }
+    public readonly TResult Map<TResult>(Func<T, TResult> map, TResult orElse) => HasValue ? map(_content) : orElse;
+    public readonly TResult Map<TResult>(Func<T, TResult> map, Func<TResult> orElse) => HasValue ? map(_content) : orElse();
 
     public readonly T Reduce(T orElse) => HasValue ? _content : orElse;
     public readonly T Reduce(Func<T> orElse) => HasValue ? _content : orElse();
@@ -43,22 +45,28 @@ public readonly struct Option<T> : IEquatable<Option<T>>{
 
     public Result<T> ToResult(ResultFlag failedStatus = ResultFlag.Failed) => HasValue ? Result<T>.Of(_content) : Result<T>.Failed(failedStatus);
 
-    public override readonly int GetHashCode() => HasValue ? _content!.GetHashCode() : 0;
-    public override readonly bool Equals(object? other) => other is Option<T> option && Equals(option);
-    public readonly bool Equals(Option<T> other) {
-        if(HasValue) {
-            if(other.HasValue) {
-                return _content!.Equals(other._content);
-            }
-            return false;
-        }
-        return !other.HasValue;
-    }
-
     public override string ToString() => HasValue ? _content!.ToString() ?? "NullString" : "None";
+    public bool Equals(T? other) => other is null ? !HasValue : HasValue && EqualityComparer<T>.Default.Equals(_content, other);
+    public bool Equals(Option<T> other) => HasValue ? other.HasValue && EqualityComparer<T>.Default.Equals(_content, other._content) : !other.HasValue;
+    public override readonly int GetHashCode() => HasValue ? _content!.GetHashCode() : 0;
 
-    public static bool operator ==(Option<T> a, Option<T> b) => a.Equals(b);
-    public static bool operator !=(Option<T> a, Option<T> b) => !(a == b);
+    int IComparable.CompareTo(object? obj) => obj is Option<T> o ? CompareTo(o) : obj is T t ? CompareTo(t) : 1;
+    public int CompareTo(Option<T> other) {
+        if(!other.HasValue) return HasValue ? 1 : 0;
+        if(!HasValue) return -1;
+
+        return CompareTo(other._content);
+    }
+    public int CompareTo(T? other) {
+        if(other is null) return HasValue ? 1 : 0;
+        if(!HasValue) return -1;
+
+        return _content switch {
+            IComparable<T> c => c.CompareTo(other),
+            IComparable c => c.CompareTo(other),
+            _ => throw new InvalidOperationException($"{typeof(T).Name} does not implement IComparable"),
+        };
+    }
 
     public static implicit operator Option<T>(T? value) => Some(value);
 }

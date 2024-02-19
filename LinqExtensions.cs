@@ -1,4 +1,6 @@
-﻿namespace Ametrin.Utils;
+﻿using System.Collections.Frozen;
+
+namespace Ametrin.Utils;
 
 public static class LinqExtensions {
     public static TimeSpan Sum<T>(this IEnumerable<T> values, Func<T, TimeSpan> selector) {
@@ -16,12 +18,11 @@ public static class LinqExtensions {
         return tmp;
     }
 
-    public static string Dump(this IEnumerable<string> values, char separator) {
-        return string.Join(separator, values);
-    }
-    public static string Dump(this IEnumerable<string> values, string separator) {
-        return string.Join(separator, values);
-    }
+    public static string Dump(this IEnumerable<string> values, char separator) => string.Join(separator, values);
+    public static string Dump(this IEnumerable<string> values, string separator) => string.Join(separator, values);
+
+    public static FrozenDictionary<TKey, TResult> ToFrozenDictionary<TKey, TResult, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source, Func<TValue, TResult> map) where TKey : notnull 
+        => source.Select(pair => new KeyValuePair<TKey, TResult>(pair.Key, map(pair.Value))).ToFrozenDictionary();
 
     public static void ForEach<T>(this IEnumerable<T> values, Action<T> action) {
         foreach(var value in values) { 

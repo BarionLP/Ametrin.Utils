@@ -8,6 +8,9 @@ public static class OptionalExtensions{
     public static T? ReduceOrDefault<T>(this Option<T> option) => option.HasValue ? option.ReduceOrThrow() : default;
     public static T? ReduceOrNull<T>(this Option<T> option) where T : struct => option.HasValue ? option.ReduceOrThrow() : null;
 
+    public static T? ReduceOrDefault<T>(this Result<T> option) => option.IsSuccess ? option.ReduceOrThrow() : default;
+    public static T? ReduceOrNull<T>(this Result<T> option) where T : struct => option.IsSuccess ? option.ReduceOrThrow() : null;
+
 
     public static IEnumerable<Option<T>> WhereSome<T>(this IEnumerable<Option<T>> source) => source.Where(option => option.HasValue);
     public static IEnumerable<T> ReduceSome<T>(this IEnumerable<Option<T>> source) => source.Where(t => t.HasValue).Select(s => s.ReduceOrThrow());
@@ -22,5 +25,10 @@ public static class OptionalExtensions{
     public static Option<R> Map<R, T1, T2>(this (Option<T1> option1, Option<T2> option2) options, Func<T1, T2, R> map) {
         if(!options.option1.HasValue || !options.option2.HasValue) return Option<R>.None();
         return Option<R>.Some(map(options.option1.ReduceOrThrow(), options.option2.ReduceOrThrow()));
+    }
+    
+    public static Option<R> Map<R, T1, T2>(this (T1?, T2?) items, Func<T1, T2, R> map) {
+        if(items.Item1 is null || items.Item2 is null) return Option<R>.None();
+        return Option<R>.Some(map(items.Item1, items.Item2));
     }
 }

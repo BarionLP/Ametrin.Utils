@@ -1,29 +1,29 @@
 ﻿namespace Ametrin.Utils;
 
-public struct TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComparable<T> {
+public class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComparable<T> {
     public event Action? OnChanged;
 
-    private T _Value;
+    private T _value;
     public T? OldValue { get; private set; }
 
-    public readonly T Value => _Value;
+    public  T Value => _value;
     public bool HasChanged { get; private set; } = false;
 
     public TrackedValue(T value) {
-        _Value = value;
+        _value = value;
         Forget();
     }
 
     public void Set(T value) {
-        if(EqualityComparer<T>.Default.Equals(_Value, value)) return;
+        if(EqualityComparer<T>.Default.Equals(_value, value)) return;
         SetSilent(value);
         HasChanged = true;
         OnChanged?.Invoke();
     }
     
     public void SetSilent(T value) {
-        OldValue = _Value;
-        _Value = value;
+        OldValue = _value;
+        _value = value;
     }
 
     public void Forget() {
@@ -31,19 +31,19 @@ public struct TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComp
         OldValue = default;
     }
 
-    public readonly override string ToString() => Value?.ToString() ?? "EmptyTrackedValue";
-    public readonly override bool Equals(object? obj) {
+    public override string ToString() => Value?.ToString() ?? "EmptyTrackedValue";
+    public override bool Equals(object? obj) {
         return obj is TrackedValue<T> other &&
                EqualityComparer<T>.Default.Equals(Value, other.Value) &&
                HasChanged == other.HasChanged;
     }
 
-    public readonly override int GetHashCode() => Value?.GetHashCode() ?? 0;
+    public override int GetHashCode() => Value?.GetHashCode() ?? 0;
 
-    public readonly int CompareTo(TrackedValue<T> other) => CompareTo(other.Value);
+    public int CompareTo(TrackedValue<T>? other) => other is null ? 1 : CompareTo(other.Value);
     
     //sniff sniff
-    public readonly int CompareTo(T? other) {
+    public int CompareTo(T? other) {
         if(Value is null) return other is null ? 0 : -1;
 
         if(Value is IComparable<T> comparable1) return comparable1.CompareTo(other);
@@ -53,7 +53,7 @@ public struct TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComp
         throw new InvalidOperationException($"{typeof(T).Name} does not implement the IComparable interface.");
     }
 
-    public readonly int CompareTo(object? other) {
+    public int CompareTo(object? other) {
         if(other is null) return 1;
 
         if(other is TrackedValue<T> trackedValue) return CompareTo(trackedValue.Value);
