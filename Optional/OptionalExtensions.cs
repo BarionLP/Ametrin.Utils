@@ -2,9 +2,10 @@ namespace Ametrin.Utils.Optional;
 
 
 public static class OptionalExtensions{
-    public static Option<T> ToOption<T>(this T? obj) where T : class => obj is null ? Option<T>.None() : Option<T>.Some(obj);
+    public static Option<T> ToOption<T>(this T? obj) where T : class => Option<T>.Some(obj);
     public static Option<T> ToOption<T>(this T? obj) where T : struct => obj.HasValue ? Option<T>.Some(obj.Value) : Option<T>.None();
     public static Option<T> ToOption<T>(this object? obj) => obj is T t ? Option<T>.Some(t) : Option<T>.None();
+    public static Option<object> ToOption(this object? obj) => Option<object>.Some(obj);
     public static T? ReduceOrDefault<T>(this Option<T> option) => option.HasValue ? option.ReduceOrThrow() : default;
     public static T? ReduceOrNull<T>(this Option<T> option) where T : struct => option.HasValue ? option.ReduceOrThrow() : null;
 
