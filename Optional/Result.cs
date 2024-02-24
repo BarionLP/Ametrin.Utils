@@ -1,6 +1,6 @@
 ﻿namespace Ametrin.Utils.Optional;
 
-public readonly struct Result<T> : IOption<T>, IEquatable<Result<T>>, IComparable<Result<T>> {
+public readonly struct Result<T> : IOption<T, Result<T>>, IEquatable<Result<T>>, IComparable<Result<T>> {
     public required ResultFlag Status { get; init; }
     private T? _content { get; init; }
 
@@ -39,7 +39,13 @@ public readonly struct Result<T> : IOption<T>, IEquatable<Result<T>>, IComparabl
     public Option<T> ToOption() => IsSuccess ? Option<T>.Some(_content) : Option<T>.None();
 
     public override int GetHashCode() => IsSuccess ? HashCode.Combine(_content!.GetHashCode(), Status.GetHashCode()) : HashCode.Combine(0, Status.GetHashCode());
-    public override bool Equals(object? obj) => obj is Result<T> result && Equals(result);
+    
+    public bool Equals(T? other) => other is null ? IsFail : IsSuccess && EqualityComparer<T>.Default.Equals(_content, other);
+    public override bool Equals(object? obj) => obj switch {
+        Result<T> r => Equals(r),
+        T t => Equals(t),
+        _ => false, 
+    };
     public bool Equals(Result<T> other) {
         if(IsSuccess) {
             if(other.IsFail) return false;
@@ -47,19 +53,31 @@ public readonly struct Result<T> : IOption<T>, IEquatable<Result<T>>, IComparabl
         }
         return other.Status == Status;
     }
+
     public int CompareTo(Result<T> other) {
         if(other.IsFail) return IsSuccess ? 1 : 0;
         if(IsFail) return -1;
 
-        return (this as IOption<T>).CompareTo(other._content);
+        return CompareTo(other._content);
+    }
+    public int CompareTo(T? other) {
+        if(other is null) return IsSuccess ? 1 : 0;
+        if(IsFail) return -1;
+
+        return _content switch {
+            IComparable<T> c => c.CompareTo(other),
+            IComparable c => c.CompareTo(other),
+            _ => throw new InvalidOperationException($"{typeof(T).Name} does not implement IComparable"),
+        };
     }
 
 
-    bool IOption<T>.HasValue => IsSuccess;
-    T? IOption<T>.Content => _content;
-    int IComparable.CompareTo(object? obj) => obj is Result<T> o ? CompareTo(o) : obj is T t ? (this as IOption<T>).CompareTo(t) : 1;
-    static IOption<T> IOption<T>.Some(T? obj) => Of(obj);
-    static IOption<T> IOption<T>.None() => Failed();
+
+    bool IOption<T, Result<T>>.HasValue => IsSuccess;
+    T? IOption<T, Result<T>>.Content => _content;
+    int IComparable.CompareTo(object? obj) => obj is Result<T> o ? CompareTo(o) : obj is T t ? CompareTo(t) : 1;
+    static Result<T> IOption<T, Result<T>>.Some(T? obj) => Of(obj);
+    static Result<T> IOption<T, Result<T>>.None() => Failed();
 
     public static bool operator ==(Result<T> left, Result<T> right) => left.Equals(right);
     public static bool operator !=(Result<T> left, Result<T> right) => !(left == right);

@@ -1,9 +1,7 @@
-using Microsoft.VisualBasic.FileIO;
-
 namespace Ametrin.Utils.Optional;
 
 // based on https://github.com/zoran-horvat/optional
-public readonly record struct Option<T> : IOption<T>, IComparable<Option<T>> {
+public readonly record struct Option<T> : IOption<T, Option<T>>, IComparable<Option<T>> {
     private readonly T _content;
     public readonly bool HasValue { get; }
 
@@ -34,8 +32,8 @@ public readonly record struct Option<T> : IOption<T>, IComparable<Option<T>> {
     public readonly T ReduceOrThrow() => HasValue ? _content : throw new NullReferenceException($"Option was empty");
 
 
-    public readonly Option<T> Where(Func<T, bool> predicate) => HasValue && predicate(_content) ? this : None();
-    public readonly Option<T> WhereNot(Func<T, bool> predicate) => HasValue && !predicate(_content) ? this : None();
+    //public readonly Option<T> Where(Func<T, bool> predicate) => HasValue && predicate(_content) ? this : None();
+    //public readonly Option<T> WhereNot(Func<T, bool> predicate) => HasValue && !predicate(_content) ? this : None();
 
     public readonly void Resolve(Action<T> success, Action? failed = null) {
         if(!HasValue) {
@@ -61,12 +59,23 @@ public readonly record struct Option<T> : IOption<T>, IComparable<Option<T>> {
         return CompareTo(other._content);
     }
 
-    T IOption<T>.Content => _content;
+    public int CompareTo(T? other) {
+        if(other is null) return HasValue ? 1 : 0;
+        if(!HasValue) return -1;
 
-    static IOption<T> IOption<T>.Some(T? obj) => Some(obj);
-    static IOption<T> IOption<T>.None() => None();
-    IOption<T> IOption<T>.Where(Func<T, bool> predicate) => Where(predicate);
-    IOption<T> IOption<T>.WhereNot(Func<T, bool> predicate) => WhereNot(predicate);
+        return _content switch {
+            IComparable<T> c => c.CompareTo(other),
+            IComparable c => c.CompareTo(other),
+            _ => throw new InvalidOperationException($"{typeof(T).Name} does not implement IComparable"),
+        };
+    }
+
+    T IOption<T, Option<T>>.Content => _content;
+
+    //static Option<T> IOption<T, Option<T>>.Some(T? obj) => Some(obj);
+    //static Option<T> IOption<T, Option<T>>.None() => None();
+    //IOption<T> IOption<T>.Where(Func<T, bool> predicate) => Where(predicate);
+    //IOption<T> IOption<T>.WhereNot(Func<T, bool> predicate) => WhereNot(predicate);
 
 
     public static implicit operator Option<T>(T? value) => Some(value);

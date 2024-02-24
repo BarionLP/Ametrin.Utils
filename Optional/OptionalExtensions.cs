@@ -1,3 +1,5 @@
+using Microsoft.VisualBasic.FileIO;
+
 namespace Ametrin.Utils.Optional;
 
 
@@ -7,16 +9,23 @@ public static class OptionalExtensions{
     public static Option<T> ToOption<T>(this object? obj) => obj is T t ? Option<T>.Some(t) : Option<T>.None();
     public static Option<object> ToOption(this object? obj) => Option<object>.Some(obj);
 
+    public static TOption Where<T, TOption>(TOption option, Func<T, bool> predicate) where TOption : IOption<T, TOption>
+        => option.HasValue && predicate(option.Content!) ? option : TOption.None();
+    public static TOption WhereNot<T, TOption>(TOption option, Func<T, bool> predicate) where TOption : IOption<T, TOption>
+        => option.HasValue && !predicate(option.Content!) ? option : TOption.None();
+
 
     public static T Reduce<T>(this Result<T> option, Func<ResultFlag, T> defaultSupplier)
         => option.IsSuccess ? option.ReduceOrThrow() : defaultSupplier(option.Status);
-    public static T Reduce<T, TOption>(this TOption option, Func<T> defaultSupplier) where TOption : IOption<T> 
+    public static T Reduce<T, TOption>(this TOption option, Func<T> defaultSupplier) where TOption : IOption<T, TOption>
         => option.HasValue ? option.Content! : defaultSupplier();
-    public static T Reduce<T, TOption>(this TOption option, T @default) where TOption : IOption<T> 
+    public static T Reduce<T, TOption>(this TOption option, T @default) where TOption : IOption<T, TOption> 
         => option.HasValue ? option.Content! : @default;
 
-    public static T? ReduceOrDefault<T>(this Option<T> option) => option.HasValue ? option.ReduceOrThrow() : default;
-    public static T? ReduceOrNull<T>(this Option<T> option) where T : struct => option.HasValue ? option.ReduceOrThrow() : null;
+    public static T? ReduceOrDefault<T, TOption>(this TOption option) where TOption : IOption<T, TOption> 
+        => option.HasValue ? option.Content : default;
+    public static T? ReduceOrNull<T, TOption>(this TOption option) where T : struct where TOption : IOption<T, TOption>
+        => option.HasValue ? option.Content : null;
 
     public static T? ReduceOrDefault<T>(this Result<T> option) => option.IsSuccess ? option.ReduceOrThrow() : default;
     public static T? ReduceOrNull<T>(this Result<T> option) where T : struct => option.IsSuccess ? option.ReduceOrThrow() : null;
@@ -33,13 +42,13 @@ public static class OptionalExtensions{
 }
 
 public static class OptionalLinqExtensions {
-    public static IEnumerable<TOption> WhereSome<T, TOption>(this IEnumerable<TOption> source) where TOption : IOption<T> 
+    public static IEnumerable<TOption> WhereSome<T, TOption>(this IEnumerable<TOption> source) where TOption : IOption<T, TOption> 
         => source.Where(option => option.HasValue);
-    public static IEnumerable<T> ReduceSome<T, TOption>(this IEnumerable<TOption> source) where TOption : IOption<T> 
+    public static IEnumerable<T> ReduceSome<T, TOption>(this IEnumerable<TOption> source) where TOption : IOption<T, TOption> 
         => source.Where(t => t.HasValue).Select(s => s.ReduceOrThrow());
-    public static IEnumerable<T> Reduce<T, TOption>(this IEnumerable<TOption> source, T @default) where TOption : IOption<T> 
+    public static IEnumerable<T> Reduce<T, TOption>(this IEnumerable<TOption> source, T @default) where TOption : IOption<T, TOption> 
         => source.Select(s => s.Reduce(@default));
-    public static IEnumerable<TResult> SelectSome<TInput, TResult, TOption>(this IEnumerable<TInput> source, Func<TInput, TOption> action) where TOption : IOption<TResult> 
+    public static IEnumerable<TResult> SelectSome<TInput, TResult, TOption>(this IEnumerable<TInput> source, Func<TInput, TOption> action) where TOption : IOption<TResult, TOption> 
         => source.Select(p => action(p)).ReduceSome<TResult, TOption>();
 
     //public static IEnumerable<Result<T>> WhereSuccess<T>(this IEnumerable<Result<T>> source) => source.Where(result => result.IsSuccess);
