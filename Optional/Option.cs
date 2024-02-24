@@ -1,9 +1,12 @@
+using Microsoft.VisualBasic.FileIO;
+
 namespace Ametrin.Utils.Optional;
 
 // based on https://github.com/zoran-horvat/optional
-public readonly record struct Option<T> : IEquatable<T>, IComparable<Option<T>>, IComparable<T>, IComparable{
+public readonly record struct Option<T> : IOption<T>, IComparable<Option<T>> {
     private readonly T _content;
     public readonly bool HasValue { get; }
+
 
     private Option(T content, bool hasValue) {
         _content = content;
@@ -57,16 +60,14 @@ public readonly record struct Option<T> : IEquatable<T>, IComparable<Option<T>>,
 
         return CompareTo(other._content);
     }
-    public int CompareTo(T? other) {
-        if(other is null) return HasValue ? 1 : 0;
-        if(!HasValue) return -1;
 
-        return _content switch {
-            IComparable<T> c => c.CompareTo(other),
-            IComparable c => c.CompareTo(other),
-            _ => throw new InvalidOperationException($"{typeof(T).Name} does not implement IComparable"),
-        };
-    }
+    T IOption<T>.Content => _content;
+
+    static IOption<T> IOption<T>.Some(T? obj) => Some(obj);
+    static IOption<T> IOption<T>.None() => None();
+    IOption<T> IOption<T>.Where(Func<T, bool> predicate) => Where(predicate);
+    IOption<T> IOption<T>.WhereNot(Func<T, bool> predicate) => WhereNot(predicate);
+
 
     public static implicit operator Option<T>(T? value) => Some(value);
 }
