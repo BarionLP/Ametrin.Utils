@@ -1,4 +1,7 @@
-﻿namespace Ametrin.Utils; 
+﻿using Microsoft.VisualBasic.FileIO;
+using SearchOption = System.IO.SearchOption;
+
+namespace Ametrin.Utils; 
 
 public static class DirectoryInfoExtensions {
     public static DirectoryInfo GetCopyOfPathIfExists(this DirectoryInfo directoryInfo) {
@@ -8,6 +11,18 @@ public static class DirectoryInfoExtensions {
 
     public static DirectoryInfo GetCopyOfPath(this DirectoryInfo directoryInfo) {
         return new(directoryInfo.FullName + " - Copy");
+    }
+
+    public static void CreateIfNotExists(this DirectoryInfo directoryInfo) {
+        if(!directoryInfo.Exists) {
+            directoryInfo.Create();
+        }
+    }
+
+    public static FileInfo File(this DirectoryInfo directoryInfo, string fileName) => new(Path.Combine(directoryInfo.FullName, fileName));
+
+    public static void Trash(this DirectoryInfo info, UIOption options = UIOption.OnlyErrorDialogs){
+        FileSystem.DeleteDirectory(info.FullName, options, RecycleOption.SendToRecycleBin);
     }
 
     public static void ForeachFile(this DirectoryInfo directoryInfo, Action<FileInfo> action, IProgress<(float, string)>? progress, SearchOption searchOption = SearchOption.AllDirectories, string pattern = "*") {

@@ -3,9 +3,9 @@
 namespace Ametrin.Utils;
 public static class CollectionExtensions {
     private static readonly Random _random = new(DateTime.UtcNow.Millisecond);
-    
-    public static T GetRandomElement<T>(this ICollection<T> collection){
-        return collection.ElementAt(_random.Next(0, collection.Count));
+    public static T GetRandomElement<T>(this ICollection<T> collection) => collection.GetRandomElement(_random);
+    public static T GetRandomElement<T>(this ICollection<T> collection, Random random){
+        return collection.ElementAt(random.Next(0, collection.Count));
     }
 
     public static void Move<T>(this IList<T> from, int idx, ICollection<T> to){
@@ -15,13 +15,6 @@ public static class CollectionExtensions {
         from.RemoveAt(idx);
     }
 
-    public static string Dump(this IEnumerable<string> source, char separator) {
-        return string.Join(separator, source);
-    }
-    public static string Dump(this IEnumerable<string> source, string separator) {
-        return string.Join(separator, source);
-    }
-
     public static bool Contains<T>(this ICollection<T> values, IEnumerable<T> contains){
         foreach(var contain in contains){
             if(!values.Contains(contain)) return false;
@@ -29,13 +22,5 @@ public static class CollectionExtensions {
         return true;
     }
 
-    public static Option<TValue> Get<TValue, TKey>(this IDictionary<TKey, TValue> dic, TKey key){
-        if(dic.TryGetValue(key, out var res)) {
-            return res;
-        }
-        return Option<TValue>.None();
-    }
-
-    public static bool StartsWith<T>(this ReadOnlySpan<T> span, T value) => !span.IsEmpty && span[0]!.Equals(value);
     public static bool StartsWith<T>(this ICollection<T> collection, T value) => collection.Count > 0 && collection.ElementAt(0)!.Equals(value);
 }

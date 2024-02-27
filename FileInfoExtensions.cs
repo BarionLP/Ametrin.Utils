@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using Microsoft.VisualBasic.FileIO;
 
 namespace Ametrin.Utils;
 
@@ -19,6 +20,10 @@ public static class FileInfoExtensions {
 
     public static void CopyTo(this FileInfo mainFile, FileInfo newFile, bool overwrite = false) {
         mainFile.CopyTo(newFile.FullName, overwrite);
+    }
+
+    public static void Trash(this FileInfo info, UIOption options = UIOption.OnlyErrorDialogs){
+        FileSystem.DeleteFile(info.FullName, options, RecycleOption.SendToRecycleBin);
     }
 
     public static bool CompareHash(this FileInfo self, FileInfo other) {

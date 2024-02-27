@@ -16,8 +16,8 @@ public static class RegistryExtensions {
         return registry.TryRegister(name, type);
     }
 
-    public static IRegistry<TKey, TValue> ToRegistry<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dic) where TKey : notnull => new Registry<TKey, TValue>(dic);
-    public static IRegistry<TKey, TValue> ToRegistry<TKey, TValue>(this IEnumerable<TValue> entries, Func<TValue, TKey> keyProvider) where TKey : notnull => new Registry<TKey, TValue>(entries, keyProvider);
-    public static IMutableRegistry<TKey, TValue> ToMutableRegistry<TKey, TValue>(this IDictionary<TKey, TValue> dic) where TKey : notnull => new MutableRegistry<TKey, TValue>(dic);
-    public static IMutableRegistry<TKey, TValue> ToMutableRegistry<TKey, TValue>(this IEnumerable<TValue> entries, Func<TValue, TKey> keyProvider) where TKey : notnull => new MutableRegistry<TKey, TValue>(entries, keyProvider);
+    public static Registry<TKey, TValue> ToRegistry<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> values) where TKey : notnull => new(values);
+    public static Registry<TKey, TValue> ToRegistry<TKey, TValue>(this IEnumerable<TValue> entries, Func<TValue, TKey> keyProvider) where TKey : notnull => new(entries, keyProvider);
+    public static MutableRegistry<TKey, TValue> ToMutableRegistry<TKey, TValue>(this IDictionary<TKey, TValue> dic) where TKey : notnull => new(dic);
+    public static MutableRegistry<TKey, TValue> ToMutableRegistry<TKey, TValue>(this IEnumerable<TValue> entries, Func<TValue, TKey> keyProvider) where TKey : notnull => new(entries, keyProvider);
 }

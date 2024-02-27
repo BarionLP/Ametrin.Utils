@@ -1,29 +1,29 @@
 ﻿namespace Ametrin.Utils;
 
-public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComparable<T> {
+public class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComparable<T> {
     public event Action? OnChanged;
 
-    private T _Value;
+    private T _value;
     public T? OldValue { get; private set; }
 
-    public T Value => _Value;
+    public  T Value => _value;
     public bool HasChanged { get; private set; } = false;
 
     public TrackedValue(T value) {
-        _Value = value;
+        _value = value;
         Forget();
     }
 
     public void Set(T value) {
-        if(EqualityComparer<T>.Default.Equals(_Value, value)) return;
+        if(EqualityComparer<T>.Default.Equals(_value, value)) return;
         SetSilent(value);
         HasChanged = true;
         OnChanged?.Invoke();
     }
     
     public void SetSilent(T value) {
-        OldValue = _Value;
-        _Value = value;
+        OldValue = _value;
+        _value = value;
     }
 
     public void Forget() {
@@ -31,33 +31,18 @@ public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable,
         OldValue = default;
     }
 
-    public override string ToString() => Value?.ToString() ?? "Empty";
-
+    public override string ToString() => Value?.ToString() ?? "EmptyTrackedValue";
     public override bool Equals(object? obj) {
         return obj is TrackedValue<T> other &&
                EqualityComparer<T>.Default.Equals(Value, other.Value) &&
                HasChanged == other.HasChanged;
     }
 
-    public static bool operator ==(TrackedValue<T> A, TrackedValue<T> B) {
-        if(A is null) return B is null;
-        return A.Equals(B);
-    }
+    public override int GetHashCode() => Value?.GetHashCode() ?? 0;
 
-    public static bool operator !=(TrackedValue<T> A, TrackedValue<T> B) {
-        if(A is null) return B is not null;
-        return !A.Equals(B);
-    }
-
-    public static implicit operator T(TrackedValue<T> value) => value.Value;
-
-    public override int GetHashCode() => Value!.GetHashCode();
-
-    public int CompareTo(TrackedValue<T>? other) {
-        if(other is null) return 1;
-        return CompareTo(other.Value);
-    }
-
+    public int CompareTo(TrackedValue<T>? other) => other is null ? 1 : CompareTo(other.Value);
+    
+    //sniff sniff
     public int CompareTo(T? other) {
         if(Value is null) return other is null ? 0 : -1;
 
@@ -65,7 +50,7 @@ public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable,
         if(Value is IComparable<T?> comparable2) return comparable2.CompareTo(other);
         if(Value is IComparable comparable3) return comparable3.CompareTo(other);
 
-        throw new InvalidOperationException("T does not implement the IComparable interface.");
+        throw new InvalidOperationException($"{typeof(T).Name} does not implement the IComparable interface.");
     }
 
     public int CompareTo(object? other) {
@@ -76,4 +61,9 @@ public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable,
 
         throw new InvalidOperationException($"Cannot compare {typeof(T).FullName} to {other.GetType().FullName}");
     }
+
+
+    public static bool operator ==(TrackedValue<T> A, TrackedValue<T> B) => A.Equals(B);
+    public static bool operator !=(TrackedValue<T> A, TrackedValue<T> B) => !A.Equals(B);
+    public static implicit operator T(TrackedValue<T> value) => value.Value;
 }
