@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace Ametrin.Utils.Optional;
 
 public static class OptionalLinqExtensions {
@@ -10,8 +12,5 @@ public static class OptionalLinqExtensions {
     public static IEnumerable<TResult> SelectSome<TInput, TResult, TOption>(this IEnumerable<TInput> source, Func<TInput, TOption> action) where TOption : IOptional<TResult> 
         => source.Select(p => action(p)).ReduceSome<TResult, TOption>();
 
-    //public static IEnumerable<Result<T>> WhereSuccess<T>(this IEnumerable<Result<T>> source) => source.Where(result => result.IsSuccess);
-    //public static IEnumerable<T> ReduceSuccess<T>(this IEnumerable<Result<T>> source) => source.WhereSuccess().Select(s => s.ReduceOrThrow());
-    //public static IEnumerable<T> Reduce<T>(this IEnumerable<Result<T>> source, T @default) => source.Select(s => s.Reduce(@default));
-    //public static IEnumerable<TResult> SelectSuccess<TInput, TResult>(this IEnumerable<TInput> source, Func<TInput, Result<TResult>> action) => source.Select(p => action(p)).ReduceSuccess();
+    public static IEnumerable<T> ReduceSome<T>(this IEnumerable<Option<T>> source) => source.ReduceSome<T, Option<T>>();
 }

@@ -11,6 +11,8 @@ public static class OptionalExtensions{
         => Option<T>.Of(optional);
     public static Option<T> ToOptionWhereExists<T>(this T? directoryInfo) where T : FileSystemInfo 
         => directoryInfo.ToOption().Where(dir => dir.Exists);
+    public static ResultFlag ToFlag<T>(this IOptional<T> optional, ResultFlag flag = ResultFlag.Failed) 
+        => optional.HasValue ? ResultFlag.Succeeded : flag;
 
     public static Result<T> ToResult<T>(this T? obj, ResultFlag flag = ResultFlag.Null) where T : class
         => obj is not null ? Result<T>.Success(obj) : Result<T>.Fail(flag);    
