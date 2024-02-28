@@ -9,8 +9,11 @@ public static class OptionalExtensions{
         => obj.HasValue ? Option<T>.Some(obj.Value) : Option<T>.None();
     public static Option<T> ToOption<T>(this IOptional<T> optional) 
         => Option<T>.Of(optional);
-    public static Option<T> ToOptionWhereExists<T>(this T? directoryInfo) where T : FileSystemInfo 
-        => directoryInfo.ToOption().Where(dir => dir.Exists);
+    
+    public static Option<T> ToOption<T>(this object obj)
+        => obj is T t ? Option<T>.Some(t) : Option<T>.None();
+    public static Option<T> WhereExists<T>(this Option<T> option) where T : FileSystemInfo 
+        => option.Where(info => info.Exists);
     public static ResultFlag ToFlag<T>(this IOptional<T> optional, ResultFlag flag = ResultFlag.Failed) 
         => optional.HasValue ? ResultFlag.Succeeded : flag;
 
