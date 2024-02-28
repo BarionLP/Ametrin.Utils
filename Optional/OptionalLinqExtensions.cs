@@ -1,3 +1,4 @@
+using Microsoft.VisualBasic.FileIO;
 using System.Collections;
 
 namespace Ametrin.Utils.Optional;
@@ -14,4 +15,5 @@ public static class OptionalLinqExtensions {
         => source.Select(p => action(p)).ReduceSome<TResult, TOption>();
 
     public static IEnumerable<T> ReduceSome<T>(this IEnumerable<Option<T>> source) => source.ReduceSome<T, Option<T>>();
+    public static IEnumerable<TResult> SelectSome<TInput, TResult>(this IEnumerable<TInput> source, Func<TInput, Option<TResult>> action) => source.SelectSome<TInput, TResult, Option<TResult>>(action);
 }
