@@ -4,9 +4,7 @@ namespace Ametrin.Utils;
 public static class CollectionExtensions {
     private static readonly Random _random = new(DateTime.UtcNow.Millisecond);
     public static T GetRandomElement<T>(this ICollection<T> collection) => collection.GetRandomElement(_random);
-    public static T GetRandomElement<T>(this ICollection<T> collection, Random random){
-        return collection.ElementAt(random.Next(0, collection.Count));
-    }
+    public static T GetRandomElement<T>(this ICollection<T> collection, Random random) => collection.ElementAt(random.Next(0, collection.Count));
 
     public static void Move<T>(this IList<T> from, int idx, ICollection<T> to){
         if (idx < 0 || idx >= from.Count) throw new IndexOutOfRangeException(nameof(idx));

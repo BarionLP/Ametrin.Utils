@@ -2,7 +2,7 @@
 
 public static class SpanExtensions {
     public static bool StartsWith<T>(this ReadOnlySpan<T> span, T value) => !span.IsEmpty && span[0]!.Equals(value);
-    public static List<Range> Split(this ReadOnlySpan<char> span, char delimiter) {
+    public static List<Range> SplitDynamic(this ReadOnlySpan<char> span, char delimiter) {
         int start = 0;
         var result = new List<Range>();
         for(int i = 0; i < span.Length; i++) {
@@ -22,5 +22,12 @@ public static class SpanExtensions {
             if (!condition(element)) return false;
         }
         return true;
+    }
+
+    public static int GetFirstDigitIndex(this ReadOnlySpan<char> s) {
+        for(int i = 0; i < s.Length; i++) {
+            if(char.IsDigit(s[i])) return i;
+        }
+        return s.Length;
     }
 }

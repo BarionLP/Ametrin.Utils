@@ -14,21 +14,11 @@ public static class FileInfoExtensions {
         return new(Path.Combine(fileInfo.DirectoryName!, newFileName));
     }
 
-    public static string NameWithoutExtension(this FileInfo fileInfo) {
-        return Path.GetFileNameWithoutExtension(fileInfo.FullName);
-    }
-
-    public static void CopyTo(this FileInfo mainFile, FileInfo newFile, bool overwrite = false) {
-        mainFile.CopyTo(newFile.FullName, overwrite);
-    }
-
-    public static void Trash(this FileInfo info, UIOption options = UIOption.OnlyErrorDialogs){
-        FileSystem.DeleteFile(info.FullName, options, RecycleOption.SendToRecycleBin);
-    }
-
-    public static bool CompareHash(this FileInfo self, FileInfo other) {
-        return self.ComputeMd5Hash() == other.ComputeMd5Hash();
-    }
+    public static string NameWithoutExtension(this FileInfo fileInfo) => Path.GetFileNameWithoutExtension(fileInfo.FullName);
+    public static void CopyTo(this FileInfo mainFile, DirectoryInfo target, bool overwrite = false) => mainFile.CopyTo(Path.Combine(target.FullName, mainFile.Name), overwrite);
+    public static void CopyTo(this FileInfo mainFile, FileInfo newFile, bool overwrite = false) => mainFile.CopyTo(newFile.FullName, overwrite);
+    public static void Trash(this FileInfo info, UIOption options = UIOption.OnlyErrorDialogs) => FileSystem.DeleteFile(info.FullName, options, RecycleOption.SendToRecycleBin);
+    public static bool CompareHash(this FileInfo self, FileInfo other) => self.ComputeMd5Hash() == other.ComputeMd5Hash();
 
     public static string ComputeSha256Hash(this FileInfo fileInfo) {
         using var sha256Hash = SHA256.Create();

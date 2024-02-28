@@ -15,8 +15,8 @@ public static class DictionaryExtensions{
         return false;
     }
 
-    public static Option<TValue> Get<TValue, TKey>(this IReadOnlyDictionary<TKey, TValue> dic, TKey key) {
-        if (dic.TryGetValue(key, out var res)) {
+    public static Option<TValue> Get<TValue, TKey>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) {
+        if (dictionary.TryGetValue(key, out var res)) {
             return res;
         }
         return Option<TValue>.None();
@@ -28,10 +28,10 @@ public static class DictionaryExtensions{
         dictionary.Add(key, @default);
         return @default;
     }
-    public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key) where TValue : new(){
-        if (!dict.TryGetValue(key, out var val)){
+    public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) where TValue : new(){
+        if (!dictionary.TryGetValue(key, out var val)){
             val = new TValue();
-            dict.Add(key, val);
+            dictionary.Add(key, val);
         }
 
         return val;
