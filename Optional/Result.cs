@@ -1,86 +1,59 @@
-﻿namespace Ametrin.Utils.Optional;
+﻿using System.Diagnostics;
 
-public readonly struct Result<T> : IEquatable<Result<T>>{
-    public required ResultFlag Status { get; init; }
-    private T? _content { get; init; }
+namespace Ametrin.Utils.Optional;
 
-    public static Result<T> Of(T? value) {
-        if(value is null) return Failed(ResultFlag.Null);
-        return new() {
-            Status = ResultFlag.Succeeded,
-            _content = value,
-        };
-    }
-    public static Result<T> Failed(ResultFlag status = ResultFlag.Failed) {
-        if(status.IsSuccess()) throw new ArgumentException("Cannot Succeed without value! Use Result.Of", nameof(status));
-        return new() { Status = status };
-    }
+public readonly record struct Result<T> : IOptional<T>{
+    public bool IsSuccess => ResultFlag.IsSuccess();
+    public bool IsFail => ResultFlag.IsFail();
+    bool IOptional<T>.HasValue => IsSuccess;
 
-    public readonly bool IsFail => Status.IsFail();
-    public readonly bool IsSuccess => Status.IsSuccess();
+    public T? Value { get; private init; }
+    public ResultFlag ResultFlag { get; private init; }
 
-    public readonly void Resolve(Action<T> success, Action<ResultFlag>? failed = null) {
-        if(IsFail) {
-            failed?.Invoke(Status);
-            return;
-        }
+    public Result<T> Where(Func<T, bool> predicate, ResultFlag flag = ResultFlag.Failed) => IsSuccess ? (predicate(Value!) ? this : Fail(flag)) : Fail(ResultFlag);
+    public Result<T> WhereNot(Func<T, bool> predicate, ResultFlag flag = ResultFlag.Failed) => IsSuccess ? (!predicate(Value!) ? this : Fail(flag)) : Fail(ResultFlag);
 
-        success(_content!);
-    }
+    public Result<TResult> Map<TResult>(Func<T, TResult> map)
+        => IsSuccess ? map(Value!) : ResultFlag;
+    public Result<TResult> Map<TResult>(Func<T, IOptional<TResult>> map)
+        => IsSuccess ? Result<TResult>.Of(map(Value!)) : ResultFlag;
+    public Result<TResult> Map<TResult>(Func<T, IOptional<TResult>> map, ResultFlag flag)
+        => IsSuccess ? Result<TResult>.Of(map(Value!), flag) : ResultFlag;
+    public Result<TResult> Cast<TResult>(ResultFlag flag = ResultFlag.InvalidType) 
+        => IsFail ? ResultFlag 
+        : Value is not TResult casted ? flag 
+        : casted;
 
-    public readonly Result<TResult> Map<TResult>(Func<T, TResult> map) => IsSuccess ? map(_content!) : Result<TResult>.Failed(Status);
-    public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map) => IsSuccess ? map(_content!) : Result<TResult>.Failed(Status);
-    public readonly Result<TResult> Map<TResult>(Func<T, Option<TResult>> map) => IsSuccess ? map(_content!).ToResult(Status) : Result<TResult>.Failed(Status);
-    public readonly Result<TResult> Map<TResult>(Func<T, TResult> map, Func<ResultFlag, TResult> error) => IsSuccess ? map(_content!) : error(Status);
+    public TResult MapReduce<TResult>(Func<T, TResult> map, Func<ResultFlag, TResult> defaultSupplier) => IsSuccess ? map(Value!) : defaultSupplier(ResultFlag);
 
-    public Option<T> ToOption() => IsSuccess ? Option<T>.Some(_content) : Option<T>.None();
-    public T Reduce(Func<ResultFlag, T> defaultSupplier) => IsSuccess ? _content! : defaultSupplier(Status);
-    public T Reduce(Func<T> defaultSupplier) => IsSuccess ? _content! : defaultSupplier();
-    public T Reduce(T @default) => IsSuccess ? _content! : @default;
-    public T ReduceOrThrow() => IsSuccess ? _content! : throw new NullReferenceException($"Result was empty: {Status}");
+    public T Reduce(Func<ResultFlag, T> defaultSupplier) => IsSuccess ? Value! : defaultSupplier(ResultFlag);
+    public T ReduceOrThrow() => IsSuccess ? Value! : throw new NullReferenceException($"Result has Failed: {ResultFlag}");
 
-    public override int GetHashCode() => IsSuccess ? HashCode.Combine(_content!.GetHashCode(), Status.GetHashCode()) : HashCode.Combine(0, Status.GetHashCode());
-    public override bool Equals(object? obj) => obj is Result<T> result && Equals(result);
-    public bool Equals(Result<T> other) {
-        if(IsSuccess) {
-            if(other.IsFail) return false;
-            return _content!.Equals(other._content);
-        }
-        return other.Status == Status;
+    public void Resolve(Action<T> action, Action<ResultFlag> failed){
+        if (IsSuccess) action(Value!);
+        failed.Invoke(ResultFlag);
     }
 
-    public static bool operator ==(Result<T> left, Result<T> right) => left.Equals(right);
-    public static bool operator !=(Result<T> left, Result<T> right) => !(left == right);
-    public static implicit operator Result<T>(ResultFlag status) => Failed(status);
-    public static implicit operator Result<T>(T? value) => Of(value);
-}
+    public static Result<T> Success(T value) => value is not null ? new() { Value = value, ResultFlag = ResultFlag.Succeeded } : throw new ArgumentNullException(nameof(value), "Cannot create Result with null value");
+    public static Result<T> Fail(ResultFlag flag = ResultFlag.Failed) => flag.IsFail() ? new() { ResultFlag = flag } : throw new ArgumentException("Cannot Fail with Succeed flag");
+    public static Result<T> Of(T? value, ResultFlag flag = ResultFlag.Null) => value is not null ? Success(value) : Fail(flag);
+    public static Result<T> Of(IOptional<T> optional, ResultFlag flag = ResultFlag.Null) => optional switch
+    {
+        Result<T> option => option,
+        IOptional<T> option when option.HasValue => Success(option.Value!),
+        IOptional<T> option when !option.HasValue => Fail(flag),
+        _ => throw new UnreachableException(),
+    };
 
-public static class ResultExtensions {
-    public static bool IsFail(this ResultFlag flag) => flag.HasFlag(ResultFlag.Failed);
-    public static bool IsSuccess(this ResultFlag flag) => flag is ResultFlag.Succeeded;
-    public static void Catch(this ResultFlag flag, Action<ResultFlag> action) {
-        if(flag.IsFail()) {
-            action(flag);
-        }
-    }
-}
+    IOptional<T> IOptional<T>.Where(Func<T, bool> predicate) => Where(predicate);
+    IOptional<T> IOptional<T>.WhereNot(Func<T, bool> predicate) => WhereNot(predicate);
+    IOptional<TResult> IOptional<T>.Map<TResult>(Func<T, TResult> map) => Map(map);
+    IOptional<TResult> IOptional<T>.Map<TResult>(Func<T, IOptional<TResult>> map) => Map(map);
+    IOptional<TResult> IOptional<T>.Cast<TResult>() => Cast<TResult>();
 
+    public override string ToString() => IsSuccess ? Value!.ToString() ?? "NullString" : "None";
+    public override int GetHashCode() => IsSuccess ? HashCode.Combine(Value!.GetHashCode(), ResultFlag.GetHashCode()) : HashCode.Combine(0, ResultFlag.GetHashCode());
 
-[Flags] //for fails first bit must be 1
-public enum ResultFlag {
-    Succeeded           = 0b0000000000000000000000000000000,
-    Failed              = 0b1000000000000000000000000000000,
-    InvalidArgument     = 0b1000000000000000000000000000001,
-    IOError             = 0b1000000000000000000000000000010,
-    WebError            = 0b1000000000000000000000000000100,
-    Null                = 0b1000000000000000000000000001000,
-    ConnectionFailed    = 0b1000000000000000000000000010000,
-    AlreadyExists       = 0b1000000000000000000000000100000,
-    Canceled            = 0b1000000000000000000000001000000,
-    OutOfRange          = 0b1000000000000000000000010000000,
-    AccessDenied        = 0b1000000000000000000001000000000,
-    PathNotFound        = IOError | Null,
-    PathAlreadyExists   = IOError | AlreadyExists,
-    NoInternet          = WebError | ConnectionFailed,
-    InvalidFile         = IOError | InvalidArgument,
+    public static implicit operator Result<T>(ResultFlag flag) => Fail(flag);
+    public static implicit operator Result<T>(T? obj) => Of(obj);
 }

@@ -2,30 +2,50 @@ namespace Ametrin.Utils.Optional;
 
 
 public static class OptionalExtensions{
-    public static Option<T> ToOption<T>(this T? obj) where T : class => Option<T>.Some(obj);
-    public static Option<T> ToOption<T>(this T? obj) where T : struct => obj.HasValue ? Option<T>.Some(obj.Value) : Option<T>.None();
-    public static Option<T> ToOption<T>(this object? obj) => obj is T t ? Option<T>.Some(t) : Option<T>.None();
-    public static Option<object> ToOption(this object? obj) => Option<object>.Some(obj);
-    public static T? ReduceOrDefault<T>(this Option<T> option) => option.HasValue ? option.ReduceOrThrow() : default;
-    public static T? ReduceOrNull<T>(this Option<T> option) where T : struct => option.HasValue ? option.ReduceOrThrow() : null;
+    public static Option<T> ToOption<T>(this T? obj) where T : class 
+        => Option<T>.Some(obj);
+    public static Option<T> ToOption<T>(this T? obj) where T : struct
+        // would return Option<int?> if done without explicit struct nullability
+        => obj.HasValue ? Option<T>.Some(obj.Value) : Option<T>.None();
+    public static Option<T> ToOption<T>(this IOptional<T> optional) 
+        => Option<T>.Of(optional);
+    public static Option<T> ToOptionWhereExists<T>(this T? directoryInfo) where T : FileSystemInfo 
+        => directoryInfo.ToOption().Where(dir => dir.Exists);
+    public static ResultFlag ToFlag<T>(this IOptional<T> optional, ResultFlag flag = ResultFlag.Failed) 
+        => optional.HasValue ? ResultFlag.Succeeded : flag;
 
-    public static T? ReduceOrDefault<T>(this Result<T> option) => option.IsSuccess ? option.ReduceOrThrow() : default;
-    public static T? ReduceOrNull<T>(this Result<T> option) where T : struct => option.IsSuccess ? option.ReduceOrThrow() : null;
+    public static Result<T> ToResult<T>(this T? obj, ResultFlag flag = ResultFlag.Null) where T : class
+        => obj is not null ? Result<T>.Success(obj) : Result<T>.Fail(flag);    
+    public static Result<T> ToResult<T>(this T? obj, ResultFlag flag = ResultFlag.Null) where T : struct
+        // would return Result<int?> if done without explicit struct nullability
+        => obj.HasValue ? Result<T>.Success(obj.Value) : Result<T>.Fail(flag);
+    public static Result<T> ToResult<T>(this IOptional<T> optional, ResultFlag flag = ResultFlag.Failed) 
+        => Result<T>.Of(optional, flag);
+    public static Result<T> ToResultWhereExists<T>(this T? fileSystemInfo) where T : FileSystemInfo 
+        => fileSystemInfo.ToResult().Where(dir => dir.Exists, ResultFlag.PathNotFound);
 
+    public static TResult MapReduce<T, TResult>(this IOptional<T> optional, Func<T, TResult> map, TResult defaultValue) 
+        => optional.HasValue ? map(optional.Value!) : defaultValue;
+    public static TResult MapReduce<T, TResult>(this IOptional<T> optional, Func<T, TResult> map, Func<TResult> defaultSupplier) 
+        => optional.HasValue ? map(optional.Value!) : defaultSupplier();
 
-    public static IEnumerable<Option<T>> WhereSome<T>(this IEnumerable<Option<T>> source) => source.Where(option => option.HasValue);
-    public static IEnumerable<T> ReduceSome<T>(this IEnumerable<Option<T>> source) => source.Where(t => t.HasValue).Select(s => s.ReduceOrThrow());
-    public static IEnumerable<T> Reduce<T>(this IEnumerable<Option<T>> source, T @default) => source.Select(s => s.Reduce(@default));
-    public static IEnumerable<TResult> SelectSome<TInput, TResult>(this IEnumerable<TInput> source, Func<TInput, Option<TResult>> action) => source.Select(p => action(p)).ReduceSome();
-    
-    public static IEnumerable<Result<T>> WhereSuccess<T>(this IEnumerable<Result<T>> source) => source.Where(result => result.IsSuccess);
-    public static IEnumerable<T> ReduceSuccess<T>(this IEnumerable<Result<T>> source) => source.WhereSuccess().Select(s => s.ReduceOrThrow());
-    public static IEnumerable<T> Reduce<T>(this IEnumerable<Result<T>> source, T @default) => source.Select(s => s.Reduce(@default));
-    public static IEnumerable<TResult> SelectSuccess<TInput, TResult>(this IEnumerable<TInput> source, Func<TInput, Result<TResult>> action) => source.Select(p => action(p)).ReduceSuccess();
+    public static T Reduce<T>(this IOptional<T> optional, T defaultValue) 
+        => optional.HasValue ? optional.Value! : defaultValue;
+    public static T Reduce<T>(this IOptional<T> optional, Func<T> defaultSupplier) 
+        => optional.HasValue ? optional.Value! : defaultSupplier();
+    public static T? ReduceOrDefault<T>(this IOptional<T> optional) 
+        => optional.HasValue ? optional.Value : default;
+    public static T? ReduceOrNull<T>(this IOptional<T> option) where T : struct 
+        => option.HasValue ? option.Value : null;
 
-    public static Option<R> Map<R, T1, T2>(this (Option<T1> option1, Option<T2> option2) options, Func<T1, T2, R> map) {
-        if(!options.option1.HasValue || !options.option2.HasValue) return Option<R>.None();
-        return Option<R>.Some(map(options.option1.ReduceOrThrow(), options.option2.ReduceOrThrow()));
+    public static void Resolve<T>(this IOptional<T> optional, Action<T> action, Action? failed = null){
+        if (optional.HasValue) action(optional.Value!);
+        else failed?.Invoke();
+    }
+
+    public static Option<R> Map<R, T1, T2>(this (Option<T1>, Option<T2>) options, Func<T1, T2, R> map) {
+        if(!options.Item1.HasValue || !options.Item2.HasValue) return Option<R>.None();
+        return Option<R>.Some(map(options.Item1.Value!, options.Item2.Value!));
     }
     
     public static Option<R> Map<R, T1, T2>(this (T1?, T2?) items, Func<T1, T2, R> map) {
