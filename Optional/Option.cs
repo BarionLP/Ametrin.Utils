@@ -1,82 +1,46 @@
+using System.Diagnostics;
+
 namespace Ametrin.Utils.Optional;
 
 // based on https://github.com/zoran-horvat/optional
-public readonly record struct Option<T> : IOption<T, Option<T>>, IComparable<Option<T>> {
-    private readonly T _content;
-    public readonly bool HasValue { get; }
+public readonly record struct Option<T> : IOptional<T>{
+    public bool HasValue { get; private init; }
+    public T? Value { get; private init; }
 
+    public Option<T> Where(Func<T, bool> predicate) => HasValue ? predicate(Value!) ? this : None() : this;
+    public Option<T> WhereNot(Func<T, bool> predicate) => HasValue ? !predicate(Value!) ? this : None() : this;
 
-    private Option(T content, bool hasValue) {
-        _content = content;
-        HasValue = hasValue;
-    }
-
-    public static Option<T> Some(T? obj) => obj is null ? None() : new(obj, true);
-    public static Option<T> None() => new(default!, false);
-
-    public readonly Option<TResult> Map<TResult>(Func<T, TResult> map) => HasValue ? map(_content) : Option<TResult>.None();
-    public readonly Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) => HasValue ? map(_content) : Option<TResult>.None();
-    public readonly Result<TResult> Map<TResult>(Func<T, Result<TResult>> map, ResultFlag defaultFlag = ResultFlag.Failed) => HasValue ? map(_content) : Result<TResult>.Failed(defaultFlag);
-
-    public readonly Option<TResult> Cast<TResult>(){
-        if(HasValue && _content is TResult castedContent){
-            return Option<TResult>.Some(castedContent);
+    public Option<TResult> Map<TResult>(Func<T, TResult> map) => HasValue ? Option<TResult>.Some(map(Value!)) : Option<TResult>.None();
+    public Option<TResult> Map<TResult>(Func<T, IOptional<TResult>> map) => HasValue ? Option<TResult>.Of(map(Value!)) : Option<TResult>.None();
+    public Option<TResult> Cast<TResult>(){
+        if (HasValue && Value is TResult casted){
+            return Option<TResult>.Some(casted);
         }
         return Option<TResult>.None();
     }
-    public readonly TResult Map<TResult>(Func<T, TResult> map, TResult orElse) => HasValue ? map(_content) : orElse;
-    public readonly TResult Map<TResult>(Func<T, TResult> map, Func<TResult> orElse) => HasValue ? map(_content) : orElse();
 
-    public readonly T Reduce(T orElse) => HasValue ? _content : orElse;
-    public readonly T Reduce(Func<T> orElse) => HasValue ? _content : orElse();
-    public readonly T ReduceOrThrow() => HasValue ? _content : throw new NullReferenceException($"Option was empty");
+    public T ReduceOrThrow() => HasValue ? Value! : throw new NullReferenceException("Option was empty");
 
-
-    //public readonly Option<T> Where(Func<T, bool> predicate) => HasValue && predicate(_content) ? this : None();
-    //public readonly Option<T> WhereNot(Func<T, bool> predicate) => HasValue && !predicate(_content) ? this : None();
-
-    public readonly void Resolve(Action<T> success, Action? failed = null) {
-        if(!HasValue) {
-            failed?.Invoke();
-            return;
-        }
-
-        success(_content!);
-    }
-
-    public Result<T> ToResult(ResultFlag failedStatus = ResultFlag.Failed) => HasValue ? Result<T>.Of(_content) : Result<T>.Failed(failedStatus);
-
-    public override string ToString() => HasValue ? _content!.ToString() ?? "NullString" : "None";
-    public bool Equals(T? other) => other is null ? !HasValue : HasValue && EqualityComparer<T>.Default.Equals(_content, other);
-    public bool Equals(Option<T> other) => HasValue ? other.HasValue && EqualityComparer<T>.Default.Equals(_content, other._content) : !other.HasValue;
-    public override readonly int GetHashCode() => HasValue ? _content!.GetHashCode() : 0;
-
-    int IComparable.CompareTo(object? obj) => obj is Option<T> o ? CompareTo(o) : obj is T t ? CompareTo(t) : 1;
-    public int CompareTo(Option<T> other) {
-        if(!other.HasValue) return HasValue ? 1 : 0;
-        if(!HasValue) return -1;
-
-        return CompareTo(other._content);
-    }
-
-    public int CompareTo(T? other) {
-        if(other is null) return HasValue ? 1 : 0;
-        if(!HasValue) return -1;
-
-        return _content switch {
-            IComparable<T> c => c.CompareTo(other),
-            IComparable c => c.CompareTo(other),
-            _ => throw new InvalidOperationException($"{typeof(T).Name} does not implement IComparable"),
+    public static Option<T> Some(T? value) => value is T t ? new() { HasValue = true, Value = t } : None();
+    public static Option<T> None() => new() { HasValue = false };
+    public static Option<T> Of(IOptional<T> optional)
+    {
+        return optional switch
+        {
+            Option<T> option => option,
+            IOptional<T> option when option.HasValue => Some(option.Value),
+            IOptional<T> option when !option.HasValue => None(),
+            _ => throw new UnreachableException(),
         };
     }
 
-    T IOption<T, Option<T>>.Content => _content;
+    IOptional<T> IOptional<T>.Where(Func<T, bool> predicate) => Where(predicate);
+    IOptional<T> IOptional<T>.WhereNot(Func<T, bool> predicate) => WhereNot(predicate);
+    IOptional<TResult> IOptional<T>.Map<TResult>(Func<T, IOptional<TResult>> map) => Map(map);
+    IOptional<TResult> IOptional<T>.Map<TResult>(Func<T, TResult> map) => Map(map);
+    IOptional<TResult> IOptional<T>.Cast<TResult>() => Cast<TResult>();
 
-    //static Option<T> IOption<T, Option<T>>.Some(T? obj) => Some(obj);
-    //static Option<T> IOption<T, Option<T>>.None() => None();
-    //IOption<T> IOption<T>.Where(Func<T, bool> predicate) => Where(predicate);
-    //IOption<T> IOption<T>.WhereNot(Func<T, bool> predicate) => WhereNot(predicate);
+    public override string ToString() => HasValue ? Value!.ToString() ?? "NoString" : "None";
+    public override readonly int GetHashCode() => HasValue ? Value!.GetHashCode() : 0;
 
-
-    public static implicit operator Option<T>(T? value) => Some(value);
 }
