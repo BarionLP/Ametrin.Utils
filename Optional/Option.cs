@@ -23,10 +23,8 @@ public readonly record struct Option<T> : IOptional<T>{
 
     public static Option<T> Some(T? value) => value is T t ? new() { HasValue = true, Value = t } : None();
     public static Option<T> None() => new() { HasValue = false };
-    public static Option<T> Of(IOptional<T> optional)
-    {
-        return optional switch
-        {
+    public static Option<T> Of(IOptional<T> optional){
+        return optional switch{
             Option<T> option => option,
             IOptional<T> option when option.HasValue => Some(option.Value),
             IOptional<T> option when !option.HasValue => None(),
@@ -43,4 +41,5 @@ public readonly record struct Option<T> : IOptional<T>{
     public override string ToString() => HasValue ? Value!.ToString() ?? "NoString" : "None";
     public override readonly int GetHashCode() => HasValue ? Value!.GetHashCode() : 0;
 
+    public static implicit operator Option<T>(T? obj) => Some(obj);
 }
