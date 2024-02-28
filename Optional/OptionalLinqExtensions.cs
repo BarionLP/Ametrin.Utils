@@ -3,6 +3,7 @@ using System.Collections;
 namespace Ametrin.Utils.Optional;
 
 public static class OptionalLinqExtensions {
+    public static Option<T> FirstOrNone<T>(this IEnumerable<T> source) => source.Any() ? source.First() : Option<T>.None();
     public static IEnumerable<TOption> WhereSome<T, TOption>(this IEnumerable<TOption> source) where TOption : IOptional<T> 
         => source.Where(option => option.HasValue);
     public static IEnumerable<T> ReduceSome<T, TOption>(this IEnumerable<TOption> source) where TOption : IOptional<T> 

@@ -19,8 +19,8 @@ public static class OptionalExtensions{
     public static Result<T> ToResult<T>(this T? obj, ResultFlag flag = ResultFlag.Null) where T : struct
         // would return Result<int?> if done without explicit struct nullability
         => obj.HasValue ? Result<T>.Success(obj.Value) : Result<T>.Fail(flag);
-    public static Result<T> ToResult<T>(this IOptional<T> optional) 
-        => Result<T>.Of(optional);
+    public static Result<T> ToResult<T>(this IOptional<T> optional, ResultFlag flag = ResultFlag.Failed) 
+        => Result<T>.Of(optional, flag);
     public static Result<T> ToResultWhereExists<T>(this T? fileSystemInfo) where T : FileSystemInfo 
         => fileSystemInfo.ToResult().Where(dir => dir.Exists, ResultFlag.PathNotFound);
 

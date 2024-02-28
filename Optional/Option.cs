@@ -11,6 +11,7 @@ public readonly record struct Option<T> : IOptional<T>{
     public Option<T> WhereNot(Func<T, bool> predicate) => HasValue ? !predicate(Value!) ? this : None() : this;
 
     public Option<TResult> Map<TResult>(Func<T, TResult> map) => HasValue ? Option<TResult>.Some(map(Value!)) : Option<TResult>.None();
+    public Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) => HasValue ? Option<TResult>.Of(map(Value!)) : Option<TResult>.None();
     public Option<TResult> Map<TResult>(Func<T, IOptional<TResult>> map) => HasValue ? Option<TResult>.Of(map(Value!)) : Option<TResult>.None();
     public Option<TResult> Cast<TResult>(){
         if (HasValue && Value is TResult casted){
