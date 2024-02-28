@@ -50,9 +50,17 @@ public static class OptionalExtensions{
         if(!options.Item1.HasValue || !options.Item2.HasValue) return Option<R>.None();
         return Option<R>.Some(map(options.Item1.Value!, options.Item2.Value!));
     }
-    
+    public static Option<R> Map<R, T1, T2>(this (Option<T1>, Option<T2>) options, Func<T1, T2, Option<R>> map) {
+        if(!options.Item1.HasValue || !options.Item2.HasValue) return Option<R>.None();
+        return map(options.Item1.Value!, options.Item2.Value!);
+    }
     public static Option<R> Map<R, T1, T2>(this (T1?, T2?) items, Func<T1, T2, R> map) {
         if(items.Item1 is null || items.Item2 is null) return Option<R>.None();
         return Option<R>.Some(map(items.Item1, items.Item2));
+    }
+
+    public static void Resolve<T1, T2>(this (Option<T1>, Option<T2>) options, Action<T1, T2> action, Action? failed = null) {
+        if(!options.Item1.HasValue || !options.Item2.HasValue) failed?.Invoke();
+        else action(options.Item1.Value!, options.Item2.Value!);
     }
 }
