@@ -19,6 +19,8 @@ public readonly record struct Result<T> : IOptional<T>{
         => IsSuccess ? Result<TResult>.Of(map(Value!)) : ResultFlag;
     public Result<TResult> Map<TResult>(Func<T, IOptional<TResult>> map, ResultFlag flag)
         => IsSuccess ? Result<TResult>.Of(map(Value!), flag) : ResultFlag;
+    public Result<TResult> Map<TResult>(Func<T, Option<TResult>> map, ResultFlag flag = ResultFlag.Failed)
+        => IsSuccess ? Result<TResult>.Of(map(Value!), flag) : ResultFlag;
     public Result<TResult> Cast<TResult>(ResultFlag flag = ResultFlag.InvalidType) 
         => IsFail ? ResultFlag 
         : Value is not TResult casted ? flag 
