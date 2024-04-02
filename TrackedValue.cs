@@ -1,6 +1,6 @@
 ﻿namespace Ametrin.Utils;
 
-public class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComparable<T> {
+public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable, IComparable<T> {
     public event Action? OnChanged;
 
     private T _value;

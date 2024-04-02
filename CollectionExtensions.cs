@@ -19,5 +19,5 @@ public static class CollectionExtensions {
         return true;
     }
 
-    public static bool StartsWith<T>(this ICollection<T> collection, T value) => collection.Count > 0 && collection.ElementAt(0)!.Equals(value);
+    public static bool StartsWith<T>(this IEnumerable<T> collection, T value) => collection.Any() && collection.First()!.Equals(value);
 }
