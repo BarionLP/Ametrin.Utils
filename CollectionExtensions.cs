@@ -1,9 +1,13 @@
 ﻿namespace Ametrin.Utils;
 
 public static class CollectionExtensions {
-    private static readonly Random _random = new(DateTime.UtcNow.Millisecond);
-    public static T GetRandomElement<T>(this ICollection<T> collection) => collection.GetRandomElement(_random);
+    public static T GetRandomElement<T>(this ICollection<T> collection) => collection.GetRandomElement(Random.Shared);
     public static T GetRandomElement<T>(this ICollection<T> collection, Random random) => collection.ElementAt(random.Next(0, collection.Count));
+    public static IEnumerable<T> GetRandomElements<T>(this ICollection<T> collection, int count) {
+        foreach(int _ in ..count) {
+            yield return collection.GetRandomElement();
+        }
+    }
 
     public static void Move<T>(this IList<T> from, int idx, ICollection<T> to) {
         if (idx < 0 || idx >= from.Count) throw new IndexOutOfRangeException(nameof(idx));
