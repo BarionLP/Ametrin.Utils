@@ -10,6 +10,17 @@ public static class CollectionExtensions {
         }
     }
 
+    public static int MaxIndex<T>(this IList<T> list) where T : IComparable<T>{
+        var maxIndex = 0;
+        for(int i = 1; i < list.Count; i++) {
+            if(list[i].CompareTo(list[maxIndex]) > 0) {
+                maxIndex = i;
+            }
+        }
+
+        return maxIndex;
+    }
+
     public static void Move<T>(this IList<T> from, int idx, ICollection<T> to) {
         if (idx < 0 || idx >= from.Count) throw new IndexOutOfRangeException(nameof(idx));
 
