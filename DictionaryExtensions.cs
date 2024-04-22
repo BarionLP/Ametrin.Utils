@@ -44,4 +44,7 @@ public static class DictionaryExtensions{
 
         return value;
     }
+
+    public static TKey GetKey<TKey, TData>(this IDictionary<TKey, TData> dictionary, TData value) 
+        => dictionary.First(pair => EqualityComparer<TData>.Default.Equals(pair.Value, value)).Key;
 }
