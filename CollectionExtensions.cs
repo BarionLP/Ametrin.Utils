@@ -36,4 +36,10 @@ public static class CollectionExtensions {
     }
 
     public static bool StartsWith<T>(this IEnumerable<T> collection, T value) => collection.Any() && collection.First()!.Equals(value);
+
+    public static T[] Copy<T>(this T[] original){
+        var clone = new T[original.Length];
+        Array.Copy(original, clone, original.Length);
+        return clone;
+    }
 }
