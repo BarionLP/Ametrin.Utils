@@ -3,8 +3,8 @@
 public static class CollectionExtensions {
     public static T GetRandomElement<T>(this ICollection<T> collection) => collection.GetRandomElement(Random.Shared);
     public static T GetRandomElement<T>(this ICollection<T> collection, Random random) => collection.ElementAt(random.Next(0, collection.Count));
-    public static IEnumerable<T> GetRandomElements<T>(this ICollection<T> collection, int count) => collection.GetRandomElements(count, Random.Shared);
-    public static IEnumerable<T> GetRandomElements<T>(this ICollection<T> collection, int count, Random randomSource) {
+    public static IEnumerable<T> GetRandomElements<T>(this ICollection<T> collection, int count, Random? randomSource = null) {
+        randomSource ??= Random.Shared;
         foreach(int _ in ..count) {
             yield return collection.GetRandomElement(randomSource);
         }
