@@ -18,9 +18,11 @@ public static class LinqExtensions {
         return tmp;
     }
 
-    public static string Dump(this IEnumerable<string> values, char separator) => string.Join(separator, values);
-    public static string Dump(this IEnumerable<string> values, string separator) => string.Join(separator, values);
-
+    public static string Dump<T>(this IEnumerable<T> values, char separator, string format) where T : IFormattable
+        => values.Select(t => t.ToString(format, null)).Dump(separator);
+    public static string Dump<T>(this IEnumerable<T> values, string separator) => string.Join(separator, values);
+    public static string Dump<T>(this IEnumerable<T> values, char separator) => string.Join(separator, values);
+    
     public static FrozenDictionary<TKey, TResult> ToFrozenDictionary<TKey, TResult, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source, Func<TValue, TResult> map) where TKey : notnull 
         => source.Select(pair => new KeyValuePair<TKey, TResult>(pair.Key, map(pair.Value))).ToFrozenDictionary();
 

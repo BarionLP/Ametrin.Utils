@@ -53,7 +53,7 @@ public readonly record struct Result<T> : IOptional<T>{
     IOptional<TResult> IOptional<T>.Map<TResult>(Func<T, IOptional<TResult>> map) => Map(map);
     IOptional<TResult> IOptional<T>.Cast<TResult>() => Cast<TResult>();
 
-    public override string ToString() => IsSuccess ? Value!.ToString() ?? "NullString" : "None";
+    public override string ToString() => IsSuccess ? Value!.ToString() ?? "NullString" : ResultFlag.ToString();
     public override int GetHashCode() => IsSuccess ? HashCode.Combine(Value!.GetHashCode(), ResultFlag.GetHashCode()) : HashCode.Combine(0, ResultFlag.GetHashCode());
 
     public static implicit operator Result<T>(ResultFlag flag) => Fail(flag);

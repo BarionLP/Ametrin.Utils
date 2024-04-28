@@ -1,10 +1,8 @@
-﻿
-using Ametrin.Utils.Optional;
+﻿using Ametrin.Utils.Optional;
 
 namespace Ametrin.Utils.Registry;
 
 public sealed class TypeRegistry<TKey> : Registry<TKey, Type> where TKey : notnull{
-    public TypeRegistry(IReadOnlyDictionary<TKey, Type> entries) : base(entries) {}
     public TypeRegistry(IEnumerable<KeyValuePair<TKey, Type>> entries) : base(entries) { }
     public TypeRegistry(IEnumerable<Type> values, Func<Type, TKey> keyProvider) : base(values, keyProvider) {}
 }
