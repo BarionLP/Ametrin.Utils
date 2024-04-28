@@ -31,6 +31,11 @@ public readonly record struct Except<T> : IOptional<T>{
     public T Reduce(Func<Exception, T> defaultSupplier) => IsSuccess ? Value! : defaultSupplier(Error!);
     public T ReduceOrThrow() => IsSuccess ? Value! : throw new NullReferenceException($"Result has Failed", Error);
 
+    public void Resolve(Action<T> action, Action<Exception> failed) {
+        if(IsSuccess) action(Value!);
+        else failed.Invoke(Error!);
+    }
+
     public static Except<T> Success(T value) => value is not null ? new() { HasValue = true, Value = value } : throw new ArgumentNullException(nameof(value), "Cannot create Result with null value");
     public static Except<T> Fail(Exception error) => new() { HasValue = false, Error = error };
     public static Except<T> Of(T? value) => Of(value, ()=> new NullReferenceException());
@@ -41,6 +46,14 @@ public readonly record struct Except<T> : IOptional<T>{
         IOptional<T> option when !option.HasValue => Fail(errorSupplier()),
         _ => throw new UnreachableException(),
     };
+
+    public static Except<T> Try(Func<T> func) {
+        try {
+            return Success(func());
+        } catch(Exception e) {
+            return Fail(e);
+        }
+    }
 
     IOptional<T> IOptional<T>.Where(Func<T, bool> predicate) => Where(predicate);
     IOptional<T> IOptional<T>.WhereNot(Func<T, bool> predicate) => WhereNot(predicate);
