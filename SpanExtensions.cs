@@ -24,7 +24,7 @@ public static class SpanExtensions {
         return true;
     }
 
-    public static int GetFirstDigitIndex(this ReadOnlySpan<char> s) {
+    public static int FirstDigitIndex(this ReadOnlySpan<char> s) {
         for(int i = 0; i < s.Length; i++) {
             if(char.IsDigit(s[i])) return i;
         }
