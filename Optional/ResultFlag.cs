@@ -14,11 +14,15 @@ public enum ResultFlag {
     OutOfRange          = 0b1000000000000000000000010000000,
     AccessDenied        = 0b1000000000000000000001000000000,
     InvalidType         = 0b1000000000000000000010000000000,
+    DatabaseError       = 0b1000000000000000000100000000000,
+    UnknownFormat       = 0b1000000000000000001000000000000,
     Impossible          = 0b1100000000000000000000000000000,
     PathNotFound        = IOError | Null,
     PathAlreadyExists   = IOError | AlreadyExists,
     NoInternet          = WebError | ConnectionFailed,
     InvalidFile         = IOError | InvalidArgument,
+    UnknownFileFormat   = InvalidFile | UnknownFormat,
+    DatabaseNotConnected= ConnectionFailed | DatabaseError,
 }
 
 public static class ResultFlagExtensions{

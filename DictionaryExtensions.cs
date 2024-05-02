@@ -14,6 +14,16 @@ public static class DictionaryExtensions{
         result = default!;
         return false;
     }
+    
+    public static T Get<T>(this IReadOnlyDictionary<string, T> dictionary, ReadOnlySpan<char> spanKey){
+        foreach(var key in dictionary.Keys){
+            if(spanKey.SequenceEqual(key)){
+                return dictionary[key];
+            }
+        }
+
+        throw new KeyNotFoundException();
+    }
 
     public static Option<TValue> Get<TValue, TKey>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key) {
         if (dictionary.TryGetValue(key, out var res)) {

@@ -49,11 +49,19 @@ public static partial class StringExtensions {
     public static bool ContainsInvalidXmlChars(string input) => ValidXMLCharacters().IsMatch(input);
 
     public static bool StartsWith(this string str, ReadOnlySpan<char> value) {
-        if(str == null || value.Length > str.Length) {
+        if(str is null || value.Length > str.Length) {
             return false;
         }
 
         return str.AsSpan()[..value.Length].SequenceEqual(value);
+    }
+
+    public static int FirstDigitIndex(this string s) {
+        for(int i = 0; i < s.Length; i++) {
+            if(char.IsDigit(s[i]))
+                return i;
+        }
+        return s.Length;
     }
 
 

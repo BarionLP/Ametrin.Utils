@@ -33,7 +33,7 @@ public readonly record struct Result<T> : IOptional<T>{
 
     public void Resolve(Action<T> action, Action<ResultFlag> failed){
         if (IsSuccess) action(Value!);
-        failed.Invoke(ResultFlag);
+        else failed.Invoke(ResultFlag);
     }
 
     public static Result<T> Success(T value) => value is not null ? new() { Value = value, ResultFlag = ResultFlag.Succeeded } : throw new ArgumentNullException(nameof(value), "Cannot create Result with null value");
