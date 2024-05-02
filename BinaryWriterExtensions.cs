@@ -9,6 +9,7 @@ public static class BinaryWriterExtensions {
         if(!BitConverter.IsLittleEndian) Array.Reverse(bytes);
         writer.Write(bytes);
     }
+    
     public static void WriteBigEndian(this BinaryWriter writer, float value) => writer.WriteBigEndian(BitConverter.GetBytes(value));
     public static void WriteBigEndian(this BinaryWriter writer, double value) => writer.WriteBigEndian(BitConverter.GetBytes(value));
     public static void WriteBigEndian(this BinaryWriter writer, int value) => writer.WriteBigEndian(BitConverter.GetBytes(value));
