@@ -42,4 +42,9 @@ public static class CollectionExtensions {
         Array.Copy(original, clone, original.Length);
         return clone;
     }
+    public static T[,] Copy<T>(this T[,] original){
+        var clone = new T[original.GetLength(0), original.GetLength(1)];
+        Array.Copy(original, clone, original.Length);
+        return clone;
+    }
 }
