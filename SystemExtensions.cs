@@ -11,9 +11,15 @@ public static class SystemExtensions {
     }
     
     public static Option<IPAddress> LocalIPv4Address() {
-        var addresses = Dns.GetHostAddresses(Dns.GetHostName()).Where(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+        var addresses = LocalIPv4Addresses();
         if(!addresses.Any()) return Option<IPAddress>.None();
         return addresses.First();
+    }
+    public static IEnumerable<IPAddress> LocalIPv4Addresses() {
+        var addresses = Dns.GetHostAddresses(Dns.GetHostName()).Where(ip => ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+        if(!addresses.Any()) return [];
+
+        return addresses;
     }
     
     public static async Task<Result<IPAddress>> LocalIPAddressAsync() {
