@@ -13,12 +13,17 @@ public readonly record struct Result<T> : IOptional<T>{
     public Result<T> Where(Func<T, bool> predicate, ResultFlag flag = ResultFlag.Failed) => IsSuccess ? (predicate(Value!) ? this : Fail(flag)) : Fail(ResultFlag);
     public Result<T> WhereNot(Func<T, bool> predicate, ResultFlag flag = ResultFlag.Failed) => IsSuccess ? (!predicate(Value!) ? this : Fail(flag)) : Fail(ResultFlag);
 
+    public Result<TResult> Map<TResult>(Func<T, TResult?> map, ResultFlag flag = ResultFlag.Null)
+        => IsSuccess ? Result<TResult>.Of(map(Value!), flag) : ResultFlag;
     public Result<TResult> Map<TResult>(Func<T, TResult> map)
         => IsSuccess ? map(Value!) : ResultFlag;
     public Result<TResult> Map<TResult>(Func<T, IOptional<TResult>> map)
         => IsSuccess ? Result<TResult>.Of(map(Value!)) : ResultFlag;
-    public Result<TResult> Map<TResult>(Func<T, IOptional<TResult>> map, ResultFlag flag)
-        => IsSuccess ? Result<TResult>.Of(map(Value!), flag) : ResultFlag;
+    //public Result<TResult> Map<TResult>(Func<T, IOptional<TResult>> map, ResultFlag flag)
+    //    => IsSuccess ? Result<TResult>.Of(map(Value!), flag) : ResultFlag;
+
+    public Result<TResult> Map<TResult>(Func<T, Result<TResult>> map)
+        => IsSuccess ? map(Value!) : ResultFlag;
     public Result<TResult> Map<TResult>(Func<T, Option<TResult>> map, ResultFlag flag = ResultFlag.Failed)
         => IsSuccess ? Result<TResult>.Of(map(Value!), flag) : ResultFlag;
     public Result<TResult> Cast<TResult>(ResultFlag flag = ResultFlag.InvalidType) 

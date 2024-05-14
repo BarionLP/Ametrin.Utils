@@ -14,6 +14,9 @@ public static class OptionalExtensions{
         => obj is T t ? Option<T>.Some(t) : Option<T>.None();
     public static Option<T> WhereExists<T>(this Option<T> option) where T : FileSystemInfo 
         => option.Where(info => info.Exists);
+    
+    public static Result<IEnumerable<T>> WhereNotEmpty<T>(this Result<IEnumerable<T>> result, ResultFlag flag = ResultFlag.Null)
+        => result.Where(collection=> collection.Any());
     public static ResultFlag ToFlag<T>(this IOptional<T> optional, ResultFlag flag = ResultFlag.Failed) 
         => optional.HasValue ? ResultFlag.Succeeded : flag;
 
