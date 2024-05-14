@@ -66,4 +66,8 @@ public static class OptionalExtensions{
         if(!options.Item1.HasValue || !options.Item2.HasValue) failed?.Invoke();
         else action(options.Item1.Value!, options.Item2.Value!);
     }
+    public static void Resolve<T1, T2>(this (Result<T1>, Result<T2>) options, Action<T1, T2> action, Action? failed = null) {
+        if(options.Item1.IsFail || options.Item2.IsFail) failed?.Invoke();
+        else action(options.Item1.Value!, options.Item2.Value!);
+    }
 }
