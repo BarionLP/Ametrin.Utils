@@ -29,7 +29,7 @@ public static class FileInfoExtensions {
         return BitConverter.ToString(hash).Replace("-", string.Empty);
     }
 
-    static string ComputeMd5Hash(this FileInfo fileInfo) {
+    public static string ComputeMd5Hash(this FileInfo fileInfo) {
         using var md5Hash = MD5.Create();
         using var stream = File.OpenRead(fileInfo.FullName);
 
