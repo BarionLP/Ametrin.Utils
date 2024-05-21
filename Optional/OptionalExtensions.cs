@@ -16,7 +16,7 @@ public static class OptionalExtensions{
         => option.Where(info => info.Exists);
     
     public static Result<IEnumerable<T>> WhereNotEmpty<T>(this Result<IEnumerable<T>> result, ResultFlag flag = ResultFlag.Null)
-        => result.Where(collection=> collection.Any());
+        => result.Where(collection=> collection.Any(), flag);
     public static ResultFlag ToFlag<T>(this IOptional<T> optional, ResultFlag flag = ResultFlag.Failed) 
         => optional.HasValue ? ResultFlag.Succeeded : flag;
 
@@ -29,6 +29,9 @@ public static class OptionalExtensions{
         => Result<T>.Of(optional, flag);
     public static Result<T> ToResultWhereExists<T>(this T? fileSystemInfo) where T : FileSystemInfo 
         => fileSystemInfo.ToResult().Where(dir => dir.Exists, ResultFlag.PathNotFound);
+
+    public static ErrorOr<T> ToErrorOr<T>(this IOptional<T> option, string message = "")
+        => ErrorOr<T>.Of(option, message);
 
     public static TResult MapReduce<T, TResult>(this IOptional<T> optional, Func<T, TResult> map, TResult defaultValue) 
         => optional.HasValue ? map(optional.Value!) : defaultValue;
