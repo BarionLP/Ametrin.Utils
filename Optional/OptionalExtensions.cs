@@ -47,9 +47,13 @@ public static class OptionalExtensions{
     public static T? ReduceOrNull<T>(this IOptional<T> option) where T : struct 
         => option.HasValue ? option.Value : null;
 
+    public static void Resolve<T>(this IOptional<T> optional, Action failed, Action<T> action) => Resolve(optional, action, failed);
     public static void Resolve<T>(this IOptional<T> optional, Action<T> action, Action? failed = null){
-        if (optional.HasValue) action(optional.Value!);
-        else failed?.Invoke();
+        if (optional.HasValue) {
+            action(optional.Value!);
+        } else {
+            failed?.Invoke();
+        }
     }
 
     public static Option<R> Map<R, T1, T2>(this (Option<T1>, Option<T2>) options, Func<T1, T2, R> map) {
