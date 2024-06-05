@@ -46,8 +46,14 @@ public static class OptionalExtensions
         => option.HasValue ? option.Value : null;
 
     public static void Resolve<T>(this IOptional<T> optional, Action<T> action, Action? failed = null){
-        if (optional.HasValue) action(optional.Value!);
-        else failed?.Invoke();
+        if (optional.HasValue)
+        {
+            action(optional.Value!);
+        }
+        else
+        {
+            failed?.Invoke();
+        }
     }
 
     public static Option<R> Map<R, T1, T2>(this (Option<T1>, Option<T2>) options, Func<T1, T2, R> map)
