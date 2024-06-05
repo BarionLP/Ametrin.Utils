@@ -3,7 +3,8 @@ using System.Diagnostics;
 namespace Ametrin.Utils.Optional;
 
 // based on https://github.com/zoran-horvat/optional
-public readonly record struct Option<T> : IOptional<T>{
+public readonly record struct Option<T> : IOptional<T>
+{
     public bool HasValue { get; private init; }
     public T? Value { get; private init; }
 
@@ -13,8 +14,10 @@ public readonly record struct Option<T> : IOptional<T>{
     public Option<TResult> Map<TResult>(Func<T, TResult> map) => HasValue ? Option<TResult>.Some(map(Value!)) : Option<TResult>.None();
     public Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) => HasValue ? Option<TResult>.Of(map(Value!)) : Option<TResult>.None();
     public Option<TResult> Map<TResult>(Func<T, IOptional<TResult>> map) => HasValue ? Option<TResult>.Of(map(Value!)) : Option<TResult>.None();
-    public Option<TResult> Cast<TResult>(){
-        if (HasValue && Value is TResult casted){
+    public Option<TResult> Cast<TResult>()
+    {
+        if(HasValue && Value is TResult casted)
+        {
             return Option<TResult>.Some(casted);
         }
         return Option<TResult>.None();
@@ -24,8 +27,10 @@ public readonly record struct Option<T> : IOptional<T>{
 
     public static Option<T> Some(T? value) => value is T t ? new() { HasValue = true, Value = t } : None();
     public static Option<T> None() => new() { HasValue = false };
-    public static Option<T> Of(IOptional<T> optional){
-        return optional switch{
+    public static Option<T> Of(IOptional<T> optional)
+    {
+        return optional switch
+        {
             Option<T> option => option,
             IOptional<T> option when option.HasValue => Some(option.Value),
             IOptional<T> option when !option.HasValue => None(),

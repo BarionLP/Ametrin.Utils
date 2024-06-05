@@ -5,7 +5,8 @@ namespace Ametrin.Utils;
 /// <summary>
 /// Analogy of System.Math class for decimal types 
 /// </summary>
-public static class MathM{
+public static class MathM
+{
     /// <summary>
     /// represents PI
     /// </summary>
@@ -71,16 +72,17 @@ public static class MathM{
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
-    public static decimal Exp(decimal x){
+    public static decimal Exp(decimal x)
+    {
         var count = 0;
 
-        if (x > One)
+        if(x > One)
         {
             count = decimal.ToInt32(decimal.Truncate(x));
             x -= decimal.Truncate(x);
         }
 
-        if (x < Zero)
+        if(x < Zero)
         {
             count = decimal.ToInt32(decimal.Truncate(x) - 1);
             x = One + (x - decimal.Truncate(x));
@@ -95,9 +97,9 @@ public static class MathM{
             cachedResult = result;
             factorial *= x / iteration++;
             result += factorial;
-        } while (cachedResult != result);
+        } while(cachedResult != result);
 
-        if (count == 0)
+        if(count == 0)
             return result;
         return result * PowerN(E, count);
     }
@@ -110,13 +112,16 @@ public static class MathM{
     /// <returns></returns>
     public static decimal Power(decimal value, decimal pow)
     {
-        if (pow == Zero) return One;
-        if (pow == One) return value;
-        if (value == One) return One;
+        if(pow == Zero)
+            return One;
+        if(pow == One)
+            return value;
+        if(value == One)
+            return One;
 
-        if (value == Zero)
+        if(value == Zero)
         {
-            if (pow > Zero)
+            if(pow > Zero)
             {
                 return Zero;
             }
@@ -124,24 +129,25 @@ public static class MathM{
             throw new Exception("Invalid Operation: zero base and negative power");
         }
 
-        if (pow == -One) return One / value;
+        if(pow == -One)
+            return One / value;
 
         var isPowerInteger = IsInteger(pow);
-        if (value < Zero && !isPowerInteger)
+        if(value < Zero && !isPowerInteger)
         {
             throw new Exception("Invalid Operation: negative base and non-integer power");
         }
 
-        if (isPowerInteger && value > Zero)
+        if(isPowerInteger && value > Zero)
         {
-            int powerInt = (int)pow;
+            int powerInt = (int) pow;
             return PowerN(value, powerInt);
         }
 
-        if (isPowerInteger && value < Zero)
+        if(isPowerInteger && value < Zero)
         {
-            int powerInt = (int)pow;
-            if (powerInt % 2 == 0)
+            int powerInt = (int) pow;
+            if(powerInt % 2 == 0)
             {
                 return Exp(pow * Log(-value));
             }
@@ -154,7 +160,7 @@ public static class MathM{
 
     private static bool IsInteger(decimal value)
     {
-        var longValue = (long)value;
+        var longValue = (long) value;
         return Abs(value - longValue) <= Epsilon;
     }
 
@@ -166,10 +172,11 @@ public static class MathM{
     /// <returns></returns>
     public static decimal PowerN(decimal value, int power)
     {
-        while (true)
+        while(true)
         {
-            if (power == Zero) return One;
-            if (power < Zero)
+            if(power == Zero)
+                return One;
+            if(power < Zero)
             {
                 value = One / value;
                 power = -power;
@@ -179,9 +186,9 @@ public static class MathM{
             var q = power;
             var prod = One;
             var current = value;
-            while (q > 0)
+            while(q > 0)
             {
-                if (q % 2 == 1)
+                if(q % 2 == 1)
                 {
                     // detects the 1s in the binary expression of power
                     prod = current * prod; // picks up the relevant power
@@ -211,30 +218,37 @@ public static class MathM{
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
-    public static decimal Log(decimal x){
-        if (x <= Zero) throw new ArgumentException("x must be greater than zero");
-        if (x == One) return Zero;
+    public static decimal Log(decimal x)
+    {
+        if(x <= Zero)
+            throw new ArgumentException("x must be greater than zero");
+        if(x == One)
+            return Zero;
 
         var count = 0;
-        while (x >= One){
+        while(x >= One)
+        {
             x *= Einv;
             count++;
         }
 
-        while (x <= Einv){
+        while(x <= Einv)
+        {
             x *= E;
             count--;
         }
 
         x--;
-        if (x == Zero) return count;
-        
+        if(x == Zero)
+            return count;
+
         var result = Zero;
         var iteration = 0;
         var y = One;
         var cacheResult = result - One;
 
-        while (cacheResult != result && iteration < MaxIteration){
+        while(cacheResult != result && iteration < MaxIteration)
+        {
             iteration++;
             cacheResult = result;
             y *= -x;
@@ -249,15 +263,18 @@ public static class MathM{
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
-    public static decimal Cos(decimal x){
+    public static decimal Cos(decimal x)
+    {
         //truncating to  [-2*PI;2*PI]
         TruncateToPeriodicInterval(ref x);
 
         // now x in (-2pi,2pi)
-        if (x >= PI && x <= PIx2){
+        if(x >= PI && x <= PIx2)
+        {
             return -Cos(x - PI);
         }
-        if (x >= -PIx2 && x <= -PI){
+        if(x >= -PIx2 && x <= -PI)
+        {
             return -Cos(x + PI);
         }
 
@@ -266,7 +283,7 @@ public static class MathM{
         var xx = -x * Half;
         var y = One + xx;
         var cachedY = y - One;//init cache  with different value
-        for (var i = 1; cachedY != y && i < MaxIteration; i++)
+        for(var i = 1; cachedY != y && i < MaxIteration; i++)
         {
             cachedY = y;
             decimal factor = i * ((i << 1) + 3) + 1; //2i^2+2i+i+1=2i^2+3i+1
@@ -285,7 +302,8 @@ public static class MathM{
     public static decimal Tan(decimal x)
     {
         var cos = Cos(x);
-        if (cos == Zero) throw new ArgumentException(nameof(x));
+        if(cos == Zero)
+            throw new ArgumentException(nameof(x));
         //calculate sin using cos
         var sin = CalculateSinFromCos(x, cos);
         return sin / cos;
@@ -300,7 +318,8 @@ public static class MathM{
     {
         var moduleOfSin = Sqrt(One - (cos * cos));
         var sineIsPositive = IsSignOfSinePositive(x);
-        if (sineIsPositive) return moduleOfSin;
+        if(sineIsPositive)
+            return moduleOfSin;
         return -moduleOfSin;
     }
     /// <summary>
@@ -321,13 +340,13 @@ public static class MathM{
     /// <param name="x"></param>
     private static void TruncateToPeriodicInterval(ref decimal x)
     {
-        while (x >= PIx2)
+        while(x >= PIx2)
         {
             var divide = Math.Abs(decimal.ToInt32(x / PIx2));
             x -= divide * PIx2;
         }
 
-        while (x <= -PIx2)
+        while(x <= -PIx2)
         {
             var divide = Math.Abs(decimal.ToInt32(x / PIx2));
             x += divide * PIx2;
@@ -341,10 +360,14 @@ public static class MathM{
         TruncateToPeriodicInterval(ref x);
 
         //now x in [-2*PI;2*PI]
-        if (x >= -PIx2 && x <= -PI) return true;
-        if (x >= -PI && x <= Zero) return false;
-        if (x >= Zero && x <= PI) return true;
-        if (x >= PI && x <= PIx2) return false;
+        if(x >= -PIx2 && x <= -PI)
+            return true;
+        if(x >= -PI && x <= Zero)
+            return false;
+        if(x >= Zero && x <= PI)
+            return true;
+        if(x >= PI && x <= PIx2)
+            return false;
 
         //will not be reached
         throw new ArgumentException(nameof(x));
@@ -358,15 +381,17 @@ public static class MathM{
     /// <returns></returns>
     public static decimal Sqrt(decimal x, decimal epsilon = Zero)
     {
-        if (x < Zero) throw new OverflowException("Cannot calculate square root from a negative number");
+        if(x < Zero)
+            throw new OverflowException("Cannot calculate square root from a negative number");
         //initial approximation
-        decimal current = (decimal)Math.Sqrt((double)x), previous;
+        decimal current = (decimal) Math.Sqrt((double) x), previous;
         do
         {
             previous = current;
-            if (previous == Zero) return Zero;
+            if(previous == Zero)
+                return Zero;
             current = (previous + x / previous) * Half;
-        } while (Abs(previous - current) > epsilon);
+        } while(Abs(previous - current) > epsilon);
         return current;
     }
     /// <summary>
@@ -422,7 +447,7 @@ public static class MathM{
     /// <returns></returns>
     public static decimal Abs(decimal x)
     {
-        if (x <= Zero)
+        if(x <= Zero)
         {
             return -x;
         }
@@ -436,15 +461,18 @@ public static class MathM{
     /// <returns></returns>
     public static decimal Asin(decimal x)
     {
-        if (x > One || x < -One)
+        if(x > One || x < -One)
         {
             throw new ArgumentException("x must be in [-1,1]");
         }
         //known values
-        if (x == Zero) return Zero;
-        if (x == One) return PIdiv2;
+        if(x == Zero)
+            return Zero;
+        if(x == One)
+            return PIdiv2;
         //asin function is odd function
-        if (x < Zero) return -Asin(-x);
+        if(x < Zero)
+            return -Asin(-x);
 
         //my optimize trick here
 
@@ -456,7 +484,7 @@ public static class MathM{
 
         //for calculating new value near to zero than current
         //because we gain more speed with values near to zero
-        if (Abs(x) > Abs(newX))
+        if(Abs(x) > Abs(newX))
         {
             var t = Asin(newX);
             return Half * (PIdiv2 - t);
@@ -473,7 +501,7 @@ public static class MathM{
             result *= xx * (One - Half / (i));
             y += result / ((i << 1) + 1);
             i++;
-        } while (cachedResult != result);
+        } while(cachedResult != result);
         return y;
     }
 
@@ -484,8 +512,10 @@ public static class MathM{
     /// <returns></returns>
     public static decimal ATan(decimal x)
     {
-        if (x == Zero) return Zero;
-        if (x == One) return PIdiv4;
+        if(x == Zero)
+            return Zero;
+        if(x == One)
+            return PIdiv4;
         return Asin(x / Sqrt(One + x * x));
     }
     /// <summary>
@@ -495,9 +525,12 @@ public static class MathM{
     /// <returns></returns>
     public static decimal Acos(decimal x)
     {
-        if (x == Zero) return PIdiv2;
-        if (x == One) return Zero;
-        if (x < Zero) return PI - Acos(-x);
+        if(x == Zero)
+            return PIdiv2;
+        if(x == One)
+            return Zero;
+        if(x < Zero)
+            return PI - Acos(-x);
         return PIdiv2 - Asin(x);
     }
 
@@ -511,23 +544,23 @@ public static class MathM{
     /// <returns></returns>
     public static decimal Atan2(decimal y, decimal x)
     {
-        if (x > Zero)
+        if(x > Zero)
         {
             return ATan(y / x);
         }
-        if (x < Zero && y >= Zero)
+        if(x < Zero && y >= Zero)
         {
             return ATan(y / x) + PI;
         }
-        if (x < Zero && y < Zero)
+        if(x < Zero && y < Zero)
         {
             return ATan(y / x) - PI;
         }
-        if (x == Zero && y > Zero)
+        if(x == Zero && y > Zero)
         {
             return PIdiv2;
         }
-        if (x == Zero && y < Zero)
+        if(x == Zero && y < Zero)
         {
             return -PIdiv2;
         }

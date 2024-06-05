@@ -3,13 +3,17 @@ using Microsoft.VisualBasic.FileIO;
 
 namespace Ametrin.Utils;
 
-public static class FileInfoExtensions {    
-    public static FileInfo GetCopyOfPathIfExists(this FileInfo fileInfo) {
-        if(!fileInfo.Exists) return fileInfo;
+public static class FileInfoExtensions
+{
+    public static FileInfo GetCopyOfPathIfExists(this FileInfo fileInfo)
+    {
+        if(!fileInfo.Exists)
+            return fileInfo;
         return GetCopyOfPathIfExists(GetCopyOfPath(fileInfo));
     }
-    
-    public static FileInfo GetCopyOfPath(this FileInfo fileInfo) {
+
+    public static FileInfo GetCopyOfPath(this FileInfo fileInfo)
+    {
         var newFileName = $"{fileInfo.NameWithoutExtension()} - Copy{fileInfo.Extension}";
         return new(Path.Combine(fileInfo.DirectoryName!, newFileName));
     }
@@ -21,7 +25,8 @@ public static class FileInfoExtensions {
     public static void Trash(this FileInfo info, UIOption options = UIOption.OnlyErrorDialogs) => FileSystem.DeleteFile(info.FullName, options, RecycleOption.SendToRecycleBin);
     public static bool CompareHash(this FileInfo self, FileInfo other) => self.ComputeMd5Hash() == other.ComputeMd5Hash();
 
-    public static string ComputeSha256Hash(this FileInfo fileInfo) {
+    public static string ComputeSha256Hash(this FileInfo fileInfo)
+    {
         using var sha256Hash = SHA256.Create();
         using var stream = File.OpenRead(fileInfo.FullName);
 
@@ -29,7 +34,8 @@ public static class FileInfoExtensions {
         return BitConverter.ToString(hash).Replace("-", string.Empty);
     }
 
-    public static string ComputeMd5Hash(this FileInfo fileInfo) {
+    public static string ComputeMd5Hash(this FileInfo fileInfo)
+    {
         using var md5Hash = MD5.Create();
         using var stream = File.OpenRead(fileInfo.FullName);
 

@@ -3,13 +3,17 @@ using System.Collections.Specialized;
 
 namespace Ametrin.Utils;
 
-public sealed class BulkObservableCollection<T> : ObservableCollection<T>{
-    public void AddRange(IEnumerable<T> collection){
-        if (collection is null || !collection.Any()) return;
+public sealed class BulkObservableCollection<T> : ObservableCollection<T>
+{
+    public void AddRange(IEnumerable<T> collection)
+    {
+        if(collection is null || !collection.Any())
+            return;
 
         CheckReentrancy();
 
-        foreach (var item in collection){
+        foreach(var item in collection)
+        {
             Items.Add(item);
         }
 
