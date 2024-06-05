@@ -1,6 +1,3 @@
-using Microsoft.VisualBasic.FileIO;
-using System.Collections;
-
 namespace Ametrin.Utils.Optional;
 
 public static class OptionalLinqExtensions

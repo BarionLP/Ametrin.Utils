@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Diagnostics;
 
 // from https://github.com/raminrahimzada/CSharp-Helper-Classes/blob/master/Math/DecimalMath/DecimalMath.cs
 namespace Ametrin.Utils;
@@ -369,8 +369,7 @@ public static class MathM
         if(x >= PI && x <= PIx2)
             return false;
 
-        //will not be reached
-        throw new ArgumentException(nameof(x));
+        throw new UnreachableException(nameof(x));
     }
 
     /// <summary>
