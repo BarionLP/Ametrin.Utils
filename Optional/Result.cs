@@ -2,7 +2,8 @@
 
 namespace Ametrin.Utils.Optional;
 
-public readonly record struct Result<T> : IOptional<T>{
+public readonly record struct Result<T> : IOptional<T>
+{
     public bool IsSuccess => ResultFlag.IsSuccess();
     public bool IsFail => ResultFlag.IsFail();
     bool IOptional<T>.HasValue => IsSuccess;
@@ -26,9 +27,9 @@ public readonly record struct Result<T> : IOptional<T>{
         => IsSuccess ? map(Value!) : ResultFlag;
     public Result<TResult> Map<TResult>(Func<T, Option<TResult>> map, ResultFlag flag = ResultFlag.Failed)
         => IsSuccess ? Result<TResult>.Of(map(Value!), flag) : ResultFlag;
-    public Result<TResult> Cast<TResult>(ResultFlag flag = ResultFlag.InvalidType) 
-        => IsFail ? ResultFlag 
-        : Value is not TResult casted ? flag 
+    public Result<TResult> Cast<TResult>(ResultFlag flag = ResultFlag.InvalidType)
+        => IsFail ? ResultFlag
+        : Value is not TResult casted ? flag
         : casted;
 
     public TResult MapReduce<TResult>(Func<T, TResult> map, Func<ResultFlag, TResult> defaultSupplier) => IsSuccess ? map(Value!) : defaultSupplier(ResultFlag);
@@ -36,9 +37,12 @@ public readonly record struct Result<T> : IOptional<T>{
     public T Reduce(Func<ResultFlag, T> defaultSupplier) => IsSuccess ? Value! : defaultSupplier(ResultFlag);
     public T ReduceOrThrow() => IsSuccess ? Value! : throw new NullReferenceException($"Result has Failed: {ResultFlag}");
 
-    public void Resolve(Action<T> action, Action<ResultFlag> failed){
-        if (IsSuccess) action(Value!);
-        else failed.Invoke(ResultFlag);
+    public void Resolve(Action<T> action, Action<ResultFlag> failed)
+    {
+        if(IsSuccess)
+            action(Value!);
+        else
+            failed.Invoke(ResultFlag);
     }
 
     public static Result<T> Success(T value) => value is not null ? new() { Value = value, ResultFlag = ResultFlag.Succeeded } : throw new ArgumentNullException(nameof(value), "Cannot create Result with null value");

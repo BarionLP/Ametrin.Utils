@@ -6,82 +6,109 @@ using System.Xml;
 namespace Ametrin.Utils;
 
 [DataContract(Namespace = "Ametrin.Utils", IsReference = true)]
-public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValue : notnull{
+public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValue : notnull
+{
     [DataMember(Name = "nodes")]
     private readonly HashSet<TNode> Nodes = new();
 
     public int Count => Nodes.Count;
 
-    public Result<TNode> TryGet(TValue value){
-        if(value is null) return ResultFlag.InvalidArgument;
+    public Result<TNode> TryGet(TValue value)
+    {
+        if(value is null)
+            return ResultFlag.InvalidArgument;
         var result = Nodes.FirstOrDefault(entry => entry.Value.Equals(value));
-        if(result is null) return ResultFlag.Null;
+        if(result is null)
+            return ResultFlag.Null;
         return result;
     }
 
-    public Result<TNode> TryGet(Index idx) {
-        try {
+    public Result<TNode> TryGet(Index idx)
+    {
+        try
+        {
             return Nodes.ElementAt(idx);
-        } catch(ArgumentOutOfRangeException) {
+        }
+        catch(ArgumentOutOfRangeException)
+        {
             return ResultFlag.OutOfRange;
-        } catch {
+        }
+        catch
+        {
             return ResultFlag.Failed;
         }
 
     }
 
-    public ResultFlag TryAdd(TNode node) {
-        if(node is null) return ResultFlag.InvalidArgument;
-        if(Exists(node.Value)) return ResultFlag.AlreadyExists;
+    public ResultFlag TryAdd(TNode node)
+    {
+        if(node is null)
+            return ResultFlag.InvalidArgument;
+        if(Exists(node.Value))
+            return ResultFlag.AlreadyExists;
         Nodes.Add(node);
         return ResultFlag.Succeeded;
     }
 
-    public void Link(TNode a, TNode b) {
-        if(!Exists(a) || !Exists(b)) throw new ArgumentException("Cannot link nodes outside of the graph");
+    public void Link(TNode a, TNode b)
+    {
+        if(!Exists(a) || !Exists(b))
+            throw new ArgumentException("Cannot link nodes outside of the graph");
         a.Link(b);
         b.Link(a);
     }
 
-    public bool Exists(TValue value) {
+    public bool Exists(TValue value)
+    {
         return Nodes.Any(entry => entry.Value.Equals(value));
     }
-    public bool Exists(TNode node) {
+    public bool Exists(TNode node)
+    {
         return Nodes.Contains(node);
     }
 
-    public bool TryRemove(TValue value) {
+    public bool TryRemove(TValue value)
+    {
         var node = Nodes.FirstOrDefault(entry => entry.Value.Equals(value));
-        if(node is null) return false;
+        if(node is null)
+            return false;
         return TryRemove(node);
     }
-    public int TryRemoveAll(TValue value) {
+    public int TryRemoveAll(TValue value)
+    {
         return Nodes.RemoveWhere(entry => entry.Value.Equals(value));
     }
-    public bool TryRemove(TNode node) {
+    public bool TryRemove(TNode node)
+    {
         node.Delete();
         return Nodes.Remove(node);
     }
 }
 
 [DataContract(IsReference = true)]
-public sealed class Node<T> : INode<T> where T : notnull {
+public sealed class Node<T> : INode<T> where T : notnull
+{
     [DataMember(Name = "value"), NotNull]
     public required T Value { get; init; }
     [DataMember(Name = "links", EmitDefaultValue = false)]
     private readonly HashSet<INode<T>> Links = new();
 
-    public void Link(INode<T> node) {
+    public void Link(INode<T> node)
+    {
         Links.Add(node);
     }
-    public bool HasLink(INode<T> node) {
+    public bool HasLink(INode<T> node)
+    {
         return Links.Contains(node);
     }
-    public bool RemoveLink(INode<T> node) {
+    public bool RemoveLink(INode<T> node)
+    {
         return Links.Remove(node);
     }
-    public void Delete() {
-        foreach(var node in Links) {
+    public void Delete()
+    {
+        foreach(var node in Links)
+        {
             node.RemoveLink(this);
         }
         Links.Clear();
@@ -90,7 +117,8 @@ public sealed class Node<T> : INode<T> where T : notnull {
     public static implicit operator T(Node<T> node) { return node.Value; }
 }
 
-public interface INode<T> where T : notnull{
+public interface INode<T> where T : notnull
+{
     T Value { get; }
     public void Link(INode<T> node);
     public bool HasLink(INode<T> node);
@@ -98,30 +126,41 @@ public interface INode<T> where T : notnull{
     public void Delete();
 }
 
-public static class GraphSerializer{
+public static class GraphSerializer
+{
     public static readonly DataContractSerializerSettings DataContractSettings = new() { };
 
-    public static void Serialize<TNode, TValue>(Graph<TNode, TValue> graph, FileInfo target, bool indent = false) where TNode : class, INode<TValue> where TValue : notnull {
+    public static void Serialize<TNode, TValue>(Graph<TNode, TValue> graph, FileInfo target, bool indent = false) where TNode : class, INode<TValue> where TValue : notnull
+    {
         using var stream = target.Create();
         var serializer = new DataContractSerializer(typeof(Graph<TNode, TValue>), DataContractSettings);
-        var settings = new XmlWriterSettings {
+        var settings = new XmlWriterSettings
+        {
             Indent = indent,
         };
         using var writer = XmlWriter.Create(stream, settings);
         serializer.WriteObject(writer, graph);
     }
 
-    public static Result<Graph<TNode, TValue>> Deserialize<TNode, TValue>(FileInfo target) where TNode : class, INode<TValue> where TValue : notnull {
-        if(!target.Exists) return ResultFlag.PathNotFound;
+    public static Result<Graph<TNode, TValue>> Deserialize<TNode, TValue>(FileInfo target) where TNode : class, INode<TValue> where TValue : notnull
+    {
+        if(!target.Exists)
+            return ResultFlag.PathNotFound;
         using var stream = target.OpenRead();
         var serializer = new DataContractSerializer(typeof(Graph<TNode, TValue>));
 
-        try{
-            if(serializer.ReadObject(stream) is not Graph<TNode, TValue> result) return ResultFlag.Null;
+        try
+        {
+            if(serializer.ReadObject(stream) is not Graph<TNode, TValue> result)
+                return ResultFlag.Null;
             return result;
-        } catch(IOException) {
+        }
+        catch(IOException)
+        {
             return ResultFlag.IOError;
-        } catch(Exception) {
+        }
+        catch(Exception)
+        {
             return ResultFlag.Failed;
         }
     }

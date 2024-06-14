@@ -25,7 +25,8 @@ public enum ResultFlag {
     DatabaseNotConnected= ConnectionFailed | DatabaseError,
 }
 
-public static class ResultFlagExtensions{
+public static class ResultFlagExtensions
+{
     public static bool IsFail(this ResultFlag flag) => flag.HasFlag(ResultFlag.Failed);
     public static bool IsSuccess(this ResultFlag flag) => flag is ResultFlag.Succeeded;
 }
