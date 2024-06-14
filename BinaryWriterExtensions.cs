@@ -1,6 +1,7 @@
-﻿namespace Ametrin.Utils; 
+﻿namespace Ametrin.Utils;
 
-public static class BinaryWriterExtensions {
+public static class BinaryWriterExtensions
+{
     public static void WriteBigEndian(this BinaryWriter writer, float value) => writer.WriteBigEndian(value, sizeof(float), BitConverter.TryWriteBytes);
     public static void WriteBigEndian(this BinaryWriter writer, double value) => writer.WriteBigEndian(value, sizeof(double), BitConverter.TryWriteBytes);
     public static void WriteBigEndian(this BinaryWriter writer, short value) => writer.WriteBigEndian(value, sizeof(short), BitConverter.TryWriteBytes);
@@ -8,14 +9,17 @@ public static class BinaryWriterExtensions {
     public static void WriteBigEndian(this BinaryWriter writer, int value) => writer.WriteBigEndian(value, sizeof(int), BitConverter.TryWriteBytes);
     public static void WriteBigEndian(this BinaryWriter writer, uint value) => writer.WriteBigEndian(value, sizeof(uint), BitConverter.TryWriteBytes);
 
-    public static void WriteBigEndian<T>(this BinaryWriter writer, T value, int byteSize, Converter<T> converter) {
+    public static void WriteBigEndian<T>(this BinaryWriter writer, T value, int byteSize, Converter<T> converter)
+    {
         Span<byte> buffer = stackalloc byte[byteSize];
         converter(buffer, value);
         writer.WriteBigEndian(buffer);
     }
 
-    public static void WriteBigEndian(this BinaryWriter writer, Span<byte> buffer) { 
-        if(BitConverter.IsLittleEndian) {
+    public static void WriteBigEndian(this BinaryWriter writer, Span<byte> buffer)
+    {
+        if(BitConverter.IsLittleEndian)
+        {
             //do i need to copy?
             buffer.Reverse();
         }

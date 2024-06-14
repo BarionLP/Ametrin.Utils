@@ -17,8 +17,8 @@ public static class OptionalExtensions
         => option.Where(info => info.Exists);
 
     public static Result<IEnumerable<T>> WhereNotEmpty<T>(this Result<IEnumerable<T>> result, ResultFlag flag = ResultFlag.Null)
-        => result.Where(collection=> collection.Any());
-    public static ResultFlag ToFlag<T>(this IOptional<T> optional, ResultFlag flag = ResultFlag.Failed) 
+        => result.Where(collection => collection.Any());
+    public static ResultFlag ToFlag<T>(this IOptional<T> optional, ResultFlag flag = ResultFlag.Failed)
         => optional.HasValue ? ResultFlag.Succeeded : flag;
 
     public static Result<T> ToResult<T>(this T? obj, ResultFlag flag = ResultFlag.Null) where T : class
@@ -31,7 +31,7 @@ public static class OptionalExtensions
     public static Result<T> ToResultWhereExists<T>(this T? fileSystemInfo) where T : FileSystemInfo
         => fileSystemInfo.ToResult().Where(dir => dir.Exists, ResultFlag.PathNotFound);
 
-    public static TResult MapReduce<T, TResult>(this IOptional<T> optional, Func<T, TResult> map, TResult defaultValue) 
+    public static TResult MapReduce<T, TResult>(this IOptional<T> optional, Func<T, TResult> map, TResult defaultValue)
         => optional.HasValue ? map(optional.Value!) : defaultValue;
     public static TResult MapReduce<T, TResult>(this IOptional<T> optional, Func<T, TResult> map, Func<TResult> defaultSupplier)
         => optional.HasValue ? map(optional.Value!) : defaultSupplier();
@@ -45,8 +45,9 @@ public static class OptionalExtensions
     public static T? ReduceOrNull<T>(this IOptional<T> option) where T : struct
         => option.HasValue ? option.Value : null;
 
-    public static void Resolve<T>(this IOptional<T> optional, Action<T> action, Action? failed = null){
-        if (optional.HasValue)
+    public static void Resolve<T>(this IOptional<T> optional, Action<T> action, Action? failed = null)
+    {
+        if(optional.HasValue)
         {
             action(optional.Value!);
         }

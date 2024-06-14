@@ -1,7 +1,8 @@
 namespace Ametrin.Utils.Optional;
 
 [Flags] //for fails first bit must be 1
-public enum ResultFlag {
+public enum ResultFlag 
+{
     Succeeded           = 0b0000000000000000000000000000000,
     Failed              = 0b1000000000000000000000000000000,
     InvalidArgument     = 0b1000000000000000000000000000001, // a given argument contained an invalid value

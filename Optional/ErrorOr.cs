@@ -2,7 +2,8 @@
 
 namespace Ametrin.Utils.Optional;
 
-public readonly record struct ErrorOr<T> : IOptional<T> {
+public readonly record struct ErrorOr<T> : IOptional<T>
+{
     public bool HasValue { get; private init; }
     public T? Value { get; private init; }
     public string Message { get; private init; }
@@ -23,15 +24,19 @@ public readonly record struct ErrorOr<T> : IOptional<T> {
         : casted;
 
     public T ReduceOrThrow() => HasValue ? Value! : throw new NullReferenceException(Message);
-    public void Resolve(Action<T> action, Action<string> failed) {
-        if(HasValue) action(Value!);
-        else failed.Invoke(Message);
+    public void Resolve(Action<T> action, Action<string> failed)
+    {
+        if(HasValue)
+            action(Value!);
+        else
+            failed.Invoke(Message);
     }
 
     public static ErrorOr<T> Success(T value) => value is not null ? new() { HasValue = true, Value = value } : throw new ArgumentNullException(nameof(value), "Cannot create success state with null value");
     public static ErrorOr<T> Fail(string msg) => new() { HasValue = false, Message = msg };
     public static ErrorOr<T> Of(T? value, string valueNullMessage = "") => value is not null ? Success(value) : Fail(valueNullMessage);
-    public static ErrorOr<T> Of(IOptional<T> optional, string optionFailedMessage = "") => optional switch {
+    public static ErrorOr<T> Of(IOptional<T> optional, string optionFailedMessage = "") => optional switch
+    {
         ErrorOr<T> option => option,
         IOptional<T> option when option.HasValue => Success(option.Value!),
         IOptional<T> option when !option.HasValue => Fail(optionFailedMessage),
