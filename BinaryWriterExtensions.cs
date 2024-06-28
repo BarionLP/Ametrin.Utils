@@ -28,4 +28,3 @@ public static class BinaryWriterExtensions
 
     public delegate bool Converter<T>(Span<byte> buffer, T value);
 }
-

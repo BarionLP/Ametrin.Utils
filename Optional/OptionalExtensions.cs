@@ -31,6 +31,8 @@ public static class OptionalExtensions
     public static Result<T> ToResultWhereExists<T>(this T? fileSystemInfo) where T : FileSystemInfo
         => fileSystemInfo.ToResult().Where(dir => dir.Exists, ResultFlag.PathNotFound);
 
+    public static ErrorOr<T> ToErrorOr<T>(this IOptional<T> optional, string optionFailedMessage = "") => ErrorOr<T>.Of(optional, optionFailedMessage);
+
     public static TResult MapReduce<T, TResult>(this IOptional<T> optional, Func<T, TResult> map, TResult defaultValue)
         => optional.HasValue ? map(optional.Value!) : defaultValue;
     public static TResult MapReduce<T, TResult>(this IOptional<T> optional, Func<T, TResult> map, Func<TResult> defaultSupplier)
