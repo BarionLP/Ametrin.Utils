@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Ametrin.Utils.Optional;
 
 namespace Ametrin.Utils;
+
 public static partial class StringExtensions
 {
     public static T Parse<T>(this string input, IFormatProvider? provider = null) where T : IParsable<T>
@@ -48,6 +49,23 @@ public static partial class StringExtensions
     {
         return input.TryParse(out T result, provider) ? result : defaultValue;
     }
+
+    public static string Remove(this string value, Span<char> remove)
+    {
+        Span<char> buffer =  stackalloc char[value.Length];
+        int bufferIdx = 0;
+        for(int valueIdx = 0; valueIdx < value.Length; valueIdx++)
+        {
+            if(remove.Contains(value[valueIdx]))
+            {
+                continue;
+            }
+            buffer[bufferIdx] = value[valueIdx];
+            bufferIdx++;
+        }
+        return new string(buffer[..bufferIdx]);
+    }
+
     public static string ToNumberFriendly(this string input, NumberFormatInfo? formatInfo = null)
     {
         formatInfo ??= CultureInfo.CurrentCulture.NumberFormat;

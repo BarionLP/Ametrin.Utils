@@ -13,7 +13,7 @@ public static class MathM
     public const decimal PI = 3.14159265358979323846264338327950288419716939937510M;
 
     /// <summary>
-    /// represents PI
+    /// represents a small value
     /// </summary>
     public const decimal Epsilon = 0.0000000000000000001M;
 
