@@ -50,6 +50,5 @@ public readonly record struct ErrorOr<T> : IOptional<T>
     IOptional<T> IOptional<T>.Where(Func<T, bool> condition) => Where(condition);
     IOptional<T> IOptional<T>.WhereNot(Func<T, bool> condition) => WhereNot(condition);
     IOptional<TResult> IOptional<T>.Map<TResult>(Func<T, TResult> map) => Map(map);
-    IOptional<TResult> IOptional<T>.Map<TResult>(Func<T, IOptional<TResult>> map) => Map(map);
     T IOptional<T>.ReduceOrThrow() => throw new NotImplementedException();
 }
