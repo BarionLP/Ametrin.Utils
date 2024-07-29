@@ -10,7 +10,6 @@ public interface IOptional<T> : IEquatable<IOptional<T>>, IComparable<IOptional<
     public IOptional<T> WhereNot(Func<T, bool> predicate);
 
     public IOptional<TResult> Map<TResult>(Func<T, TResult> map);
-    public IOptional<TResult> Map<TResult>(Func<T, IOptional<TResult>> map);
     public IOptional<TResult> Cast<TResult>();
 
     public T ReduceOrThrow();
