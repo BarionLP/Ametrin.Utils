@@ -61,22 +61,5 @@ public static class CollectionExtensions
         return clone;
     }
 
-    public static string ToHexString(this ReadOnlySpan<byte> bytes)
-    {
-        Span<char> charSpan = stackalloc char[bytes.Length * 2];
-
-        for(int i = 0, j = 0; i < bytes.Length; i++, j += 2)
-        {
-            byte b = bytes[i];
-            charSpan[j] = GetHexCharacter(b / 16);
-            charSpan[j + 1] = GetHexCharacter(b % 16);
-        }
-
-        return new string(charSpan);
-
-        static char GetHexCharacter(int value)
-        {
-            return value < 10 ? (char) ('0' + value) : (char) ('A' + value - 10);
-        }
-    }
+    public static string ToHexString(this byte[] bytes) => SpanExtensions.ToHexString(bytes);
 }
