@@ -67,7 +67,6 @@ public readonly record struct Except<T> : IOptional<T>
     IOptional<T> IOptional<T>.Where(Func<T, bool> predicate) => Where(predicate);
     IOptional<T> IOptional<T>.WhereNot(Func<T, bool> predicate) => WhereNot(predicate);
     IOptional<TResult> IOptional<T>.Map<TResult>(Func<T, TResult> map) => Map(map);
-    IOptional<TResult> IOptional<T>.Map<TResult>(Func<T, IOptional<TResult>> map) => Map(map);
     IOptional<TResult> IOptional<T>.Cast<TResult>() => Cast<TResult>();
 
     public static implicit operator Except<T>(T? value) => Of(value);

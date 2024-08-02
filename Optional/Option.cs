@@ -13,7 +13,7 @@ public readonly record struct Option<T> : IOptional<T>
 
     public Option<TResult> Map<TResult>(Func<T, TResult> map) => HasValue ? Option<TResult>.Some(map(Value!)) : Option<TResult>.None();
     public Option<TResult> Map<TResult>(Func<T, Option<TResult>> map) => HasValue ? Option<TResult>.Of(map(Value!)) : Option<TResult>.None();
-    public Option<TResult> Map<TResult>(Func<T, IOptional<TResult>> map) => HasValue ? Option<TResult>.Of(map(Value!)) : Option<TResult>.None();
+    public Option<TResult> Map<TResult>(Func<T, Result<TResult>> map) => HasValue ? Option<TResult>.Of(map(Value!)) : Option<TResult>.None();
     public Option<TResult> Cast<TResult>()
     {
         if(HasValue && Value is TResult casted)
@@ -40,11 +40,10 @@ public readonly record struct Option<T> : IOptional<T>
 
     IOptional<T> IOptional<T>.Where(Func<T, bool> predicate) => Where(predicate);
     IOptional<T> IOptional<T>.WhereNot(Func<T, bool> predicate) => WhereNot(predicate);
-    IOptional<TResult> IOptional<T>.Map<TResult>(Func<T, IOptional<TResult>> map) => Map(map);
     IOptional<TResult> IOptional<T>.Map<TResult>(Func<T, TResult> map) => Map(map);
     IOptional<TResult> IOptional<T>.Cast<TResult>() => Cast<TResult>();
 
-    public override string ToString() => HasValue ? Value!.ToString() ?? "NoString" : "None";
+    public override string ToString() => HasValue ? Value!.ToString() ?? string.Empty : "None";
     public override readonly int GetHashCode() => HasValue ? Value!.GetHashCode() : 0;
 
     public static implicit operator Option<T>(T? obj) => Some(obj);

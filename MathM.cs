@@ -10,17 +10,17 @@ public static class MathM
     /// <summary>
     /// represents PI
     /// </summary>
-    public const decimal PI = 3.14159265358979323846264338327950288419716939937510M;
-
+    public const decimal PI = 3.14159265358979323846264338327950288419716939937510M; //output: 3.1415926535897932384626433833
+    
     /// <summary>
-    /// represents PI
+    /// represents a small value
     /// </summary>
     public const decimal Epsilon = 0.0000000000000000001M;
 
     /// <summary>
     /// represents 2*PI
     /// </summary>
-    private const decimal PIx2 = 6.28318530717958647692528676655900576839433879875021M;
+    private const decimal PIx2 = PI * 2;
 
     /// <summary>
     /// represents E
@@ -30,17 +30,17 @@ public static class MathM
     /// <summary>
     /// represents PI/2
     /// </summary>
-    private const decimal PIdiv2 = 1.570796326794896619231321691639751442098584699687552910487M;
+    private const decimal PIdiv2 = PI / 2.0M;
 
     /// <summary>
     /// represents PI/4
     /// </summary>
-    private const decimal PIdiv4 = 0.785398163397448309615660845819875721049292349843776455243M;
+    private const decimal PIdiv4 = PI / 4.0M;
 
     /// <summary>
-    /// represents 1.0/E
+    /// represents 1/E
     /// </summary>
-    private const decimal Einv = 0.3678794411714423215955237701614608674458111310317678M;
+    private const decimal Einv = One / E;
 
     /// <summary>
     /// log(10,E) factor
@@ -65,7 +65,7 @@ public static class MathM
     /// <summary>
     /// Max iterations count in Taylor series
     /// </summary>
-    private const int MaxIteration = 100;
+    private const int MaxTaylorIteration = 100;
 
     /// <summary>
     /// Analogy of Math.Exp method
@@ -247,7 +247,7 @@ public static class MathM
         var y = One;
         var cacheResult = result - One;
 
-        while(cacheResult != result && iteration < MaxIteration)
+        while(cacheResult != result && iteration < MaxTaylorIteration)
         {
             iteration++;
             cacheResult = result;
@@ -283,7 +283,7 @@ public static class MathM
         var xx = -x * Half;
         var y = One + xx;
         var cachedY = y - One;//init cache  with different value
-        for(var i = 1; cachedY != y && i < MaxIteration; i++)
+        for(var i = 1; cachedY != y && i < MaxTaylorIteration; i++)
         {
             cachedY = y;
             decimal factor = i * ((i << 1) + 3) + 1; //2i^2+2i+i+1=2i^2+3i+1
