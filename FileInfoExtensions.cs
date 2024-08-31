@@ -27,19 +27,19 @@ public static class FileInfoExtensions
 
     public static string ComputeSha256Hash(this FileInfo fileInfo)
     {
-        using var sha256Hash = SHA256.Create();
+        using var hasher = SHA256.Create();
         using var stream = File.OpenRead(fileInfo.FullName);
 
-        var hash = sha256Hash.ComputeHash(stream);
-        return BitConverter.ToString(hash).Replace("-", string.Empty);
+        var hash = hasher.ComputeHash(stream);
+        return hash.ToHexString();
     }
 
     public static string ComputeMd5Hash(this FileInfo fileInfo)
     {
-        using var md5Hash = MD5.Create();
+        using var hasher = MD5.Create();
         using var stream = File.OpenRead(fileInfo.FullName);
 
-        var hash = md5Hash.ComputeHash(stream);
-        return BitConverter.ToString(hash).Replace("-", string.Empty);
+        var hash = hasher.ComputeHash(stream);
+        return hash.ToHexString();
     }
 }

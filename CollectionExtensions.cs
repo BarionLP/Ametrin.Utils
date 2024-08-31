@@ -65,4 +65,6 @@ public static class CollectionExtensions
         Array.Copy(original, clone, original.Length);
         return clone;
     }
+
+    public static string ToHexString(this byte[] bytes) => SpanExtensions.ToHexString(bytes);
 }
