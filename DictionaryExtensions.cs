@@ -41,7 +41,7 @@ public static class DictionaryExtensions
         return Option<TValue>.None();
     }
 
-    public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue @default)
+    public static TValue GetValueOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue @default)
     {
         if(dictionary.TryGetValue(key, out var value))
             return value;
@@ -49,7 +49,7 @@ public static class DictionaryExtensions
         dictionary.Add(key, @default);
         return @default;
     }
-    public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) where TValue : new()
+    public static TValue GetValueOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) where TValue : new()
     {
         if(!dictionary.TryGetValue(key, out var val))
         {
@@ -59,7 +59,7 @@ public static class DictionaryExtensions
 
         return val;
     }
-    public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TValue> valueFactory)
+    public static TValue GetValueOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TValue> valueFactory)
     {
         if(!dictionary.TryGetValue(key, out var value))
         {
@@ -70,6 +70,7 @@ public static class DictionaryExtensions
         return value;
     }
 
+    [Obsolete] //TODO: make equality comparer a parameter
     public static TKey GetKey<TKey, TData>(this IDictionary<TKey, TData> dictionary, TData value)
         => dictionary.First(pair => EqualityComparer<TData>.Default.Equals(pair.Value, value)).Key;
 }
