@@ -21,4 +21,8 @@ public static class StringBuilderExtensions
         }
         return builder;
     }
+
+    public static StringBuilder Indent(this StringBuilder builder, int count) => builder.AppendRepeated('\t', count);
+    public static StringBuilder Append(this StringBuilder builder, string value, int indent) => builder.Indent(indent).Append(value);
+    public static StringBuilder AppendLine(this StringBuilder builder, string value, int indent) => builder.Indent(indent).AppendLine(value);
 }
