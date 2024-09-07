@@ -28,6 +28,8 @@ public static class LinqExtensions
     public static string Dump<T>(this IEnumerable<T> values, string separator) => string.Join(separator, values);
     public static string Dump<T>(this IEnumerable<T> values, char separator) => string.Join(separator, values);
 
+    public static IEnumerable<string> SelectDuplicates(this IEnumerable<string> values) => values.GroupBy(x => x).Where(g => g.Count() > 1).Select(g => g.Key);
+
     public static FrozenDictionary<TKey, TResult> ToFrozenDictionary<TKey, TResult, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source, Func<TValue, TResult> map) where TKey : notnull
         => source.Select(pair => new KeyValuePair<TKey, TResult>(pair.Key, map(pair.Value))).ToFrozenDictionary();
 
