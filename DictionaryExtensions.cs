@@ -70,7 +70,10 @@ public static class DictionaryExtensions
         return value;
     }
 
-    [Obsolete] //TODO: make equality comparer a parameter
-    public static TKey GetKey<TKey, TData>(this IDictionary<TKey, TData> dictionary, TData value)
-        => dictionary.First(pair => EqualityComparer<TData>.Default.Equals(pair.Value, value)).Key;
+    public static TKey GetKey<TKey, TData>(this IDictionary<TKey, TData> dictionary, TData value) => dictionary.GetKey(value, null);
+    public static TKey GetKey<TKey, TData>(this IDictionary<TKey, TData> dictionary, TData value, EqualityComparer<TData>? comparer)
+    {
+        comparer ??= EqualityComparer<TData>.Default;
+        return dictionary.First(pair => comparer.Equals(pair.Value, value)).Key;
+    }
 }
