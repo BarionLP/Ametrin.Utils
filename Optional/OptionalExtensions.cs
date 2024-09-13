@@ -1,6 +1,5 @@
 namespace Ametrin.Utils.Optional;
 
-
 public static class OptionalExtensions
 {
     public static Option<T> ToOption<T>(this T? obj) where T : class
@@ -16,14 +15,14 @@ public static class OptionalExtensions
     public static Option<T> WhereExists<T>(this Option<T> option) where T : FileSystemInfo
         => option.Where(info => info.Exists);
 
-    public static Result<IEnumerable<T>> WhereNotEmpty<T>(this Result<IEnumerable<T>> result, ResultFlag flag = ResultFlag.Null)
-        => result.Where(collection => collection.Any());
+    public static Result<IEnumerable<T>> WhereNotEmpty<T>(this Result<IEnumerable<T>> result, ResultFlag flag = ResultFlag.NullOrEmpty)
+        => result.Where(collection => collection.Any(), flag);
     public static ResultFlag ToFlag<T>(this IOptional<T> optional, ResultFlag flag = ResultFlag.Failed)
         => optional.HasValue ? ResultFlag.Succeeded : flag;
 
-    public static Result<T> ToResult<T>(this T? obj, ResultFlag flag = ResultFlag.Null) where T : class
+    public static Result<T> ToResult<T>(this T? obj, ResultFlag flag = ResultFlag.NullOrEmpty) where T : class
         => obj is not null ? Result<T>.Success(obj) : Result<T>.Fail(flag);
-    public static Result<T> ToResult<T>(this T? obj, ResultFlag flag = ResultFlag.Null) where T : struct
+    public static Result<T> ToResult<T>(this T? obj, ResultFlag flag = ResultFlag.NullOrEmpty) where T : struct
         // would return Result<int?> if done without explicit struct nullability
         => obj.HasValue ? Result<T>.Success(obj.Value) : Result<T>.Fail(flag);
     public static Result<T> ToResult<T>(this IOptional<T> optional, ResultFlag flag = ResultFlag.Failed)

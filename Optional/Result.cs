@@ -14,7 +14,7 @@ public readonly record struct Result<T> : IOptional<T>
     public Result<T> Where(Func<T, bool> predicate, ResultFlag flag = ResultFlag.Failed) => IsSuccess ? (predicate(Value!) ? this : Fail(flag)) : Fail(ResultFlag);
     public Result<T> WhereNot(Func<T, bool> predicate, ResultFlag flag = ResultFlag.Failed) => IsSuccess ? (!predicate(Value!) ? this : Fail(flag)) : Fail(ResultFlag);
 
-    public Result<TResult> Map<TResult>(Func<T, TResult?> map, ResultFlag flag = ResultFlag.Null)
+    public Result<TResult> Map<TResult>(Func<T, TResult?> map, ResultFlag flag = ResultFlag.NullOrEmpty)
         => IsSuccess ? Result<TResult>.Of(map(Value!), flag) : ResultFlag;
     public Result<TResult> Map<TResult>(Func<T, TResult> map)
         => IsSuccess ? map(Value!) : ResultFlag;
@@ -47,8 +47,8 @@ public readonly record struct Result<T> : IOptional<T>
 
     public static Result<T> Success(T value) => value is not null ? new() { Value = value, ResultFlag = ResultFlag.Succeeded } : throw new ArgumentNullException(nameof(value), "Cannot create Result with null value");
     public static Result<T> Fail(ResultFlag flag = ResultFlag.Failed) => flag.IsFail() ? new() { ResultFlag = flag } : throw new ArgumentException("Cannot Fail with Succeed flag");
-    public static Result<T> Of(T? value, ResultFlag flag = ResultFlag.Null) => value is not null ? Success(value) : Fail(flag);
-    public static Result<T> Of(IOptional<T> optional, ResultFlag flag = ResultFlag.Null) => optional switch
+    public static Result<T> Of(T? value, ResultFlag flag = ResultFlag.NullOrEmpty) => value is not null ? Success(value) : Fail(flag);
+    public static Result<T> Of(IOptional<T> optional, ResultFlag flag = ResultFlag.NullOrEmpty) => optional switch
     {
         Result<T> option => option,
         IOptional<T> option when option.HasValue => Success(option.Value!),

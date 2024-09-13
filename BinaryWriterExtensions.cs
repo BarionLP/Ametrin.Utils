@@ -12,7 +12,15 @@ public static class BinaryWriterExtensions
     public static void WriteBigEndian<T>(this BinaryWriter writer, T value, int byteSize, Converter<T> converter)
     {
         Span<byte> buffer = stackalloc byte[byteSize];
+#if RELEASE
         converter(buffer, value);
+#endif
+#if DEBUG
+        if(!converter(buffer, value))
+        {
+            throw new InvalidOperationException();
+        }
+#endif
         writer.WriteBigEndian(buffer);
     }
 

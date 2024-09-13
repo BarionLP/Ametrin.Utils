@@ -16,11 +16,12 @@ public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValu
     public Result<TNode> TryGet(TValue value)
     {
         if(value is null)
+        {
             return ResultFlag.InvalidArgument;
+        }
+
         var result = Nodes.FirstOrDefault(entry => entry.Value.Equals(value));
-        if(result is null)
-            return ResultFlag.Null;
-        return result;
+        return result is null ? ResultFlag.NullOrEmpty : result;
     }
 
     public Result<TNode> TryGet(Index idx)
@@ -37,15 +38,20 @@ public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValu
         {
             return ResultFlag.Failed;
         }
-
     }
 
     public ResultFlag TryAdd(TNode node)
     {
         if(node is null)
+        {
             return ResultFlag.InvalidArgument;
+        }
+
         if(Exists(node.Value))
+        {
             return ResultFlag.AlreadyExists;
+        }
+
         Nodes.Add(node);
         return ResultFlag.Succeeded;
     }
@@ -91,7 +97,7 @@ public sealed class Node<T> : INode<T> where T : notnull
     [DataMember(Name = "value"), NotNull]
     public required T Value { get; init; }
     [DataMember(Name = "links", EmitDefaultValue = false)]
-    private readonly HashSet<INode<T>> Links = new();
+    private readonly HashSet<INode<T>> Links = [];
 
     public void Link(INode<T> node)
     {
@@ -151,9 +157,7 @@ public static class GraphSerializer
 
         try
         {
-            if(serializer.ReadObject(stream) is not Graph<TNode, TValue> result)
-                return ResultFlag.Null;
-            return result;
+            return serializer.ReadObject(stream) is Graph<TNode, TValue> result ? result : ResultFlag.NullOrEmpty;
         }
         catch(IOException)
         {
