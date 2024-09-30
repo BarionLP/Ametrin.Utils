@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 using System.Xml;
 
-namespace Ametrin.Utils;
+namespace Ametrin.Utils.Graph;
 
 [DataContract(Namespace = "Ametrin.Utils", IsReference = true)]
 public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValue : notnull
