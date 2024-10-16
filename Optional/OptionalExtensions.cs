@@ -10,7 +10,7 @@ public static class OptionalExtensions
     public static Option<T> ToOption<T>(this IOptional<T> optional)
         => Option<T>.Of(optional);
 
-    public static Option<T> ToOption<T>(this object obj)
+    public static Option<T> ToOption<T>(this object? obj)
         => obj is T t ? Option<T>.Some(t) : Option<T>.None();
     public static Option<T> WhereExists<T>(this Option<T> option) where T : FileSystemInfo
         => option.Where(info => info.Exists);
