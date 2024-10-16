@@ -6,7 +6,7 @@ public static class StringBuilderExtensions
 {
     public static StringBuilder AppendRepeated(this StringBuilder builder, string value, int count)
     {
-        for(int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             builder.Append(value);
         }
@@ -15,7 +15,7 @@ public static class StringBuilderExtensions
 
     public static StringBuilder AppendRepeated(this StringBuilder builder, char value, int count)
     {
-        for(int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             builder.Append(value);
         }

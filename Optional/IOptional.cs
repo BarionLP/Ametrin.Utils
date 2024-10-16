@@ -1,6 +1,7 @@
 ﻿namespace Ametrin.Utils.Optional;
 
 // The entire Optional Framework is based on Zoran Horvats Option type https://github.com/zoran-horvat/optional
+[Obsolete]
 public interface IOptional<T> : IEquatable<IOptional<T>>, IComparable<IOptional<T>>, IEquatable<T>, IComparable<T>, IComparable
 {
     public bool HasValue { get; }

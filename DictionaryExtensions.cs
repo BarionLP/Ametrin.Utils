@@ -1,4 +1,4 @@
-using Ametrin.Utils.Optional;
+using Ametrin.Optional;
 
 namespace Ametrin.Utils;
 
@@ -6,9 +6,9 @@ public static class DictionaryExtensions
 {
     public static bool TryGetValue<T>(this IReadOnlyDictionary<string, T> dictionary, ReadOnlySpan<char> spanKey, out T result)
     {
-        foreach(var key in dictionary.Keys)
+        foreach (var key in dictionary.Keys)
         {
-            if(spanKey.SequenceEqual(key))
+            if (spanKey.SequenceEqual(key))
             {
                 result = dictionary[key];
                 return true;
@@ -19,11 +19,12 @@ public static class DictionaryExtensions
         return false;
     }
 
+    [Obsolete("Replace with GetAlternateLookup")]
     public static T Get<T>(this IReadOnlyDictionary<string, T> dictionary, ReadOnlySpan<char> spanKey)
     {
-        foreach(var key in dictionary.Keys)
+        foreach (var key in dictionary.Keys)
         {
-            if(spanKey.SequenceEqual(key))
+            if (spanKey.SequenceEqual(key))
             {
                 return dictionary[key];
             }
@@ -33,25 +34,21 @@ public static class DictionaryExtensions
     }
 
     public static Option<TValue> Get<TValue, TKey>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key)
-    {
-        if(dictionary.TryGetValue(key, out var res))
-        {
-            return res;
-        }
-        return Option<TValue>.None();
-    }
+        => dictionary.TryGetValue(key, out var res) ? (Option<TValue>)res : default;
 
     public static TValue GetValueOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue @default)
     {
-        if(dictionary.TryGetValue(key, out var value))
+        if (dictionary.TryGetValue(key, out var value))
+        {
             return value;
+        }
 
         dictionary.Add(key, @default);
         return @default;
     }
     public static TValue GetValueOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) where TValue : new()
     {
-        if(!dictionary.TryGetValue(key, out var val))
+        if (!dictionary.TryGetValue(key, out var val))
         {
             val = new TValue();
             dictionary.Add(key, val);
@@ -61,7 +58,7 @@ public static class DictionaryExtensions
     }
     public static TValue GetValueOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TValue> valueFactory)
     {
-        if(!dictionary.TryGetValue(key, out var value))
+        if (!dictionary.TryGetValue(key, out var value))
         {
             value = valueFactory();
             dictionary.Add(key, value);

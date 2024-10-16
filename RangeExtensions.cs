@@ -21,8 +21,10 @@ public static class RangeExtensions
 
         public RangeEnumerator(Range range)
         {
-            if(range.End.IsFromEnd)
+            if (range.End.IsFromEnd)
+            {
                 throw new NotFiniteNumberException("Can't count to infinity!", range.End.Value);
+            }
 
             _current = range.Start.Value - 1;
             _end = range.End.Value;

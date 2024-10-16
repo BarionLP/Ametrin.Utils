@@ -1,9 +1,36 @@
+using System.Collections;
 using System.Collections.Concurrent;
 
 namespace Ametrin.Utils.Registry;
 
-public sealed class ConcurrentRegistry<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValue>> values)
-    : MutableRegistry<TKey, TValue>(new ConcurrentDictionary<TKey, TValue>(values)) where TKey : notnull
+public sealed class ConcurrentRegistry<TKey, TValue>(ConcurrentDictionary<TKey, TValue> entries) : IMutableRegistry<TKey, TValue> where TKey : notnull
 {
-    public ConcurrentRegistry(IEnumerable<TValue> values, Func<TValue, TKey> keyProvider) : this(values.Select(val => new KeyValuePair<TKey, TValue>(keyProvider(val), val))) { }
+    private readonly ConcurrentDictionary<TKey, TValue> _entries = entries;
+    public int Count => _entries.Count;
+    public IEnumerable<TKey> Keys => _entries.Keys;
+
+    public TValue this[TKey key]
+    {
+        get => _entries[key];
+        set => _entries[key] = value;
+    }
+
+    public ConcurrentRegistry(IEnumerable<KeyValuePair<TKey, TValue>> values)
+    : this(new ConcurrentDictionary<TKey, TValue>(values)) { }
+    public ConcurrentRegistry(IEnumerable<TValue> values, Func<TValue, TKey> keyProvider)
+        : this(values.Select(val => new KeyValuePair<TKey, TValue>(keyProvider(val), val))) { }
+    public ConcurrentRegistry() : this([]) { }
+
+    public Option<TValue> TryGet(TKey key)
+        => _entries.TryGetValue(key, out var value) ? (Option<TValue>)value : Option<TValue>.None();
+    public ResultFlag TryRegister(TKey key, TValue value)
+        => _entries.TryAdd(key, value) ? ResultFlag.Succeeded : ResultFlag.AlreadyExists;
+    
+    public bool ContainsKey(TKey key) => _entries.ContainsKey(key);
+
+    public ConcurrentDictionary<TKey, TValue>.AlternateLookup<TAlternate> GetAlternateLookup<TAlternate>() where TAlternate : notnull
+        => _entries.GetAlternateLookup<TAlternate>();
+
+    public IEnumerator<TValue> GetEnumerator() => _entries.Values.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_entries).GetEnumerator();
 }

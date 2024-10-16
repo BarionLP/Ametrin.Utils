@@ -1,4 +1,3 @@
-using Ametrin.Utils.Optional;
 using System.Collections;
 using System.Collections.Frozen;
 
@@ -14,19 +13,16 @@ public class Registry<TKey, TValue>(FrozenDictionary<TKey, TValue> entries) : IR
     public Registry(IEnumerable<KeyValuePair<TKey, TValue>> entries) : this(entries.ToFrozenDictionary()) { }
     public Registry(IEnumerable<TValue> values, Func<TValue, TKey> keyProvider) : this(values.ToFrozenDictionary(keyProvider)) { }
 
-    public Option<TValue> TryGet(TKey key)
-    {
-        if(_entries.TryGetValue(key, out var value))
-        {
-            return value;
-        }
-        return Option<TValue>.None();
-    }
     public bool ContainsKey(TKey key) => _entries.ContainsKey(key);
+    public Option<TValue> TryGet(TKey key)
+        => _entries.TryGetValue(key, out var value) ? value : default;
+
+    public FrozenDictionary<TKey, TValue>.AlternateLookup<TAlternate> GetAlternateLookup<TAlternate>() where TAlternate : notnull
+        => _entries.GetAlternateLookup<TAlternate>();
 
     public IEnumerator<TValue> GetEnumerator()
     {
-        foreach(var value in _entries.Values)
+        foreach (var value in _entries.Values)
         {
             yield return value;
         }

@@ -1,5 +1,6 @@
 namespace Ametrin.Utils.Optional;
 
+[Obsolete]
 public static class OptionalLinqExtensions
 {
     public static Option<T> FirstOrNone<T>(this IEnumerable<T> source) => source.Any() ? source.First() : Option<T>.None();

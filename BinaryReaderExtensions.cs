@@ -1,4 +1,6 @@
-﻿namespace Ametrin.Utils;
+﻿using System.IO;
+
+namespace Ametrin.Utils;
 
 public static class BinaryReaderExtensions
 {
@@ -21,7 +23,7 @@ public static class BinaryReaderExtensions
     public static void ReadBigEndian(this BinaryReader reader, Span<byte> buffer)
     {
         reader.Read(buffer);
-        if(BitConverter.IsLittleEndian)
+        if (BitConverter.IsLittleEndian)
         {
             buffer.Reverse();
         }

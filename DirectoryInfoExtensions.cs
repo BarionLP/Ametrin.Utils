@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic.FileIO;
+﻿using System.IO;
+using Microsoft.VisualBasic.FileIO;
 using SearchOption = System.IO.SearchOption;
 
 namespace Ametrin.Utils;
@@ -7,7 +8,7 @@ public static class DirectoryInfoExtensions
 {
     public static DirectoryInfo GetCopyOfPathIfExists(this DirectoryInfo directoryInfo)
     {
-        if(!directoryInfo.Exists)
+        if (!directoryInfo.Exists)
             return directoryInfo;
         return directoryInfo.GetCopyOfPath().GetCopyOfPathIfExists();
     }
@@ -19,7 +20,7 @@ public static class DirectoryInfoExtensions
 
     public static void CreateIfNotExists(this DirectoryInfo directoryInfo)
     {
-        if(!directoryInfo.Exists)
+        if (!directoryInfo.Exists)
         {
             directoryInfo.Create();
         }
@@ -35,7 +36,7 @@ public static class DirectoryInfoExtensions
 
     public static void ForeachFile(this DirectoryInfo directoryInfo, Action<FileInfo> action, IProgress<(float, string)>? progress, SearchOption searchOption = SearchOption.AllDirectories, string pattern = "*")
     {
-        if(progress is null)
+        if (progress is null)
         {
             directoryInfo.ForeachFile(action);
             return;
@@ -44,7 +45,7 @@ public static class DirectoryInfoExtensions
         var files = directoryInfo.GetFiles(pattern, searchOption);
         float totalFiles = files.Length;
         var processed = 0;
-        foreach(var file in files)
+        foreach (var file in files)
         {
             action(file);
             processed++;
@@ -54,7 +55,7 @@ public static class DirectoryInfoExtensions
 
     public static void ForeachFile(this DirectoryInfo directoryInfo, Action<FileInfo> action, IProgress<float>? progress, SearchOption searchOption = SearchOption.AllDirectories, string pattern = "*")
     {
-        if(progress is null)
+        if (progress is null)
         {
             directoryInfo.ForeachFile(action);
             return;
@@ -63,7 +64,7 @@ public static class DirectoryInfoExtensions
         var files = directoryInfo.GetFiles(pattern, searchOption);
         float totalFiles = files.Length;
         var processed = 0;
-        foreach(var file in files)
+        foreach (var file in files)
         {
             action(file);
             processed++;
@@ -73,7 +74,7 @@ public static class DirectoryInfoExtensions
 
     public static void ForeachFile(this DirectoryInfo directoryInfo, Action<FileInfo> action, SearchOption searchOption = SearchOption.AllDirectories, string pattern = "*")
     {
-        foreach(var file in directoryInfo.GetFiles(pattern, searchOption))
+        foreach (var file in directoryInfo.GetFiles(pattern, searchOption))
         {
             action(file);
         }

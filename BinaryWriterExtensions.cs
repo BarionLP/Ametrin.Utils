@@ -1,4 +1,6 @@
-﻿namespace Ametrin.Utils;
+﻿using System.IO;
+
+namespace Ametrin.Utils;
 
 public static class BinaryWriterExtensions
 {
@@ -16,7 +18,7 @@ public static class BinaryWriterExtensions
         converter(buffer, value);
 #endif
 #if DEBUG
-        if(!converter(buffer, value))
+        if (!converter(buffer, value))
         {
             throw new InvalidOperationException();
         }
@@ -26,7 +28,7 @@ public static class BinaryWriterExtensions
 
     public static void WriteBigEndian(this BinaryWriter writer, Span<byte> buffer)
     {
-        if(BitConverter.IsLittleEndian)
+        if (BitConverter.IsLittleEndian)
         {
             //do i need to copy?
             buffer.Reverse();

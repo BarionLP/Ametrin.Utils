@@ -25,8 +25,8 @@ internal sealed class FlatTransformable<TData>(TData[] array, int width) : ISmoo
 
     public TData Sample(double x, double y)
     {
-        int indexLeft = (int) x;
-        int indexBottom = (int) y;
+        int indexLeft = (int)x;
+        int indexBottom = (int)y;
         int indexRight = Math.Min(indexLeft + 1, Width - 1);
         int indexTop = Math.Min(indexBottom + 1, Height - 1);
 

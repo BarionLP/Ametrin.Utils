@@ -1,4 +1,4 @@
-using Ametrin.Utils.Optional;
+using Ametrin.Optional;
 
 namespace Ametrin.Utils.Registry;
 

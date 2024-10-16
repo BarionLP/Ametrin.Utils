@@ -2,6 +2,7 @@ using System.Diagnostics;
 
 namespace Ametrin.Utils.Optional;
 
+[Obsolete("Use Ametrin.Optional.Result")]
 public readonly record struct Except<T> : IOptional<T>
 {
     public bool HasValue { get; private init; }

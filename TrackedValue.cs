@@ -18,7 +18,7 @@ public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable,
 
     public void Set(T value)
     {
-        if(EqualityComparer<T>.Default.Equals(_value, value))
+        if (EqualityComparer<T>.Default.Equals(_value, value))
             return;
         SetSilent(value);
         HasChanged = true;
@@ -52,14 +52,14 @@ public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable,
     //sniff sniff
     public int CompareTo(T? other)
     {
-        if(Value is null)
+        if (Value is null)
             return other is null ? 0 : -1;
 
-        if(Value is IComparable<T> comparable1)
+        if (Value is IComparable<T> comparable1)
             return comparable1.CompareTo(other);
-        if(Value is IComparable<T?> comparable2)
+        if (Value is IComparable<T?> comparable2)
             return comparable2.CompareTo(other);
-        if(Value is IComparable comparable3)
+        if (Value is IComparable comparable3)
             return comparable3.CompareTo(other);
 
         throw new InvalidOperationException($"{typeof(T).Name} does not implement the IComparable interface.");
@@ -67,15 +67,13 @@ public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable,
 
     public int CompareTo(object? other)
     {
-        if(other is null)
-            return 1;
-
-        if(other is TrackedValue<T> trackedValue)
-            return CompareTo(trackedValue.Value);
-        if(other is T t)
-            return CompareTo(t);
-
-        throw new InvalidOperationException($"Cannot compare {typeof(T).FullName} to {other.GetType().FullName}");
+        return other switch
+        {
+            null => 1,
+            TrackedValue<T> trackedValue => CompareTo(trackedValue.Value),
+            T t => CompareTo(t),
+            _ => throw new InvalidOperationException($"Cannot compare {typeof(T).FullName} to {other.GetType().FullName}")
+        };
     }
 
 

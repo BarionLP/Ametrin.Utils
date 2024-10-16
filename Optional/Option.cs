@@ -3,6 +3,7 @@ using System.Diagnostics;
 namespace Ametrin.Utils.Optional;
 
 // based on https://github.com/zoran-horvat/optional
+[Obsolete("Use Ametrin.Optional.Option")]
 public readonly record struct Option<T> : IOptional<T>
 {
     public bool HasValue { get; private init; }

@@ -2,6 +2,7 @@
 
 namespace Ametrin.Utils.Optional;
 
+[Obsolete]
 public readonly record struct Result<T> : IOptional<T>
 {
     public bool IsSuccess => ResultFlag.IsSuccess();

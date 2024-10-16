@@ -7,27 +7,27 @@ public static class SpanExtensions
     {
         int start = 0;
         var result = new List<Range>();
-        for(int i = 0; i < span.Length; i++)
+        for (int i = 0; i < span.Length; i++)
         {
-            if(span[i] == delimiter)
+            if (span[i] == delimiter)
             {
-                if(i > start)
+                if (i > start)
                     result.Add(new Range(start, i));
 
                 start = i + 1;
             }
         }
 
-        if(span.Length > start)
+        if (span.Length > start)
             result.Add(new Range(start, span.Length));
         return result;
     }
 
     public static bool All<T>(this ReadOnlySpan<T> span, Func<T, bool> condition)
     {
-        foreach(var element in span)
+        foreach (var element in span)
         {
-            if(!condition(element))
+            if (!condition(element))
                 return false;
         }
         return true;
@@ -35,9 +35,9 @@ public static class SpanExtensions
 
     public static int FirstDigitIndex(this ReadOnlySpan<char> s)
     {
-        for(int i = 0; i < s.Length; i++)
+        for (int i = 0; i < s.Length; i++)
         {
-            if(char.IsDigit(s[i]))
+            if (char.IsDigit(s[i]))
                 return i;
         }
         return s.Length;
@@ -48,7 +48,7 @@ public static class SpanExtensions
     {
         Span<char> charSpan = stackalloc char[bytes.Length * 2];
 
-        for(int i = 0, j = 0; i < bytes.Length; i++, j += 2)
+        for (int i = 0, j = 0; i < bytes.Length; i++, j += 2)
         {
             byte b = bytes[i];
             charSpan[j] = GetHexCharacter(b / 16);
@@ -59,7 +59,7 @@ public static class SpanExtensions
 
         static char GetHexCharacter(int value)
         {
-            return value < 10 ? (char) ('0' + value) : (char) ('A' + value - 10);
+            return value < 10 ? (char)('0' + value) : (char)('A' + value - 10);
         }
     }
 }

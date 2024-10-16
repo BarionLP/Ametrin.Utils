@@ -1,5 +1,8 @@
+using System.IO;
+
 namespace Ametrin.Utils.Optional;
 
+[Obsolete]
 public static class OptionalExtensions
 {
     public static Option<T> ToOption<T>(this T? obj) where T : class

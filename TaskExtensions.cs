@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Ametrin.Utils;
 public static class TaskExtensions
@@ -14,7 +15,7 @@ public static class TaskExtensions
         {
             return await allTasks;
         }
-        catch(Exception)
+        catch (Exception)
         {
             //ignore
         }

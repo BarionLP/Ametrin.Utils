@@ -25,7 +25,7 @@ public class OneOf<T1, T2>
 
     public void Match<TResult>(Action<T1> a1, Action<T2> a2)
     {
-        switch(_value)
+        switch (_value)
         {
             case T1 x:
                 a1(x);
@@ -74,7 +74,7 @@ public class OneOf<T1, T2, T3>
 
     public void Match(Action<T1> a1, Action<T2> a2, Action<T3> a3)
     {
-        switch(_value)
+        switch (_value)
         {
             case T1 t1:
                 a1(t1);
@@ -94,4 +94,3 @@ public class OneOf<T1, T2, T3>
     public static implicit operator OneOf<T1, T2, T3>(T2 t2) => new(t2);
     public static implicit operator OneOf<T1, T2, T3>(T3 t3) => new(t3);
 }
-

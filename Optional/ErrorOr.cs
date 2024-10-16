@@ -2,6 +2,7 @@
 
 namespace Ametrin.Utils.Optional;
 
+[Obsolete("Use Ametrin.Optional.Result<T, string>")]
 public readonly record struct ErrorOr<T> : IOptional<T>
 {
     public bool HasValue { get; private init; }

@@ -1,16 +1,13 @@
-﻿using System.Security.Cryptography;
+﻿using System.IO;
+using System.Security.Cryptography;
 using Microsoft.VisualBasic.FileIO;
 
 namespace Ametrin.Utils;
 
 public static class FileInfoExtensions
 {
-    public static FileInfo GetCopyOfPathIfExists(this FileInfo fileInfo)
-    {
-        if(!fileInfo.Exists)
-            return fileInfo;
-        return GetCopyOfPathIfExists(GetCopyOfPath(fileInfo));
-    }
+    public static FileInfo GetCopyOfPathIfExists(this FileInfo fileInfo) 
+        => !fileInfo.Exists ? fileInfo : GetCopyOfPathIfExists(GetCopyOfPath(fileInfo));
 
     public static FileInfo GetCopyOfPath(this FileInfo fileInfo)
     {

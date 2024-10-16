@@ -1,47 +1,36 @@
-using Ametrin.Utils.Optional;
 using System.Collections;
 
 namespace Ametrin.Utils.Registry;
 
-public class MutableRegistry<TKey, TValue>(IDictionary<TKey, TValue> entries) : IMutableRegistry<TKey, TValue> where TKey : notnull
+public class MutableRegistry<TKey, TValue>(Dictionary<TKey, TValue> entries) : IMutableRegistry<TKey, TValue> where TKey : notnull
 {
-    private readonly IDictionary<TKey, TValue> Entries = entries;
-    public int Count => Entries.Count;
-    public IEnumerable<TKey> Keys => Entries.Keys;
+    private readonly Dictionary<TKey, TValue> _entries = entries;
+    public int Count => _entries.Count;
+    public IEnumerable<TKey> Keys => _entries.Keys;
 
     public TValue this[TKey key]
     {
-        get => Entries[key];
+        get => _entries[key];
         set
         {
-            Entries[key] = value;
+            _entries[key] = value;
         }
     }
     public MutableRegistry(IEnumerable<TValue> values, Func<TValue, TKey> keyProvider) : this(values.ToDictionary(keyProvider)) { }
     public MutableRegistry(IEnumerable<KeyValuePair<TKey, TValue>> entries) : this(entries.ToDictionary()) { }
-    public MutableRegistry() : this(new Dictionary<TKey, TValue>()) { }
+    public MutableRegistry() : this([]) { }
 
     public Option<TValue> TryGet(TKey key)
-    {
-        if(Entries.TryGetValue(key, out var value))
-        {
-            return value;
-        }
-        return Option<TValue>.None();
-    }
+        => _entries.TryGetValue(key, out var value) ? value : default;
 
     public ResultFlag TryRegister(TKey key, TValue value)
-    {
-        if(Entries.TryAdd(key, value))
-        {
-            return ResultFlag.Succeeded;
-        }
+        => _entries.TryAdd(key, value) ? ResultFlag.Succeeded : ResultFlag.AlreadyExists;
+    public bool ContainsKey(TKey key) => _entries.ContainsKey(key);
 
-        return ResultFlag.AlreadyExists;
-    }
-    public bool ContainsKey(TKey key) => Entries.ContainsKey(key);
 
-    public IEnumerator<TValue> GetEnumerator() => Entries.Values.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) Entries).GetEnumerator();
+    public Dictionary<TKey, TValue>.AlternateLookup<TAlternate> GetAlternateLookup<TAlternate>() where TAlternate : notnull
+        => _entries.GetAlternateLookup<TAlternate>();
 
+    public IEnumerator<TValue> GetEnumerator() => _entries.Values.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_entries).GetEnumerator();
 }

@@ -2,7 +2,6 @@
 
 public static class CollectionExtensions
 {
-    //public static T GetRandomElement<T>(this ICollection<T> collection) => collection.GetRandomElement(Random.Shared);
     public static T GetRandomElement<T>(this ICollection<T> collection, Random? random = null)
     {
         random ??= Random.Shared;
@@ -12,7 +11,7 @@ public static class CollectionExtensions
     public static IEnumerable<T> GetRandomElements<T>(this ICollection<T> collection, int count, Random? randomSource = null)
     {
         randomSource ??= Random.Shared;
-        foreach(int _ in ..count)
+        foreach (int _ in ..count)
         {
             yield return collection.GetRandomElement(randomSource);
         }
@@ -21,9 +20,9 @@ public static class CollectionExtensions
     public static int MaxIndex<T>(this IList<T> list) where T : IComparable<T>
     {
         var maxIndex = 0;
-        for(int i = 1; i < list.Count; i++)
+        for (int i = 1; i < list.Count; i++)
         {
-            if(list[i].CompareTo(list[maxIndex]) > 0)
+            if (list[i].CompareTo(list[maxIndex]) > 0)
             {
                 maxIndex = i;
             }
@@ -34,7 +33,7 @@ public static class CollectionExtensions
 
     public static void Move<T>(this IList<T> from, int idx, ICollection<T> to)
     {
-        if(idx < 0 || idx >= from.Count)
+        if (idx < 0 || idx >= from.Count)
             throw new IndexOutOfRangeException(nameof(idx));
 
         to.Add(from[idx]);
@@ -43,9 +42,9 @@ public static class CollectionExtensions
 
     public static bool Contains<T>(this ICollection<T> values, IEnumerable<T> contains)
     {
-        foreach(var contain in contains)
+        foreach (var contain in contains)
         {
-            if(!values.Contains(contain))
+            if (!values.Contains(contain))
                 return false;
         }
         return true;
