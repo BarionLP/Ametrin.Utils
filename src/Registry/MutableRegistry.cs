@@ -23,7 +23,7 @@ public class MutableRegistry<TKey, TValue>(Dictionary<TKey, TValue> entries) : I
     public Option<TValue> TryGet(TKey key)
         => _entries.TryGetValue(key, out var value) ? value : default;
 
-    public ErrorState TryRegister(TKey key, TValue value)
+    public Option TryRegister(TKey key, TValue value)
         => _entries.TryAdd(key, value);
     public bool ContainsKey(TKey key) => _entries.ContainsKey(key);
 

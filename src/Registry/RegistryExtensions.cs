@@ -13,7 +13,7 @@ public static class RegistryExtensions
         return default;
     }
 
-    public static ErrorState TryRegister<TType>(this MutableTypeRegistry<string> registry)
+    public static Option TryRegister<TType>(this MutableTypeRegistry<string> registry)
     {
         var type = typeof(TType);
         return type.FullName is string name

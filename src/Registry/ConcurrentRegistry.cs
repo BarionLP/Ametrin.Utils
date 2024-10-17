@@ -23,7 +23,7 @@ public sealed class ConcurrentRegistry<TKey, TValue>(ConcurrentDictionary<TKey, 
 
     public Option<TValue> TryGet(TKey key)
         => _entries.TryGetValue(key, out var value) ? (Option<TValue>)value : default;
-    public ErrorState TryRegister(TKey key, TValue value)
+    public Option TryRegister(TKey key, TValue value)
         => _entries.TryAdd(key, value);
 
     public bool ContainsKey(TKey key) => _entries.ContainsKey(key);
