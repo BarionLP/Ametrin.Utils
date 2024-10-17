@@ -19,7 +19,10 @@ public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable,
     public void Set(T value)
     {
         if (EqualityComparer<T>.Default.Equals(_value, value))
+        {
             return;
+        }
+
         SetSilent(value);
         HasChanged = true;
         OnChanged?.Invoke();

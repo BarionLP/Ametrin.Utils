@@ -1,6 +1,4 @@
-﻿using Ametrin.Utils.Optional;
-
-namespace Ametrin.Utils.Registry;
+﻿namespace Ametrin.Utils.Registry;
 
 public sealed class TypeRegistry<TKey> : Registry<TKey, Type> where TKey : notnull
 {
@@ -14,5 +12,5 @@ public sealed class MutableTypeRegistry<TKey> : MutableRegistry<TKey, Type> wher
     public MutableTypeRegistry(IEnumerable<KeyValuePair<TKey, Type>> entries) : base(entries) { }
     public MutableTypeRegistry(IDictionary<TKey, Type> entries) : base(entries) { }
 
-    public ResultFlag TryRegister<TType>(TKey key) => TryRegister(key, typeof(TType));
+    public ErrorState TryRegister<TType>(TKey key) => TryRegister(key, typeof(TType));
 }

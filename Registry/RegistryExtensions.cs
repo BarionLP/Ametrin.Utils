@@ -13,12 +13,12 @@ public static class RegistryExtensions
         return default;
     }
 
-    public static ResultFlag TryRegister<TType>(this MutableTypeRegistry<string> registry)
+    public static ErrorState TryRegister<TType>(this MutableTypeRegistry<string> registry)
     {
         var type = typeof(TType);
-        if (type.FullName is not string name)
-            throw new ArgumentException("Cannot register Type without name");
-        return registry.TryRegister(name, type);
+        return type.FullName is string name
+            ? registry.TryRegister(name, type)
+            : throw new ArgumentException("Cannot register Type without name"); //throw because this is a exceptional situation
     }
 
     public static Registry<TKey, TValue> ToRegistry<TKey, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> values) where TKey : notnull => new(values);

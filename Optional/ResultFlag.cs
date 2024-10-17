@@ -1,6 +1,6 @@
 namespace Ametrin.Utils.Optional;
 
-[Flags] //for fails first bit must be 1
+[Flags, Obsolete("Use ErrorState<T>")] //for fails first bit must be 1
 public enum ResultFlag 
 {
     Succeeded           = 0b0000000000000000000000000000000,
@@ -27,6 +27,7 @@ public enum ResultFlag
     DatabaseNotConnected= ConnectionFailed | DatabaseError,
 }
 
+[Obsolete]
 public static class ResultFlagExtensions
 {
     public static bool IsFail(this ResultFlag flag) => flag.HasFlag(ResultFlag.Failed);

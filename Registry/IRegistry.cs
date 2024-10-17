@@ -14,5 +14,5 @@ public interface IRegistry<TKey, TValue> : IEnumerable<TValue>
 public interface IMutableRegistry<TKey, TValue> : IRegistry<TKey, TValue>
 {
     public new TValue this[TKey key] { get; set; }
-    public ResultFlag TryRegister(TKey key, TValue value);
+    public ErrorState TryRegister(TKey key, TValue value);
 }

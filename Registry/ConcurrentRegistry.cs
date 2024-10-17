@@ -22,10 +22,10 @@ public sealed class ConcurrentRegistry<TKey, TValue>(ConcurrentDictionary<TKey, 
     public ConcurrentRegistry() : this([]) { }
 
     public Option<TValue> TryGet(TKey key)
-        => _entries.TryGetValue(key, out var value) ? (Option<TValue>)value : Option<TValue>.None();
-    public ResultFlag TryRegister(TKey key, TValue value)
-        => _entries.TryAdd(key, value) ? ResultFlag.Succeeded : ResultFlag.AlreadyExists;
-    
+        => _entries.TryGetValue(key, out var value) ? (Option<TValue>)value : default;
+    public ErrorState TryRegister(TKey key, TValue value)
+        => _entries.TryAdd(key, value);
+
     public bool ContainsKey(TKey key) => _entries.ContainsKey(key);
 
     public ConcurrentDictionary<TKey, TValue>.AlternateLookup<TAlternate> GetAlternateLookup<TAlternate>() where TAlternate : notnull
