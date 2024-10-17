@@ -1,5 +1,4 @@
-﻿using Ametrin.Utils.Optional;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 
 namespace Ametrin.Utils;
@@ -17,7 +16,7 @@ public static class SystemHelper
         }
         catch
         {
-            return Option<IPAddress>.None();
+            return default;
         }
     }
 

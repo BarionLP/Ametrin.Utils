@@ -1,4 +1,4 @@
-﻿using Ametrin.Utils.Optional;
+﻿using Ametrin.Optional;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
@@ -16,13 +16,13 @@ public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValu
 
     public Result<TNode> TryGet(TValue value)
     {
-        if(value is null)
+        if (value is null)
         {
-            return ResultFlag.InvalidArgument;
+            return new ArgumentNullException(nameof(value));
         }
 
         var result = Nodes.FirstOrDefault(entry => entry.Value.Equals(value));
-        return result is null ? ResultFlag.NullOrEmpty : result;
+        return result is null ? new InvalidOperationException("Graph contains no matching element") : result;
     }
 
     public Result<TNode> TryGet(Index idx)
@@ -31,35 +31,35 @@ public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValu
         {
             return Nodes.ElementAt(idx);
         }
-        catch(ArgumentOutOfRangeException)
+        catch (ArgumentOutOfRangeException e)
         {
-            return ResultFlag.OutOfRange;
+            return e;
         }
         catch
         {
-            return ResultFlag.Failed;
+            return new Exception();
         }
     }
 
-    public ResultFlag TryAdd(TNode node)
+    public ErrorState<Exception> TryAdd(TNode node)
     {
-        if(node is null)
+        if (node is null)
         {
-            return ResultFlag.InvalidArgument;
+            return new ArgumentNullException(nameof(node));
         }
 
-        if(Exists(node.Value))
+        if (Exists(node.Value))
         {
-            return ResultFlag.AlreadyExists;
+            return new ArgumentException("Duplicate Node", nameof(node));
         }
 
         Nodes.Add(node);
-        return ResultFlag.Succeeded;
+        return null;
     }
 
     public void Link(TNode a, TNode b)
     {
-        if(!Exists(a) || !Exists(b))
+        if (!Exists(a) || !Exists(b))
             throw new ArgumentException("Cannot link nodes outside of the graph");
         a.Link(b);
         b.Link(a);
@@ -77,7 +77,7 @@ public sealed class Graph<TNode, TValue> where TNode : INode<TValue> where TValu
     public bool TryRemove(TValue value)
     {
         var node = Nodes.FirstOrDefault(entry => entry.Value.Equals(value));
-        if(node is null)
+        if (node is null)
             return false;
         return TryRemove(node);
     }
@@ -114,7 +114,7 @@ public sealed class Node<T> : INode<T> where T : notnull
     }
     public void Delete()
     {
-        foreach(var node in Links)
+        foreach (var node in Links)
         {
             node.RemoveLink(this);
         }
@@ -151,22 +151,18 @@ public static class GraphSerializer
 
     public static Result<Graph<TNode, TValue>> Deserialize<TNode, TValue>(FileInfo target) where TNode : class, INode<TValue> where TValue : notnull
     {
-        if(!target.Exists)
-            return ResultFlag.PathNotFound;
+        if (!target.Exists)
+            return new FileNotFoundException(null, target.FullName);
         using var stream = target.OpenRead();
         var serializer = new DataContractSerializer(typeof(Graph<TNode, TValue>));
 
         try
         {
-            return serializer.ReadObject(stream) is Graph<TNode, TValue> result ? result : ResultFlag.NullOrEmpty;
+            return serializer.ReadObject(stream) is Graph<TNode, TValue> result ? result : new NullReferenceException();
         }
-        catch(IOException)
+        catch (Exception e)
         {
-            return ResultFlag.IOError;
-        }
-        catch(Exception)
-        {
-            return ResultFlag.Failed;
+            return e;
         }
     }
 }

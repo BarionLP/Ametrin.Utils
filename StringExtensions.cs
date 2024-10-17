@@ -74,7 +74,7 @@ public static partial class StringExtensions
         return s.Length;
     }
 
-
+#if NET9_0_OR_GREATER
     [GeneratedRegex("[.,]", RegexOptions.Compiled)]
     private static partial Regex DecimalRegex { get; }
 
@@ -85,4 +85,21 @@ public static partial class StringExtensions
     private static partial Regex NonDigitRegex { get; }
     [GeneratedRegex("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]")]
     private static partial Regex ValidXMLCharacters { get; }
+#else
+    private static Regex DecimalRegex => _DecimalRegex();
+    private static Regex DigitCommaRegex => _DigitCommaRegex();
+    private static Regex NonDigitRegex => _NonDigitRegex();
+    private static Regex ValidXMLCharacters => _ValidXMLCharacters();
+
+    [GeneratedRegex("[.,]", RegexOptions.Compiled)]
+    private static partial Regex _DecimalRegex();
+
+    [GeneratedRegex("[^0-9,]", RegexOptions.Compiled)]
+    private static partial Regex _DigitCommaRegex();
+
+    [GeneratedRegex("\\D", RegexOptions.Compiled)]
+    private static partial Regex _NonDigitRegex();
+    [GeneratedRegex("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]")]
+    private static partial Regex _ValidXMLCharacters();
+#endif
 }

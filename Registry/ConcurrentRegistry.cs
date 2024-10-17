@@ -28,8 +28,10 @@ public sealed class ConcurrentRegistry<TKey, TValue>(ConcurrentDictionary<TKey, 
 
     public bool ContainsKey(TKey key) => _entries.ContainsKey(key);
 
+#if NET9_0_OR_GREATER
     public ConcurrentDictionary<TKey, TValue>.AlternateLookup<TAlternate> GetAlternateLookup<TAlternate>() where TAlternate : notnull
         => _entries.GetAlternateLookup<TAlternate>();
+#endif
 
     public IEnumerator<TValue> GetEnumerator() => _entries.Values.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_entries).GetEnumerator();

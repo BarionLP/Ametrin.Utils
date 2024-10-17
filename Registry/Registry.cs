@@ -17,8 +17,10 @@ public class Registry<TKey, TValue>(FrozenDictionary<TKey, TValue> entries) : IR
     public Option<TValue> TryGet(TKey key)
         => _entries.TryGetValue(key, out var value) ? value : default;
 
+#if NET9_0_OR_GREATER
     public FrozenDictionary<TKey, TValue>.AlternateLookup<TAlternate> GetAlternateLookup<TAlternate>() where TAlternate : notnull
         => _entries.GetAlternateLookup<TAlternate>();
+#endif
 
     public IEnumerator<TValue> GetEnumerator()
     {
