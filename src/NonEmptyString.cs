@@ -8,8 +8,10 @@ public readonly record struct NonEmptyString(string Value) : IComparable<NonEmpt
 
     public bool StartsWith(char value) => Value.StartsWith(value);
     public bool StartsWith(string value) => Value.StartsWith(value);
+    public bool StartsWith(string value, StringComparison comparisonType) => Value.StartsWith(value, comparisonType);
     public bool StartsWith(ReadOnlySpan<char> value) => Value.StartsWith(value);
     public bool StartsWith(NonEmptyString value) => Value.StartsWith(value.Value);
+    public bool StartsWith(NonEmptyString value, StringComparison comparisonType) => Value.StartsWith(value.Value, comparisonType);
     public int CompareTo(NonEmptyString other) => Value.CompareTo(other.Value);
 
     public override string ToString() => Value;

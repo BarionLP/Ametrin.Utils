@@ -22,10 +22,6 @@ public static class SystemHelper
 
     public static IEnumerable<IPAddress> InterNetworkAddresses()
     {
-        var addresses = Dns.GetHostAddresses(Dns.GetHostName()).Where(ip => ip.AddressFamily == AddressFamily.InterNetwork);
-        if(!addresses.Any())
-            return [];
-
-        return addresses;
+        return Dns.GetHostAddresses(Dns.GetHostName()).Where(ip => ip.AddressFamily == AddressFamily.InterNetwork);
     }
 }
