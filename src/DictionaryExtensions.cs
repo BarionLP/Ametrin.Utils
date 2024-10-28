@@ -1,5 +1,3 @@
-using Ametrin.Optional;
-
 namespace Ametrin.Utils;
 
 public static class DictionaryExtensions

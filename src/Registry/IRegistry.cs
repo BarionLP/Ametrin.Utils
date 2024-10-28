@@ -1,5 +1,3 @@
-using Ametrin.Optional;
-
 namespace Ametrin.Utils.Registry;
 
 public interface IRegistry<TKey, TValue> : IEnumerable<TValue>
