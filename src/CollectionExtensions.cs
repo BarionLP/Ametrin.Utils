@@ -66,4 +66,5 @@ public static class CollectionExtensions
     }
 
     public static string ToHexString(this byte[] bytes) => SpanExtensions.ToHexString(bytes);
+    public static string ToBase64String(this byte[] bytes) => Convert.ToBase64String(bytes);
 }

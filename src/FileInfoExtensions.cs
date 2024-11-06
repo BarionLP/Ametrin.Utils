@@ -6,7 +6,7 @@ namespace Ametrin.Utils;
 
 public static class FileInfoExtensions
 {
-    public static FileInfo GetCopyOfPathIfExists(this FileInfo fileInfo) 
+    public static FileInfo GetCopyOfPathIfExists(this FileInfo fileInfo)
         => !fileInfo.Exists ? fileInfo : GetCopyOfPathIfExists(GetCopyOfPath(fileInfo));
 
     public static FileInfo GetCopyOfPath(this FileInfo fileInfo)
@@ -22,21 +22,15 @@ public static class FileInfoExtensions
     public static void Trash(this FileInfo info, UIOption options = UIOption.OnlyErrorDialogs) => FileSystem.DeleteFile(info.FullName, options, RecycleOption.SendToRecycleBin);
     public static bool CompareHash(this FileInfo self, FileInfo other) => self.ComputeMd5Hash() == other.ComputeMd5Hash();
 
-    public static string ComputeSha256Hash(this FileInfo fileInfo)
+    public static byte[] ComputeSHA256Hash(this FileInfo fileInfo)
     {
-        using var hasher = SHA256.Create();
         using var stream = File.OpenRead(fileInfo.FullName);
-
-        var hash = hasher.ComputeHash(stream);
-        return hash.ToHexString();
+        return stream.ComputeSHA256Hash();
     }
 
-    public static string ComputeMd5Hash(this FileInfo fileInfo)
+    public static byte[] ComputeMd5Hash(this FileInfo fileInfo)
     {
-        using var hasher = MD5.Create();
         using var stream = File.OpenRead(fileInfo.FullName);
-
-        var hash = hasher.ComputeHash(stream);
-        return hash.ToHexString();
+        return stream.ComputeMD5Hash();
     }
 }
