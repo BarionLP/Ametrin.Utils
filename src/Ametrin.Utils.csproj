@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Ametrin.Optional\src\Ametrin.Optional.csproj" />
+	<ProjectReference Include="..\..\Ametrin.Guard\src\Ametrin.Guard.csproj" />
   </ItemGroup>
 
 </Project>
