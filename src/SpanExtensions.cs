@@ -2,7 +2,10 @@
 
 public static class SpanExtensions
 {
+#if NET9_0_OR_GREATER
+#else
     public static bool StartsWith<T>(this ReadOnlySpan<T> span, T value) => !span.IsEmpty && span[0]!.Equals(value);
+#endif
     public static List<Range> SplitDynamic(this ReadOnlySpan<char> span, char delimiter)
     {
         int start = 0;
