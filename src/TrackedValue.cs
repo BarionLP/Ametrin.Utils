@@ -79,7 +79,6 @@ public sealed class TrackedValue<T> : IComparable<TrackedValue<T>>, IComparable,
         };
     }
 
-
     public static bool operator ==(TrackedValue<T> A, TrackedValue<T> B) => A.Equals(B);
     public static bool operator !=(TrackedValue<T> A, TrackedValue<T> B) => !A.Equals(B);
     public static implicit operator T(TrackedValue<T> value) => value.Value;

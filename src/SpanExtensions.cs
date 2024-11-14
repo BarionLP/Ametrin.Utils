@@ -46,7 +46,7 @@ public static class SpanExtensions
     public static string ToHexString(this Span<byte> bytes) => ToHexString((ReadOnlySpan<byte>)bytes);
     public static string ToHexString(this ReadOnlySpan<byte> bytes)
     {
-        //return Convert.ToHexString(bytes);
+        //return Convert.ToHexString(bytes); //TODO: assure equality and speed
         Span<char> charSpan = stackalloc char[bytes.Length * 2];
 
         for (int i = 0, j = 0; i < bytes.Length; i++, j += 2)

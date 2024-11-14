@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Ametrin.Utils;
@@ -12,15 +13,15 @@ public static partial class StringExtensions
 
     public static bool TryParse<T>(this ReadOnlySpan<char> input, out T result, IFormatProvider? provider = null) where T : ISpanParsable<T>
         => T.TryParse(input, provider, out result!);
-    public static bool TryParse<T>(this string input, out T result, IFormatProvider? provider = null) where T : IParsable<T>
+    public static bool TryParse<T>([NotNullWhen(true)] this string? input, out T result, IFormatProvider? provider = null) where T : IParsable<T>
         => T.TryParse(input, provider, out result!);
 
     public static Option<T> TryParse<T>(this ReadOnlySpan<char> input, IFormatProvider? provider = null) where T : ISpanParsable<T>
-        => T.TryParse(input, provider, out var result) ? result : default;
-    public static Option<T> TryParse<T>(this string input, IFormatProvider? provider = null) where T : IParsable<T>
-        => T.TryParse(input, provider, out var result) ? result : default;
+        => T.TryParse(input, provider, out var result) ? Option.Success(result) : default;
+    public static Option<T> TryParse<T>(this string? input, IFormatProvider? provider = null) where T : IParsable<T>
+        => T.TryParse(input, provider, out var result) ? Option.Success(result) : default;
 
-    public static T ParseOrDefault<T>(this string input, IFormatProvider? provider = null, T defaultValue = default!) where T : IParsable<T>
+    public static T ParseOrDefault<T>(this string? input, IFormatProvider? provider = null, T defaultValue = default!) where T : IParsable<T>
         => input.TryParse(out T result, provider) ? result : defaultValue;
     public static T ParseOrDefault<T>(this ReadOnlySpan<char> input, IFormatProvider? provider = null, T defaultValue = default!) where T : ISpanParsable<T>
         => input.TryParse(out T result, provider) ? result : defaultValue;

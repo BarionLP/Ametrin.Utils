@@ -4,6 +4,7 @@ namespace Ametrin.Utils;
 
 public static class StringBuilderExtensions
 {
+    // Todo Optimize this (prechange capacity)
     public static StringBuilder AppendRepeated(this StringBuilder builder, string value, int count)
     {
         for (int i = 0; i < count; i++)
