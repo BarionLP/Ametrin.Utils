@@ -54,37 +54,33 @@ public static partial class StringExtensions
     public static string ToXMLFriendly(this string input, string replacement = "") => ValidXMLCharacters.Replace(input, replacement);
     public static bool ContainsInvalidXmlChars(string input) => ValidXMLCharacters.IsMatch(input);
 
+    [Obsolete]
     public static bool StartsWith(this string str, ReadOnlySpan<char> value)
-    {
-        if (str is null || value.Length > str.Length)
-        {
-            return false;
-        }
-
-        return str.AsSpan()[..value.Length].SequenceEqual(value);
-    }
+        => str.AsSpan().StartsWith(value);
 
     public static int FirstDigitIndex(this string s)
     {
         for (int i = 0; i < s.Length; i++)
         {
             if (char.IsDigit(s[i]))
+            {
                 return i;
+            }
         }
         return s.Length;
     }
 
 #if NET9_0_OR_GREATER
     [GeneratedRegex("[.,]", RegexOptions.Compiled)]
-    private static partial Regex DecimalRegex { get; }
+    public static partial Regex DecimalRegex { get; }
 
     [GeneratedRegex("[^0-9,]", RegexOptions.Compiled)]
-    private static partial Regex DigitCommaRegex { get; }
+    public static partial Regex DigitCommaRegex { get; }
 
     [GeneratedRegex("\\D", RegexOptions.Compiled)]
-    private static partial Regex NonDigitRegex { get; }
+    public static partial Regex NonDigitRegex { get; }
     [GeneratedRegex("[^\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u10000-\\u10FFFF]")]
-    private static partial Regex ValidXMLCharacters { get; }
+    public static partial Regex ValidXMLCharacters { get; }
 #else
     private static Regex DecimalRegex => _DecimalRegex();
     private static Regex DigitCommaRegex => _DigitCommaRegex();

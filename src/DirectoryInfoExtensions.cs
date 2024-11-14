@@ -8,9 +8,7 @@ public static class DirectoryInfoExtensions
 {
     public static DirectoryInfo GetCopyOfPathIfExists(this DirectoryInfo directoryInfo)
     {
-        if (!directoryInfo.Exists)
-            return directoryInfo;
-        return directoryInfo.GetCopyOfPath().GetCopyOfPathIfExists();
+        return directoryInfo.Exists ? directoryInfo.GetCopyOfPath().GetCopyOfPathIfExists() : directoryInfo;
     }
 
     public static DirectoryInfo GetCopyOfPath(this DirectoryInfo directoryInfo)
@@ -74,7 +72,7 @@ public static class DirectoryInfoExtensions
 
     public static void ForeachFile(this DirectoryInfo directoryInfo, Action<FileInfo> action, SearchOption searchOption = SearchOption.AllDirectories, string pattern = "*")
     {
-        foreach (var file in directoryInfo.GetFiles(pattern, searchOption))
+        foreach (var file in directoryInfo.EnumerateFiles(pattern, searchOption))
         {
             action(file);
         }

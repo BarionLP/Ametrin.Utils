@@ -1,6 +1,7 @@
 ﻿namespace Ametrin.Utils;
 
-public class OneOf<T1, T2>
+[Obsolete]
+public sealed class OneOf<T1, T2>
 {
     private readonly object _value;
 

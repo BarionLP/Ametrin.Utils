@@ -2,7 +2,8 @@ namespace Ametrin.Utils.Registry;
 
 public static class RegistryExtensions
 {
-    [Obsolete("replace with GetAlternateLookup")]
+    #if NET9_0_OR_GREATER
+    #else
     public static Option<TValue> TryGet<TValue>(this IRegistry<string, TValue> registry, ReadOnlySpan<char> spanKey)
     {
         foreach (var key in registry.Keys)
@@ -12,6 +13,7 @@ public static class RegistryExtensions
         }
         return default;
     }
+    #endif
 
     public static Option TryRegister<TType>(this MutableTypeRegistry<string> registry)
     {

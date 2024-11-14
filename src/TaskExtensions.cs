@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 namespace Ametrin.Utils;
 
 // TODO: is this needed?
+[Obsolete]
 public static class TaskExtensions
 {
 

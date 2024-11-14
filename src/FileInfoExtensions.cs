@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Security.Cryptography;
 using Microsoft.VisualBasic.FileIO;
 
 namespace Ametrin.Utils;
@@ -20,17 +19,17 @@ public static class FileInfoExtensions
     public static void CopyTo(this FileInfo mainFile, FileInfo newFile, bool overwrite = false) => mainFile.CopyTo(newFile.FullName, overwrite);
     public static void MoveTo(this FileInfo mainFile, FileInfo newFile, bool overwrite = false) => mainFile.MoveTo(newFile.FullName, overwrite);
     public static void Trash(this FileInfo info, UIOption options = UIOption.OnlyErrorDialogs) => FileSystem.DeleteFile(info.FullName, options, RecycleOption.SendToRecycleBin);
-    public static bool CompareHash(this FileInfo self, FileInfo other) => self.ComputeMd5Hash() == other.ComputeMd5Hash();
+    public static bool CompareHash(this FileInfo self, FileInfo other) => self.ComputeMD5Hash() == other.ComputeMD5Hash();
 
     public static byte[] ComputeSHA256Hash(this FileInfo fileInfo)
     {
-        using var stream = File.OpenRead(fileInfo.FullName);
+        using var stream = fileInfo.OpenRead();
         return stream.ComputeSHA256Hash();
     }
 
-    public static byte[] ComputeMd5Hash(this FileInfo fileInfo)
+    public static byte[] ComputeMD5Hash(this FileInfo fileInfo)
     {
-        using var stream = File.OpenRead(fileInfo.FullName);
+        using var stream = fileInfo.OpenRead();
         return stream.ComputeMD5Hash();
     }
 }

@@ -5,7 +5,6 @@ public static class SpanExtensions
 #if NET9_0_OR_GREATER
 #else
     public static bool StartsWith<T>(this ReadOnlySpan<T> span, T value) => !span.IsEmpty && span[0]!.Equals(value);
-#endif
     public static List<Range> SplitDynamic(this ReadOnlySpan<char> span, char delimiter)
     {
         int start = 0;
@@ -25,6 +24,7 @@ public static class SpanExtensions
             result.Add(new Range(start, span.Length));
         return result;
     }
+#endif
 
     public static bool All<T>(this ReadOnlySpan<T> span, Func<T, bool> condition)
     {
@@ -49,22 +49,22 @@ public static class SpanExtensions
     public static string ToHexString(this Span<byte> bytes) => ToHexString((ReadOnlySpan<byte>)bytes);
     public static string ToHexString(this ReadOnlySpan<byte> bytes)
     {
-        //return Convert.ToHexString(bytes); //TODO: assure equality and speed
-        Span<char> charSpan = stackalloc char[bytes.Length * 2];
+        return Convert.ToHexString(bytes);
+        // Span<char> charSpan = stackalloc char[bytes.Length * 2];
 
-        for (int i = 0, j = 0; i < bytes.Length; i++, j += 2)
-        {
-            byte b = bytes[i];
-            charSpan[j] = GetHexCharacter(b / 16);
-            charSpan[j + 1] = GetHexCharacter(b % 16);
-        }
+        // for (int i = 0, j = 0; i < bytes.Length; i++, j += 2)
+        // {
+        //     byte b = bytes[i];
+        //     charSpan[j] = GetHexCharacter(b / 16);
+        //     charSpan[j + 1] = GetHexCharacter(b % 16);
+        // }
 
-        return new string(charSpan);
+        // return new string(charSpan);
 
-        static char GetHexCharacter(int value)
-        {
-            return value < 10 ? (char)('0' + value) : (char)('A' + value - 10);
-        }
+        // static char GetHexCharacter(int value)
+        // {
+        //     return value < 10 ? (char)('0' + value) : (char)('A' + value - 10);
+        // }
     }
     
     public static string ToBase64String(this Span<byte> bytes) => Convert.ToBase64String(bytes);

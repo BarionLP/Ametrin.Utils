@@ -7,7 +7,8 @@ public static class RangeExtensions
     public static bool Contains(this Range range, short value) => value >= range.Start.Value && value < range.End.Value;
 
     public static RangeEnumerator GetEnumerator(this Range range) => new(range);
-
+    
+    // TODO: revisit in .NET 9 (can i make it ref?)
     // struct or ref struct (what is the performance impact?)
     // i want this loop in yields
     // it is just syntactical sugar...

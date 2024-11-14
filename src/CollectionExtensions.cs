@@ -8,16 +8,16 @@ public static class CollectionExtensions
         return collection.ElementAt(random.Next(0, collection.Count));
     }
 
-    public static IEnumerable<T> GetRandomElements<T>(this ICollection<T> collection, int count, Random? randomSource = null)
+    public static IEnumerable<T> GetRandomElements<T>(this ICollection<T> collection, int count, Random? random = null)
     {
-        randomSource ??= Random.Shared;
+        random ??= Random.Shared;
         foreach (int _ in ..count)
         {
-            yield return collection.GetRandomElement(randomSource);
+            yield return collection.GetRandomElement(random);
         }
     }
 
-    public static int MaxIndex<T>(this IList<T> list) where T : IComparable<T>
+    public static int IndexOfMax<T>(this IList<T> list) where T : IComparable<T>
     {
         var maxIndex = 0;
         for (int i = 1; i < list.Count; i++)
@@ -31,26 +31,32 @@ public static class CollectionExtensions
         return maxIndex;
     }
 
+    [Obsolete]
     public static void Move<T>(this IList<T> from, int idx, ICollection<T> to)
     {
         if (idx < 0 || idx >= from.Count)
+        {
             throw new IndexOutOfRangeException(nameof(idx));
+        }
 
         to.Add(from[idx]);
         from.RemoveAt(idx);
     }
 
+    [Obsolete]
     public static bool Contains<T>(this ICollection<T> values, IEnumerable<T> contains)
     {
         foreach (var contain in contains)
         {
             if (!values.Contains(contain))
+            {
                 return false;
+            }
         }
         return true;
     }
 
-    public static bool StartsWith<T>(this IEnumerable<T> collection, T value) => collection.Any() && collection.First()!.Equals(value);
+    public static bool StartsWith<T>(this IEnumerable<T> source, T value) => source.Any() && source.First()!.Equals(value);
 
     public static T[] Copy<T>(this T[] original)
     {
@@ -65,6 +71,6 @@ public static class CollectionExtensions
         return clone;
     }
 
-    public static string ToHexString(this byte[] bytes) => SpanExtensions.ToHexString(bytes);
+    public static string ToHexString(this byte[] bytes) => Convert.ToHexString(bytes);
     public static string ToBase64String(this byte[] bytes) => Convert.ToBase64String(bytes);
 }

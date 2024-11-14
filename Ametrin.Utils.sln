@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ametrin.Utils.Test", "test\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ametrin.Optional", "..\Ametrin.Optional\src\Ametrin.Optional.csproj", "{56B7B435-C969-41EE-9BDE-DF3967B361B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ametrin.Utils.Benchmarks", "benchy\Ametrin.Utils.Benchmarks.csproj", "{84EA03B1-9767-49B9-9FE3-4270590125D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{56B7B435-C969-41EE-9BDE-DF3967B361B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56B7B435-C969-41EE-9BDE-DF3967B361B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56B7B435-C969-41EE-9BDE-DF3967B361B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84EA03B1-9767-49B9-9FE3-4270590125D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84EA03B1-9767-49B9-9FE3-4270590125D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84EA03B1-9767-49B9-9FE3-4270590125D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84EA03B1-9767-49B9-9FE3-4270590125D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
