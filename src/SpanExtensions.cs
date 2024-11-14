@@ -49,6 +49,7 @@ public static class SpanExtensions
     public static string ToHexString(this Span<byte> bytes) => ToHexString((ReadOnlySpan<byte>)bytes);
     public static string ToHexString(this ReadOnlySpan<byte> bytes)
     {
+        //return Convert.ToHexString(bytes);
         Span<char> charSpan = stackalloc char[bytes.Length * 2];
 
         for (int i = 0, j = 0; i < bytes.Length; i++, j += 2)
@@ -65,4 +66,7 @@ public static class SpanExtensions
             return value < 10 ? (char)('0' + value) : (char)('A' + value - 10);
         }
     }
+    
+    public static string ToBase64String(this Span<byte> bytes) => Convert.ToBase64String(bytes);
+    public static string ToBase64String(this ReadOnlySpan<byte> bytes) => Convert.ToBase64String(bytes);
 }
