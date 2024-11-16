@@ -2,8 +2,8 @@ namespace Ametrin.Utils;
 
 public static class DictionaryExtensions
 {
-    #if NET9_0_OR_GREATER
-    #else
+#if NET9_0_OR_GREATER
+#else
     public static bool TryGetValue<T>(this IReadOnlyDictionary<string, T> dictionary, ReadOnlySpan<char> spanKey, out T result)
     {
         foreach (var key in dictionary.Keys)
@@ -31,7 +31,7 @@ public static class DictionaryExtensions
 
         throw new KeyNotFoundException();
     }
-    #endif
+#endif
 
     public static TValue GetValueOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue @default)
     {
@@ -62,6 +62,12 @@ public static class DictionaryExtensions
         }
 
         return value;
+    }
+
+    public static bool TryAdd<TType>(this Dictionary<string, Type> dictionary)
+    {
+        var type = typeof(TType);
+        return dictionary.TryAdd(type.FullName ?? type.Name, type);
     }
 
     public static TKey GetKey<TKey, TData>(this IDictionary<TKey, TData> dictionary, TData value) => dictionary.GetKey(value, null);

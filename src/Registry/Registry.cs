@@ -3,6 +3,7 @@ using System.Collections.Frozen;
 
 namespace Ametrin.Utils.Registry;
 
+[Obsolete]
 public class Registry<TKey, TValue>(FrozenDictionary<TKey, TValue> entries) : IRegistry<TKey, TValue> where TKey : notnull
 {
     private readonly FrozenDictionary<TKey, TValue> _entries = entries;

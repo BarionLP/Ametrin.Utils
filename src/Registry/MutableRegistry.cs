@@ -2,6 +2,7 @@ using System.Collections;
 
 namespace Ametrin.Utils.Registry;
 
+[Obsolete]
 public class MutableRegistry<TKey, TValue>(Dictionary<TKey, TValue> entries) : IMutableRegistry<TKey, TValue> where TKey : notnull
 {
     private readonly Dictionary<TKey, TValue> _entries = entries;

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 
 namespace Ametrin.Utils.Registry;
 
+[Obsolete]
 public sealed class ConcurrentRegistry<TKey, TValue>(ConcurrentDictionary<TKey, TValue> entries) : IMutableRegistry<TKey, TValue> where TKey : notnull
 {
     private readonly ConcurrentDictionary<TKey, TValue> _entries = entries;

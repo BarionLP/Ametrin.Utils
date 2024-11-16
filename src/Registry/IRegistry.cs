@@ -1,5 +1,6 @@
 namespace Ametrin.Utils.Registry;
 
+[Obsolete]
 public interface IRegistry<TKey, TValue> : IEnumerable<TValue>
 {
     public IEnumerable<TKey> Keys { get; }
@@ -9,6 +10,7 @@ public interface IRegistry<TKey, TValue> : IEnumerable<TValue>
     public bool ContainsKey(TKey key);
 }
 
+[Obsolete]
 public interface IMutableRegistry<TKey, TValue> : IRegistry<TKey, TValue>
 {
     public new TValue this[TKey key] { get; set; }

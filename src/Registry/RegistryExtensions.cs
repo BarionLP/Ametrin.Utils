@@ -1,5 +1,6 @@
 namespace Ametrin.Utils.Registry;
 
+[Obsolete]
 public static class RegistryExtensions
 {
     #if NET9_0_OR_GREATER
