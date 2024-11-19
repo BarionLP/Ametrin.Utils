@@ -11,7 +11,7 @@ public static class CollectionExtensions
     public static IEnumerable<T> GetRandomElements<T>(this ICollection<T> collection, int count, Random? random = null)
     {
         random ??= Random.Shared;
-        foreach (int _ in ..count)
+        foreach (int _ in 0..count)
         {
             yield return collection.GetRandomElement(random);
         }

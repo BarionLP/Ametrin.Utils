@@ -31,7 +31,7 @@ public sealed class Test_Guard
 
     [Test]
     public async Task Test_ThrowIfNullOrEmpty_String()
-    {   
+    {
         await Assert.That(() => Guard.ThrowIfNullOrEmpty(null)).Throws<ArgumentNullException>();
         await Assert.That(() => Guard.ThrowIfNullOrEmpty("")).Throws<ArgumentNullException>();
         await Assert.That(() => Guard.ThrowIfNullOrEmpty(" ")).ThrowsNothing();
@@ -53,10 +53,27 @@ public sealed class Test_Guard
         await Assert.That(() => Guard.InRange(1, 0, 2)).ThrowsNothing();
         await Assert.That(() => Guard.InRange(2, 0, 2)).ThrowsNothing();
         await Assert.That(() => Guard.InRange(3, 0, 2)).Throws<ArgumentOutOfRangeException>();
+        await Assert.That(() => Guard.InRange(-1, 0, 2)).Throws<ArgumentOutOfRangeException>();
+    }
+
+    [Test]
+    public async Task Test_LessThan()
+    {
+        await Assert.That(() => Guard.LessThan(0, 1)).ThrowsNothing();
+        await Assert.That(() => Guard.LessThan(0, 0)).Throws<ArgumentOutOfRangeException>();
+        await Assert.That(() => Guard.LessThan(1, 0)).Throws<ArgumentOutOfRangeException>();
+    }
+    
+    [Test]
+    public async Task Test_LessThanOrEqual()
+    {
+        await Assert.That(() => Guard.LessThanOrEqual(0, 1)).ThrowsNothing();
+        await Assert.That(() => Guard.LessThanOrEqual(0, 0)).ThrowsNothing();
+        await Assert.That(() => Guard.LessThanOrEqual(1, 0)).Throws<ArgumentOutOfRangeException>();
     }
 }
 
 
-file record A;
-file record B : A;
-file record C;
+file class A;
+file class B : A;
+file class C;
