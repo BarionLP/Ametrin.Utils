@@ -31,4 +31,14 @@ public static class Guard
     public static T InRange<T>(T value, T minInclusive, T maxInclusive, [CallerArgumentExpression(nameof(value))] string expression = "")
         where T : notnull, IComparisonOperators<T, T, bool>
         => value < minInclusive || value > maxInclusive ? throw new ArgumentOutOfRangeException(expression) : value;
+        
+    [StackTraceHidden]
+    public static T LessThan<T>(T value, T max, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
+        where T : notnull, IComparisonOperators<T, T, bool>
+        => value < max ? value : throw new ArgumentOutOfRangeException(valueExpression, $"{valueExpression} must be less than {maxExpression}.");
+    
+    [StackTraceHidden]
+    public static T LessThanOrEqual<T>(T value, T max, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
+        where T : notnull, IComparisonOperators<T, T, bool>
+        => value <= max ? value : throw new ArgumentOutOfRangeException(valueExpression, $"{valueExpression} must be less than or equal to {maxExpression}.");
 }

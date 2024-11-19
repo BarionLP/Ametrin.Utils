@@ -40,22 +40,12 @@ public static class MathM
     /// <summary>
     /// represents 1/E
     /// </summary>
-    private const decimal Einv = One / E;
+    private const decimal Einv = decimal.One / E;
 
     /// <summary>
     /// log(10,E) factor
     /// </summary>
     private const decimal Log10Inv = 0.434294481903251827651128918916605082294397005803666566114M;
-
-    /// <summary>
-    /// Zero
-    /// </summary>
-    public const decimal Zero = 0.0M;
-
-    /// <summary>
-    /// One
-    /// </summary>
-    public const decimal One = 1.0M;
 
     /// <summary>
     /// Represents 0.5M
@@ -76,21 +66,21 @@ public static class MathM
     {
         var count = 0;
 
-        if (x > One)
+        if (x > decimal.One)
         {
             count = decimal.ToInt32(decimal.Truncate(x));
             x -= decimal.Truncate(x);
         }
 
-        if (x < Zero)
+        if (x < decimal.Zero)
         {
             count = decimal.ToInt32(decimal.Truncate(x) - 1);
-            x = One + (x - decimal.Truncate(x));
+            x = decimal.One + (x - decimal.Truncate(x));
         }
 
         var iteration = 1;
-        var result = One;
-        var factorial = One;
+        var result = decimal.One;
+        var factorial = decimal.One;
         decimal cachedResult;
         do
         {
@@ -110,39 +100,39 @@ public static class MathM
     /// <returns></returns>
     public static decimal Power(decimal value, decimal pow)
     {
-        if (pow == Zero)
-            return One;
-        if (pow == One)
+        if (pow == decimal.Zero)
+            return decimal.One;
+        if (pow == decimal.One)
             return value;
-        if (value == One)
-            return One;
+        if (value == decimal.One)
+            return decimal.One;
 
-        if (value == Zero)
+        if (value == decimal.Zero)
         {
-            if (pow > Zero)
+            if (pow > decimal.Zero)
             {
-                return Zero;
+                return decimal.Zero;
             }
 
             throw new InvalidOperationException("Invalid Operation: zero base and negative power");
         }
 
-        if (pow == -One)
-            return One / value;
+        if (pow == -decimal.One)
+            return decimal.One / value;
 
         var isPowerInteger = IsInteger(pow);
-        if (value < Zero && !isPowerInteger)
+        if (value < decimal.Zero && !isPowerInteger)
         {
             throw new InvalidOperationException("Invalid Operation: negative base and non-integer power");
         }
 
-        if (isPowerInteger && value > Zero)
+        if (isPowerInteger && value > decimal.Zero)
         {
             int powerInt = (int)pow;
             return PowerN(value, powerInt);
         }
 
-        if (isPowerInteger && value < Zero)
+        if (isPowerInteger && value < decimal.Zero)
         {
             int powerInt = (int)pow;
             if (powerInt % 2 == 0)
@@ -159,7 +149,7 @@ public static class MathM
     private static bool IsInteger(decimal value)
     {
         var longValue = (long)value;
-        return Abs(value - longValue) <= Epsilon;
+        return decimal.Abs(value - longValue) <= Epsilon;
     }
 
     /// <summary>
@@ -172,17 +162,17 @@ public static class MathM
     {
         while (true)
         {
-            if (power == Zero)
-                return One;
-            if (power < Zero)
+            if (power == decimal.Zero)
+                return decimal.One;
+            if (power < decimal.Zero)
             {
-                value = One / value;
+                value = decimal.One / value;
                 power = -power;
                 continue;
             }
 
             var q = power;
-            var prod = One;
+            var prod = decimal.One;
             var current = value;
             while (q > 0)
             {
@@ -215,12 +205,12 @@ public static class MathM
     /// <returns></returns>
     public static decimal Log(decimal x)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(x, Zero);
-        if (x == One)
-            return Zero;
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(x, decimal.Zero);
+        if (x == decimal.One)
+            return decimal.Zero;
 
         var count = 0;
-        while (x >= One)
+        while (x >= decimal.One)
         {
             x *= Einv;
             count++;
@@ -233,13 +223,13 @@ public static class MathM
         }
 
         x--;
-        if (x == Zero)
+        if (x == decimal.Zero)
             return count;
 
-        var result = Zero;
+        var result = decimal.Zero;
         var iteration = 0;
-        var y = One;
-        var cacheResult = result - One;
+        var y = decimal.One;
+        var cacheResult = result - decimal.One;
 
         while (cacheResult != result && iteration < MaxTaylorIteration)
         {
@@ -275,8 +265,8 @@ public static class MathM
         x *= x;
         //y=1-x/2!+x^2/4!-x^3/6!...
         var xx = -x * Half;
-        var y = One + xx;
-        var cachedY = y - One;//init cache  with different value
+        var y = decimal.One + xx;
+        var cachedY = y - decimal.One;//init cache  with different value
         for (var i = 1; cachedY != y && i < MaxTaylorIteration; i++)
         {
             cachedY = y;
@@ -296,7 +286,7 @@ public static class MathM
     public static decimal Tan(decimal x)
     {
         var cos = Cos(x);
-        if (cos == Zero)
+        if (cos == decimal.Zero)
             throw new ArgumentOutOfRangeException(nameof(x));
         //calculate sin using cos
         var sin = CalculateSinFromCos(x, cos);
@@ -310,7 +300,7 @@ public static class MathM
     /// <returns></returns>
     private static decimal CalculateSinFromCos(decimal x, decimal cos)
     {
-        var moduleOfSin = Sqrt(One - (cos * cos));
+        var moduleOfSin = Sqrt(decimal.One - (cos * cos));
         var sineIsPositive = IsSignOfSinePositive(x);
         return sineIsPositive ? moduleOfSin : -moduleOfSin;
     }
@@ -355,8 +345,8 @@ public static class MathM
         return x switch
         {
             >= -PIx2 and <= -PI => true,
-            >= -PI and <= Zero => false,
-            >= Zero and <= PI => true,
+            >= -PI and <= decimal.Zero => false,
+            >= decimal.Zero and <= PI => true,
             >= PI and <= PIx2 => false,
             _ => throw new UnreachableException(nameof(x))
         };
@@ -368,19 +358,19 @@ public static class MathM
     /// <param name="x"></param>
     /// <param name="epsilon">lasts iteration while error less than this epsilon</param>
     /// <returns></returns>
-    public static decimal Sqrt(decimal x, decimal epsilon = Zero)
+    public static decimal Sqrt(decimal x, decimal epsilon = decimal.Zero)
     {
-        if (x < Zero)
+        if (x < decimal.Zero)
             throw new OverflowException("Cannot calculate square root from a negative number");
         //initial approximation
         decimal current = (decimal)Math.Sqrt((double)x), previous;
         do
         {
             previous = current;
-            if (previous == Zero)
-                return Zero;
+            if (previous == decimal.Zero)
+                return decimal.Zero;
             current = (previous + x / previous) * Half;
-        } while (Abs(previous - current) > epsilon);
+        } while (decimal.Abs(previous - current) > epsilon);
         return current;
     }
     /// <summary>
@@ -391,7 +381,7 @@ public static class MathM
     public static decimal Sinh(decimal x)
     {
         var y = Exp(x);
-        var yy = One / y;
+        var yy = decimal.One / y;
         return (y - yy) * Half;
     }
 
@@ -403,7 +393,7 @@ public static class MathM
     public static decimal Cosh(decimal x)
     {
         var y = Exp(x);
-        var yy = One / y;
+        var yy = decimal.One / y;
         return (y + yy) * Half;
     }
 
@@ -412,7 +402,7 @@ public static class MathM
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
-    public static int Sign(decimal x) => x < Zero ? -1 : (x > Zero ? 1 : 0);
+    public static int Sign(decimal x) => x < decimal.Zero ? -1 : (x > decimal.Zero ? 1 : 0);
 
     /// <summary>
     /// Analogy of Math.Tanh
@@ -422,7 +412,7 @@ public static class MathM
     public static decimal Tanh(decimal x)
     {
         var y = Exp(x);
-        var yy = One / y;
+        var yy = decimal.One / y;
         return (y - yy) / (y + yy);
     }
 
@@ -431,7 +421,8 @@ public static class MathM
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
-    public static decimal Abs(decimal x) => x <= Zero ? -x : x;
+    [Obsolete]
+    public static decimal Abs(decimal x) => decimal.Abs(x);
 
     /// <summary>
     /// Analogy of Math.Asin
@@ -440,17 +431,17 @@ public static class MathM
     /// <returns></returns>
     public static decimal Asin(decimal x)
     {
-        if (x > One || x < -One)
+        if (x > decimal.One || x < -decimal.One)
         {
             throw new ArgumentOutOfRangeException(nameof(x), "x must be in [-1,1]");
         }
         //known values
-        if (x == Zero)
-            return Zero;
-        if (x == One)
+        if (x == decimal.Zero)
+            return decimal.Zero;
+        if (x == decimal.One)
             return PIdiv2;
         //asin function is odd function
-        if (x < Zero)
+        if (x < decimal.Zero)
             return -Asin(-x);
 
         //my optimize trick here
@@ -459,16 +450,16 @@ public static class MathM
         // asin(x)=0.5*(pi/2-asin(1-2*x*x)) 
         // if x>=0 is true
 
-        var newX = One - 2 * x * x;
+        var newX = decimal.One - 2 * x * x;
 
         //for calculating new value near to zero than current
         //because we gain more speed with values near to zero
-        if (Abs(x) > Abs(newX))
+        if (decimal.Abs(x) > decimal.Abs(newX))
         {
             var t = Asin(newX);
             return Half * (PIdiv2 - t);
         }
-        var y = Zero;
+        var y = decimal.Zero;
         var result = x;
         decimal cachedResult;
         var i = 1;
@@ -477,7 +468,7 @@ public static class MathM
         do
         {
             cachedResult = result;
-            result *= xx * (One - Half / (i));
+            result *= xx * (decimal.One - Half / (i));
             y += result / ((i << 1) + 1);
             i++;
         } while (cachedResult != result);
@@ -493,9 +484,9 @@ public static class MathM
     {
         return x switch
         {
-            Zero => Zero,
-            One => PIdiv4,
-            _ => Asin(x / Sqrt(One + x * x))
+            decimal.Zero => decimal.Zero,
+            decimal.One => PIdiv4,
+            _ => Asin(x / Sqrt(decimal.One + x * x))
         };
     }
     /// <summary>
@@ -507,9 +498,9 @@ public static class MathM
     {
         return x switch
         {
-            Zero => PIdiv2,
-            One => Zero,
-            < Zero => PI - Acos(-x),
+            decimal.Zero => PIdiv2,
+            decimal.One => decimal.Zero,
+            < decimal.Zero => PI - Acos(-x),
             _ => PIdiv2 - Asin(x)
         };
     }
@@ -526,11 +517,11 @@ public static class MathM
     {
         return x switch
         {
-            > Zero => ATan(y / x),
-            < Zero when y >= Zero => ATan(y / x) + PI,
-            < Zero when y < Zero => ATan(y / x) - PI,
-            Zero when y > Zero => PIdiv2,
-            Zero when y < Zero => -PIdiv2,
+            > decimal.Zero => ATan(y / x),
+            < decimal.Zero when y >= decimal.Zero => ATan(y / x) + PI,
+            < decimal.Zero when y < decimal.Zero => ATan(y / x) - PI,
+            decimal.Zero when y > decimal.Zero => PIdiv2,
+            decimal.Zero when y < decimal.Zero => -PIdiv2,
             _ => throw new ArgumentException("invalid atan2 arguments")
         };
     }

@@ -2,30 +2,6 @@
 
 public static class SpanExtensions
 {
-#if NET9_0_OR_GREATER
-#else
-    public static bool StartsWith<T>(this ReadOnlySpan<T> span, T value) => !span.IsEmpty && span[0]!.Equals(value);
-    public static List<Range> SplitDynamic(this ReadOnlySpan<char> span, char delimiter)
-    {
-        int start = 0;
-        var result = new List<Range>();
-        for (int i = 0; i < span.Length; i++)
-        {
-            if (span[i] == delimiter)
-            {
-                if (i > start)
-                    result.Add(new Range(start, i));
-
-                start = i + 1;
-            }
-        }
-
-        if (span.Length > start)
-            result.Add(new Range(start, span.Length));
-        return result;
-    }
-#endif
-
     public static bool All<T>(this ReadOnlySpan<T> span, Func<T, bool> condition)
     {
         foreach (var element in span)
@@ -41,32 +17,16 @@ public static class SpanExtensions
         for (int i = 0; i < s.Length; i++)
         {
             if (char.IsDigit(s[i]))
+            {
                 return i;
+            }
         }
         return s.Length;
     }
 
-    public static string ToHexString(this Span<byte> bytes) => ToHexString((ReadOnlySpan<byte>)bytes);
-    public static string ToHexString(this ReadOnlySpan<byte> bytes)
-    {
-        return Convert.ToHexString(bytes);
-        // Span<char> charSpan = stackalloc char[bytes.Length * 2];
+    public static string ToHexString(this Span<byte> bytes) => Convert.ToHexString(bytes);
+    public static string ToHexString(this ReadOnlySpan<byte> bytes) => Convert.ToHexString(bytes);
 
-        // for (int i = 0, j = 0; i < bytes.Length; i++, j += 2)
-        // {
-        //     byte b = bytes[i];
-        //     charSpan[j] = GetHexCharacter(b / 16);
-        //     charSpan[j + 1] = GetHexCharacter(b % 16);
-        // }
-
-        // return new string(charSpan);
-
-        // static char GetHexCharacter(int value)
-        // {
-        //     return value < 10 ? (char)('0' + value) : (char)('A' + value - 10);
-        // }
-    }
-    
     public static string ToBase64String(this Span<byte> bytes) => Convert.ToBase64String(bytes);
     public static string ToBase64String(this ReadOnlySpan<byte> bytes) => Convert.ToBase64String(bytes);
 }
