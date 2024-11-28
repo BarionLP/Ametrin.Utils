@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks>net9.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-	  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Ametrin.Optional\src\Ametrin.Optional.csproj" />
+    <PackageReference Include="Ametrin.Optional" Version="0.1.0" />
   </ItemGroup>
 
 </Project>
