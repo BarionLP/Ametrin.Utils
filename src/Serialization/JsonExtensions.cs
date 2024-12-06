@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace Ametrin.Serialization;
 
-[Obsolete]
 public static class JsonExtensions
 {
     public static readonly JsonSerializerOptions DefaultOptions = new() { WriteIndented = true, IncludeFields = true };
