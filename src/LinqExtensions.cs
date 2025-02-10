@@ -59,7 +59,7 @@ public static class LinqExtensions
         var values = enumerable switch
         {
             ICollection<T> collection => collection,
-            _ => enumerable.ToArray(),
+            _ => [.. enumerable],
         };
 
         float total = values.Count;
