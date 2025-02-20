@@ -17,7 +17,7 @@ public readonly record struct Option<T> : IOptional<T>
     public Option<TResult> Map<TResult>(Func<T, Result<TResult>> map) => HasValue ? Option<TResult>.Of(map(Value!)) : Option<TResult>.None();
     public Option<TResult> Cast<TResult>()
     {
-        if(HasValue && Value is TResult casted)
+        if (HasValue && Value is TResult casted)
         {
             return Option<TResult>.Some(casted);
         }

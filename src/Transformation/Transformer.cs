@@ -4,7 +4,7 @@ public static class Transformer
 {
     public static double[] ApplySmooth(this Transform2D transform, double[] array, int width, double defaultValue = 0)
     {
-        return ((FlatTransformable<double>)transform.ApplySmooth(new FlatTransformable<double>(array, width), defaultValue)).Array;
+        return ((FlatTransformable<double>) transform.ApplySmooth(new FlatTransformable<double>(array, width), defaultValue)).Array;
     }
     public static ITransformable2D<TData> ApplySmooth<TData>(this Transform2D transform, ISmoothTransformable2D<TData> transformable, TData defaultValue)
     {

@@ -34,7 +34,7 @@ public static class ResultFlagExtensions
     public static bool IsSuccess(this ResultFlag flag) => flag is ResultFlag.Succeeded;
     public static void Resolve(this ResultFlag flag, Action success, Action<ResultFlag> failure)
     {
-        if(flag is ResultFlag.Succeeded)
+        if (flag is ResultFlag.Succeeded)
         {
             success();
         }

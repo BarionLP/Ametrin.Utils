@@ -2,8 +2,8 @@ using System.Numerics;
 
 namespace Ametrin.Utils;
 
-public readonly record struct Angle : 
-    IComparable<Angle>, 
+public readonly record struct Angle :
+    IComparable<Angle>,
     IUnaryNegationOperators<Angle, Angle>,
     IAdditionOperators<Angle, Angle, Angle>,
     ISubtractionOperators<Angle, Angle, Angle>,
@@ -14,7 +14,7 @@ public readonly record struct Angle :
     public const double RADIANS_TO_DEGREES = 180 / Math.PI;
     public const double MAX_RADIANS = Math.PI * 2;
     public static Angle Zero { get; } = new(0);
-    
+
     public double Radians { get; }
     public double Degrees => Radians * RADIANS_TO_DEGREES;
     public Angle Normalized => FromRadiants(Radians % MAX_RADIANS);

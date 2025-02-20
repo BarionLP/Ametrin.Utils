@@ -21,9 +21,9 @@ public interface IOptional<T> : IEquatable<IOptional<T>>, IComparable<IOptional<
     int IComparable.CompareTo(object? obj) => obj is IOptional<T> o ? CompareTo(o) : obj is T t ? CompareTo(t) : 1;
     int IComparable<T>.CompareTo(T? other)
     {
-        if(other is null)
+        if (other is null)
             return HasValue ? 1 : 0;
-        if(!HasValue)
+        if (!HasValue)
             return -1;
 
         return Value switch

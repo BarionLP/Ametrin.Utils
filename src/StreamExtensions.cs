@@ -10,7 +10,7 @@ public static class StreamExtensions
         using var hasher = SHA256.Create();
         return hasher.ComputeHash(stream);
     }
-    
+
     public static byte[] ComputeMD5Hash(this Stream stream)
     {
         using var hasher = MD5.Create();

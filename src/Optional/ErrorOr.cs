@@ -27,7 +27,7 @@ public readonly record struct ErrorOr<T> : IOptional<T>
     public T ReduceOrThrow() => HasValue ? Value! : throw new NullReferenceException(Message);
     public void Resolve(Action<T> action, Action<string> failed)
     {
-        if(HasValue)
+        if (HasValue)
             action(Value!);
         else
             failed.Invoke(Message);

@@ -4,9 +4,9 @@ namespace Ametrin.Utils;
 
 public static class LinqExtensions
 {
-    public static TimeSpan Sum<T>(this IEnumerable<T> values, Func<T, TimeSpan> selector) 
+    public static TimeSpan Sum<T>(this IEnumerable<T> values, Func<T, TimeSpan> selector)
         => TimeSpan.FromTicks(values.Sum(v => selector(v).Ticks));
-    public static TimeSpan Sum(this IEnumerable<TimeSpan> values) 
+    public static TimeSpan Sum(this IEnumerable<TimeSpan> values)
         => TimeSpan.FromTicks(values.Sum(static timeSpan => timeSpan.Ticks));
 
     public static string Dump<T>(this IEnumerable<T> values, char separator, string format) where T : IFormattable

@@ -40,7 +40,7 @@ public readonly record struct Result<T> : IOptional<T>
 
     public void Resolve(Action<T> action, Action<ResultFlag> failed)
     {
-        if(IsSuccess)
+        if (IsSuccess)
             action(Value!);
         else
             failed.Invoke(ResultFlag);

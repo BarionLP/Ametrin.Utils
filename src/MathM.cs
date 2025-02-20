@@ -128,13 +128,13 @@ public static class MathM
 
         if (isPowerInteger && value > decimal.Zero)
         {
-            int powerInt = (int)pow;
+            int powerInt = (int) pow;
             return PowerN(value, powerInt);
         }
 
         if (isPowerInteger && value < decimal.Zero)
         {
-            int powerInt = (int)pow;
+            int powerInt = (int) pow;
             if (powerInt % 2 == 0)
             {
                 return Exp(pow * Log(-value));
@@ -148,7 +148,7 @@ public static class MathM
 
     private static bool IsInteger(decimal value)
     {
-        var longValue = (long)value;
+        var longValue = (long) value;
         return decimal.Abs(value - longValue) <= Epsilon;
     }
 
@@ -363,7 +363,7 @@ public static class MathM
         if (x < decimal.Zero)
             throw new OverflowException("Cannot calculate square root from a negative number");
         //initial approximation
-        decimal current = (decimal)Math.Sqrt((double)x), previous;
+        decimal current = (decimal) Math.Sqrt((double) x), previous;
         do
         {
             previous = current;

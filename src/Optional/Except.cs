@@ -35,7 +35,7 @@ public readonly record struct Except<T> : IOptional<T>
 
     public void Resolve(Action<T> action, Action<Exception> failed)
     {
-        if(IsSuccess)
+        if (IsSuccess)
             action(Value!);
         else
             failed.Invoke(Error!);
@@ -59,7 +59,7 @@ public readonly record struct Except<T> : IOptional<T>
         {
             return Success(func());
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             return Fail(e);
         }
