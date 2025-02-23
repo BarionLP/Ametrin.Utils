@@ -43,12 +43,12 @@ public static class Guard
         => value <= max ? value : throw new ArgumentOutOfRangeException(valueExpression, $"{valueExpression} must be less than or equal to {maxExpression}.");
 
     [StackTraceHidden]
-    public static T GreaterThan<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string maxExpression = "")
+    public static T GreaterThan<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
         where T : notnull, IComparisonOperators<T, T, bool>
-        => value > min ? value : throw new ArgumentOutOfRangeException(valueExpression, $"{valueExpression} must be greater than {maxExpression}.");
+        => value > min ? value : throw new ArgumentOutOfRangeException(valueExpression, $"{valueExpression} must be greater than {minExpression}.");
 
     [StackTraceHidden]
-    public static T GreaterThanOrEqual<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string maxExpression = "")
+    public static T GreaterThanOrEqual<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
         where T : notnull, IComparisonOperators<T, T, bool>
-        => value >= min ? value : throw new ArgumentOutOfRangeException(valueExpression, $"{valueExpression} must be greater than or equal to {maxExpression}.");
+        => value >= min ? value : throw new ArgumentOutOfRangeException(valueExpression, $"{valueExpression} must be greater than or equal to {minExpression}.");
 }
