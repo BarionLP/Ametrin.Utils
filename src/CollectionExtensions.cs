@@ -31,31 +31,6 @@ public static class CollectionExtensions
         return maxIndex;
     }
 
-    [Obsolete]
-    public static void Move<T>(this IList<T> from, int idx, ICollection<T> to)
-    {
-        if (idx < 0 || idx >= from.Count)
-        {
-            throw new IndexOutOfRangeException(nameof(idx));
-        }
-
-        to.Add(from[idx]);
-        from.RemoveAt(idx);
-    }
-
-    [Obsolete]
-    public static bool Contains<T>(this ICollection<T> values, IEnumerable<T> contains)
-    {
-        foreach (var contain in contains)
-        {
-            if (!values.Contains(contain))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public static bool StartsWith<T>(this IEnumerable<T> source, T value) => source.Any() && source.First()!.Equals(value);
 
     public static T[] Copy<T>(this T[] original)
@@ -69,6 +44,40 @@ public static class CollectionExtensions
         var clone = new T[original.GetLength(0), original.GetLength(1)];
         Array.Copy(original, clone, original.Length);
         return clone;
+    }
+
+    public static T[] PadLeft<T>(this T[] source, int totalLength, T padValue)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        if (totalLength <= source.Length)
+            return [.. source];
+
+        var padCount = totalLength - source.Length;
+        var result = new T[totalLength];
+
+        for (int i = 0; i < padCount; i++)
+            result[i] = padValue;
+
+        Array.Copy(source, 0, result, padCount, source.Length);
+        return result;
+    }
+
+    public static T[] PadRight<T>(this T[] source, int totalLength, T padValue)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+
+        if (totalLength <= source.Length)
+            return [.. source];
+
+        var result = new T[totalLength];
+
+        Array.Copy(source, result, source.Length);
+
+        for (int i = source.Length; i < totalLength; i++)
+            result[i] = padValue;
+
+        return result;
     }
 
     public static string ToHexString(this byte[] bytes) => Convert.ToHexString(bytes);
