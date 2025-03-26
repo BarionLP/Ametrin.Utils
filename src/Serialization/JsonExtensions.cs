@@ -53,6 +53,17 @@ public static class JsonExtensions
         using var stream = fileInfo.OpenRead();
         return Deserialize<T>(stream, options ?? DefaultOptions);
     }
-    public static Option<T> Deserialize<T>(Stream stream, JsonSerializerOptions? options = null) => JsonSerializer.Deserialize<T>(stream, options ?? DefaultOptions);
+    public static Option<T> Deserialize<T>(Stream stream, JsonSerializerOptions? options = null)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<T>(stream, options ?? DefaultOptions);
+        }
+        catch
+        {
+            return default;   
+        }
+    }
+
     public static Task<Option<T>> ReadFromJsonFileAsync<T>(this FileInfo fileInfo, JsonSerializerOptions? options = null) => Task.Run(() => ReadFromJsonFile<T>(fileInfo, options));
 }
