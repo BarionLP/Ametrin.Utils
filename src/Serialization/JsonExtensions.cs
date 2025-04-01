@@ -30,12 +30,12 @@ public static class JsonExtensions
     }
     public static Task WriteToJsonFileAsync<T>(this T data, string path, JsonSerializerOptions? options = null) => Task.Run(() => data.WriteToJsonFile(path, options));
 
-    public static Option<T> ReadFromJsonFile<T>(string path, JsonSerializerOptions? options = null)
+    public static Result<T> ReadFromJsonFile<T>(string path, JsonSerializerOptions? options = null)
     {
-        string json = File.ReadAllText(path);
-        return JsonSerializer.Deserialize<T>(json, options ?? DefaultOptions);
+        using var stream = File.OpenRead(path);
+        return Deserialize<T>(stream, options ?? DefaultOptions);
     }
-    public static Task<Option<T>> ReadFromJsonFileAsync<T>(string path, JsonSerializerOptions? options = null) => Task.Run(() => ReadFromJsonFile<T>(path, options));
+    public static Task<Result<T>> ReadFromJsonFileAsync<T>(string path, JsonSerializerOptions? options = null) => Task.Run(() => ReadFromJsonFile<T>(path, options));
 
     public static void WriteToJsonFile<T>(this T data, FileInfo fileInfo, JsonSerializerOptions? options = null)
     {
@@ -44,26 +44,26 @@ public static class JsonExtensions
     }
     public static Task WriteToJsonFileAsync<T>(this T data, FileInfo fileInfo, JsonSerializerOptions? options = null) => Task.Run(() => data.WriteToJsonFile(fileInfo, options));
 
-    public static Option<T> ReadFromJsonFile<T>(this FileInfo fileInfo, JsonSerializerOptions? options = null)
+    public static Result<T> ReadFromJsonFile<T>(this FileInfo fileInfo, JsonSerializerOptions? options = null)
     {
         if (!fileInfo.Exists)
         {
-            return default;
+            return new FileNotFoundException(null, fileInfo.FullName);
         }
         using var stream = fileInfo.OpenRead();
         return Deserialize<T>(stream, options ?? DefaultOptions);
     }
-    public static Option<T> Deserialize<T>(Stream stream, JsonSerializerOptions? options = null)
+    public static Result<T> Deserialize<T>(Stream stream, JsonSerializerOptions? options = null)
     {
         try
         {
-            return JsonSerializer.Deserialize<T>(stream, options ?? DefaultOptions);
+            return JsonSerializer.Deserialize<T>(stream, options ?? DefaultOptions) ?? Result.Error<T>(new NullReferenceException());
         }
-        catch
+        catch(Exception e)
         {
-            return default;   
+            return e;   
         }
     }
 
-    public static Task<Option<T>> ReadFromJsonFileAsync<T>(this FileInfo fileInfo, JsonSerializerOptions? options = null) => Task.Run(() => ReadFromJsonFile<T>(fileInfo, options));
+    public static Task<Result<T>> ReadFromJsonFileAsync<T>(this FileInfo fileInfo, JsonSerializerOptions? options = null) => Task.Run(() => ReadFromJsonFile<T>(fileInfo, options));
 }
