@@ -17,7 +17,7 @@ public static class LinqExtensions
         => string.Join(separator, values);
 
     public static IEnumerable<string> SelectDuplicates(this IEnumerable<string> values)
-        => values.GroupBy(x => x).Where(g => g.Count() > 1).Select(g => g.Key);
+        => values.CountBy(x => x).Where(g => g.Value > 1).Select(g => g.Key);
 
     public static FrozenDictionary<TKey, TResult> ToFrozenDictionary<TKey, TResult, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source, Func<TValue, TResult> map) where TKey : notnull
         => source.Select(pair => new KeyValuePair<TKey, TResult>(pair.Key, map(pair.Value))).ToFrozenDictionary();
