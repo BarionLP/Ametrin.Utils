@@ -9,7 +9,9 @@ public sealed class Test_Guard
     public async Task Test_ThrowIfNull()
     {
         await Assert.That(() => Guard.ThrowIfNull((string?)null)).Throws<ArgumentNullException>();
-        await Assert.That(() => Guard.ThrowIfNull("")).ThrowsNothing();
+        await Assert.That(() => Guard.ThrowIfNull(new int?())).Throws<ArgumentNullException>();
+        await Assert.That(() => Guard.ThrowIfNull(new int?(1))).IsEqualTo(1);
+        await Assert.That(() => Guard.ThrowIfNull("")).IsEqualTo("");
     }
 
     [Test]
