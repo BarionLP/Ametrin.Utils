@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 
 namespace Ametrin.Serialization;
@@ -42,6 +43,11 @@ public static class JsonExtensions
         using var stream = fileInfo.Create();
         JsonSerializer.Serialize(stream, data, options ?? DefaultOptions);
     }
+    public static void WriteToJsonFile<T>(this T data, FileInfo fileInfo, JsonTypeInfo<T> typeInfo)
+    {
+        using var stream = fileInfo.Create();
+        JsonSerializer.Serialize(stream, data, typeInfo);
+    }
     public static Task WriteToJsonFileAsync<T>(this T data, FileInfo fileInfo, JsonSerializerOptions? options = null) => Task.Run(() => data.WriteToJsonFile(fileInfo, options));
 
     public static Result<T> ReadFromJsonFile<T>(this FileInfo fileInfo, JsonSerializerOptions? options = null)
@@ -53,6 +59,16 @@ public static class JsonExtensions
         using var stream = fileInfo.OpenRead();
         return Deserialize<T>(stream, options ?? DefaultOptions);
     }
+
+    public static Result<T> ReadFromJsonFile<T>(this FileInfo fileInfo, JsonTypeInfo<T> typeInfo, JsonSerializerOptions? options = null)
+    {
+        if (!fileInfo.Exists)
+        {
+            return new FileNotFoundException(null, fileInfo.FullName);
+        }
+        using var stream = fileInfo.OpenRead();
+        return Deserialize<T>(stream,  options ?? DefaultOptions);
+    }
     public static Result<T> Deserialize<T>(Stream stream, JsonSerializerOptions? options = null)
     {
         try
@@ -62,6 +78,18 @@ public static class JsonExtensions
         catch(Exception e)
         {
             return e;   
+        }
+    }
+
+    public static Result<T> Deserialize<T>(Stream stream, JsonTypeInfo<T> typeInfo)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize(stream, typeInfo) ?? Result.Error<T>(new NullReferenceException());
+        }
+        catch (Exception e)
+        {
+            return e;
         }
     }
 
