@@ -19,8 +19,8 @@ public static class LinqExtensions
     public static IEnumerable<string> SelectDuplicates(this IEnumerable<string> values)
         => values.CountBy(x => x).Where(g => g.Value > 1).Select(g => g.Key);
 
-    public static FrozenDictionary<TKey, TResult> ToFrozenDictionary<TKey, TResult, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source, Func<TValue, TResult> map) where TKey : notnull
-        => source.Select(pair => new KeyValuePair<TKey, TResult>(pair.Key, map(pair.Value))).ToFrozenDictionary();
+    public static FrozenDictionary<TKey, TResult> ToFrozenDictionary<TKey, TResult, TValue>(this IEnumerable<KeyValuePair<TKey, TValue>> source, Func<TValue, TResult> selector) where TKey : notnull
+        => source.Select(pair => KeyValuePair.Create(pair.Key, selector(pair.Value))).ToFrozenDictionary();
 
     public static void Consume<T>(this IEnumerable<T> values, Action<T> action)
     {
