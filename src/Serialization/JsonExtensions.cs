@@ -6,7 +6,8 @@ namespace Ametrin.Serialization;
 
 public static class JsonExtensions
 {
-    public static readonly JsonSerializerOptions DefaultOptions = new() { WriteIndented = true, IncludeFields = true };
+    public static readonly JsonSerializerOptions DefaultOptions = new(JsonSerializerOptions.Default) { WriteIndented = true, IncludeFields = true };
+
     static JsonExtensions()
     {
         DefaultOptions.Converters.Add(new DirectoryInfoJsonConverter());
@@ -28,7 +29,7 @@ public static class JsonExtensions
     {
         JsonSerializer.Serialize(stream, data, options ?? DefaultOptions);
     }
-    public static Task WriteToJsonFileAsync<T>(this T data, string path, JsonSerializerOptions? options = null) => Task.Run(() => data.WriteToJsonFile(path, options));
+    public static Task WriteToJsonFileAsync<T>(this T data, string path, JsonSerializerOptions? options = null) => data.WriteToJsonFileAsync(path, options);
 
     public static Result<T> ReadFromJsonFile<T>(string path, JsonSerializerOptions? options = null)
     {
