@@ -24,8 +24,8 @@ public static class DirectoryInfoExtensions
         }
     }
 
-    public static FileInfo File(this DirectoryInfo directoryInfo, string fileName) => new(Path.Combine(directoryInfo.FullName, fileName));
-    public static DirectoryInfo Directory(this DirectoryInfo directoryInfo, string directoryName) => new(Path.Combine(directoryInfo.FullName, directoryName));
+    public static FileInfo File(this DirectoryInfo directoryInfo, string fileName) => new(Path.Join(directoryInfo.FullName, fileName));
+    public static DirectoryInfo Directory(this DirectoryInfo directoryInfo, string directoryName) => new(Path.Join(directoryInfo.FullName, directoryName));
 
     public static void ToRecycleBin(this DirectoryInfo info, UIOption options = UIOption.OnlyErrorDialogs)
     {
