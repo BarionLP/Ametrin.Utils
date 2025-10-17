@@ -16,7 +16,7 @@ public sealed class Graph<TNode> where TNode : notnull
 
         if (_nodes.Add(node))
         {
-            return null;
+            return default;
         }
 
         return new ArgumentException("Duplicate Node", nameof(node));

@@ -4,7 +4,7 @@ public readonly record struct NonEmptyString(string Value) : IComparable<NonEmpt
 {
     private readonly string Value = !string.IsNullOrWhiteSpace(Value) ? Value : throw new ArgumentException("String was empty", nameof(Value));
 
-    public NonEmptyString() : this("") { } //will fail
+    public NonEmptyString() : this("") { } // will fail
 
     public bool StartsWith(char value) => Value.StartsWith(value);
     public bool StartsWith(string value) => Value.StartsWith(value);

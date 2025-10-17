@@ -146,11 +146,7 @@ public static class MathM
         return Exp(pow * Log(value));
     }
 
-    private static bool IsInteger(decimal value)
-    {
-        var longValue = (long) value;
-        return decimal.Abs(value - longValue) <= Epsilon;
-    }
+    private static bool IsInteger(decimal value) => decimal.IsInteger(value);
 
     /// <summary>
     /// Power to the integer value
@@ -363,7 +359,7 @@ public static class MathM
         if (x < decimal.Zero)
             throw new OverflowException("Cannot calculate square root from a negative number");
         //initial approximation
-        decimal current = (decimal) Math.Sqrt((double) x), previous;
+        decimal current = (decimal)Math.Sqrt((double)x), previous;
         do
         {
             previous = current;
@@ -402,7 +398,7 @@ public static class MathM
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
-    public static int Sign(decimal x) => x < decimal.Zero ? -1 : (x > decimal.Zero ? 1 : 0);
+    public static int Sign(decimal x) => decimal.Sign(x);
 
     /// <summary>
     /// Analogy of Math.Tanh
@@ -421,7 +417,6 @@ public static class MathM
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
-    [Obsolete]
     public static decimal Abs(decimal x) => decimal.Abs(x);
 
     /// <summary>
