@@ -1,5 +1,3 @@
-using TUnit.Assertions.AssertConditions.Throws;
-
 namespace Ametrin.Utils.Test;
 
 public sealed class Test_NonEmptyString

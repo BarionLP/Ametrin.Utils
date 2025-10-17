@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+// todo: convert to static extensions
 // from https://github.com/raminrahimzada/CSharp-Helper-Classes/blob/master/Math/DecimalMath/DecimalMath.cs
 namespace Ametrin.Utils;
 /// <summary>
@@ -128,13 +129,13 @@ public static class MathM
 
         if (isPowerInteger && value > decimal.Zero)
         {
-            int powerInt = (int) pow;
+            int powerInt = (int)pow;
             return PowerN(value, powerInt);
         }
 
         if (isPowerInteger && value < decimal.Zero)
         {
-            int powerInt = (int) pow;
+            int powerInt = (int)pow;
             if (powerInt % 2 == 0)
             {
                 return Exp(pow * Log(-value));

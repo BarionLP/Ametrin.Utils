@@ -1,5 +1,4 @@
 using Ametrin.Guards;
-using TUnit.Assertions.AssertConditions.Throws;
 
 namespace Ametrin.Utils.Test;
 
