@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -56,4 +57,26 @@ public static class Guard
     public static T GreaterThanOrEqual<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
         where T : notnull, IComparisonOperators<T, T, bool>
         => value >= min ? value : throw new ArgumentOutOfRangeException(valueExpression, $"{valueExpression} must be greater than or equal to {minExpression}.");
+
+#if NET10_0_OR_GREATER
+    extension(FileNotFoundException)
+    {
+        [StackTraceHidden]
+        public static FileInfo ExistsOrThrow(FileInfo fileInfo)
+        {
+            if (fileInfo.Exists) return fileInfo;
+            throw new FileNotFoundException(null, fileInfo.FullName);
+        }
+    }
+
+    extension(DirectoryNotFoundException)
+    {
+        [StackTraceHidden]
+        public static DirectoryInfo ExistsOrThrow(DirectoryInfo directoryInfo)
+        {
+            if (directoryInfo.Exists) return directoryInfo;
+            throw new FileNotFoundException(null, directoryInfo.FullName);
+        }
+    }
+#endif
 }
