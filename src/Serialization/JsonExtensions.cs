@@ -125,20 +125,22 @@ public static class JsonSerializerExtensions
             JsonSerializer.Serialize(stream, value, jsonTypeInfo);
         }
 
-        public static Task SerializeToFileAsync<T>(FileInfo fileInfo, T value, JsonSerializerOptions? options = null, bool overwrite = false, CancellationToken cancellationToken = default)
+        public static async Task SerializeToFileAsync<T>(FileInfo fileInfo, T value, JsonSerializerOptions? options = null, bool overwrite = false, CancellationToken cancellationToken = default)
         {
             if (!overwrite && fileInfo.Exists) throw new IOException($"{fileInfo} already exists");
 
             using var stream = fileInfo.Create();
-            return JsonSerializer.SerializeAsync(stream, value, options, cancellationToken);
+            await JsonSerializer.SerializeAsync(stream, value, options, cancellationToken);
+            // we need to await because the stream has to be closed afterwards
         }
 
-        public static Task SerializeToFileAsync<T>(FileInfo fileInfo, T value, JsonTypeInfo<T> jsonTypeInfo, bool overwrite = false, CancellationToken cancellationToken = default)
+        public static async Task SerializeToFileAsync<T>(FileInfo fileInfo, T value, JsonTypeInfo<T> jsonTypeInfo, bool overwrite = false, CancellationToken cancellationToken = default)
         {
             if (!overwrite && fileInfo.Exists) throw new IOException($"{fileInfo} already exists");
 
             using var stream = fileInfo.Create();
-            return JsonSerializer.SerializeAsync(stream, value, jsonTypeInfo, cancellationToken);
+            await JsonSerializer.SerializeAsync(stream, value, jsonTypeInfo, cancellationToken);
+            // we need to await because the stream has to be closed afterwards
         }
 
 
