@@ -64,6 +64,7 @@ public static class Guard
         [StackTraceHidden]
         public static FileInfo ExistsOrThrow(FileInfo fileInfo)
         {
+            ArgumentNullException.ThrowIfNull(fileInfo);
             if (fileInfo.Exists) return fileInfo;
             throw new FileNotFoundException(null, fileInfo.FullName);
         }
@@ -74,6 +75,7 @@ public static class Guard
         [StackTraceHidden]
         public static DirectoryInfo ExistsOrThrow(DirectoryInfo directoryInfo)
         {
+            ArgumentNullException.ThrowIfNull(directoryInfo);
             if (directoryInfo.Exists) return directoryInfo;
             throw new FileNotFoundException(null, directoryInfo.FullName);
         }

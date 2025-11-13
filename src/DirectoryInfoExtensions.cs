@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using Microsoft.VisualBasic.FileIO;
 using SearchOption = System.IO.SearchOption;
 
@@ -16,12 +17,14 @@ public static class DirectoryInfoExtensions
         return new(directoryInfo.FullName + " - Copy");
     }
 
-    public static void CreateIfNotExists(this DirectoryInfo directoryInfo)
+    public static DirectoryInfo CreateIfNotExists(this DirectoryInfo directoryInfo)
     {
         if (!directoryInfo.Exists)
         {
             directoryInfo.Create();
         }
+        Debug.Assert(directoryInfo.Exists);
+        return directoryInfo;
     }
 
     public static FileInfo File(this DirectoryInfo directoryInfo, string fileName) => new(Path.Join(directoryInfo.FullName, fileName));
