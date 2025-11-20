@@ -1,5 +1,6 @@
 namespace Ametrin.Utils;
 
+[Obsolete]
 public readonly record struct NonEmptyString(string Value) : IComparable<NonEmptyString>
 {
     private readonly string Value = !string.IsNullOrWhiteSpace(Value) ? Value : throw new ArgumentException("String was empty", nameof(Value));

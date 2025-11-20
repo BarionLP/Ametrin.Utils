@@ -1,40 +1,35 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 
 namespace Ametrin.Utils;
 
 public static class BinaryWriterExtensions
 {
-    public static void WriteBigEndian(this BinaryWriter writer, float value) => writer.WriteBigEndian(value, sizeof(float), BitConverter.TryWriteBytes);
-    public static void WriteBigEndian(this BinaryWriter writer, double value) => writer.WriteBigEndian(value, sizeof(double), BitConverter.TryWriteBytes);
-    public static void WriteBigEndian(this BinaryWriter writer, short value) => writer.WriteBigEndian(value, sizeof(short), BitConverter.TryWriteBytes);
-    public static void WriteBigEndian(this BinaryWriter writer, ushort value) => writer.WriteBigEndian(value, sizeof(ushort), BitConverter.TryWriteBytes);
-    public static void WriteBigEndian(this BinaryWriter writer, int value) => writer.WriteBigEndian(value, sizeof(int), BitConverter.TryWriteBytes);
-    public static void WriteBigEndian(this BinaryWriter writer, uint value) => writer.WriteBigEndian(value, sizeof(uint), BitConverter.TryWriteBytes);
-
-    public static void WriteBigEndian<T>(this BinaryWriter writer, T value, int byteSize, Converter<T> converter)
+    extension(BinaryWriter writer)
     {
-        Span<byte> buffer = stackalloc byte[byteSize];
-#if RELEASE
-        converter(buffer, value);
-#endif
-#if DEBUG
-        if (!converter(buffer, value))
-        {
-            throw new InvalidOperationException();
-        }
-#endif
-        writer.WriteBigEndian(buffer);
-    }
+        public void WriteBigEndian(float value) => writer.WriteBigEndian(value, sizeof(float), BitConverter.TryWriteBytes);
+        public void WriteBigEndian(double value) => writer.WriteBigEndian(value, sizeof(double), BitConverter.TryWriteBytes);
+        public void WriteBigEndian(short value) => writer.WriteBigEndian(value, sizeof(short), BitConverter.TryWriteBytes);
+        public void WriteBigEndian(ushort value) => writer.WriteBigEndian(value, sizeof(ushort), BitConverter.TryWriteBytes);
+        public void WriteBigEndian(int value) => writer.WriteBigEndian(value, sizeof(int), BitConverter.TryWriteBytes);
+        public void WriteBigEndian(uint value) => writer.WriteBigEndian(value, sizeof(uint), BitConverter.TryWriteBytes);
 
-    public static void WriteBigEndian(this BinaryWriter writer, Span<byte> buffer)
-    {
-        if (BitConverter.IsLittleEndian)
+        public void WriteBigEndian<T>(T value, int byteSize, Func<Span<byte>, T, bool> converter)
         {
-            //do i need to copy?
-            buffer.Reverse();
+            Span<byte> buffer = stackalloc byte[byteSize];
+            var isSuccess = converter(buffer, value);
+            Debug.Assert(isSuccess);
+            writer.WriteBigEndian(buffer);
         }
-        writer.Write(buffer);
-    }
 
-    public delegate bool Converter<T>(Span<byte> buffer, T value);
+        private void WriteBigEndian(Span<byte> buffer)
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                // for this to be public we can't operate on buffer directly
+                buffer.Reverse();
+            }
+            writer.Write(buffer);
+        }
+    }
 }

@@ -41,6 +41,8 @@ public sealed class Graph<TNode> where TNode : notnull
         {
             return (A.Equals(other.A) && B.Equals(other.B)) || (A.Equals(other.B) && B.Equals(other.A));
         }
+        
+        // hashcode needs to be equal if A and B are reversed
         public override int GetHashCode() => A.GetHashCode() ^ B.GetHashCode();
     }
 }

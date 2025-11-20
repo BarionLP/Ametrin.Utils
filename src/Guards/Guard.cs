@@ -58,7 +58,6 @@ public static class Guard
         where T : notnull, IComparisonOperators<T, T, bool>
         => value >= min ? value : throw new ArgumentOutOfRangeException(valueExpression, $"{valueExpression} must be greater than or equal to {minExpression}.");
 
-#if NET10_0_OR_GREATER
     extension(FileNotFoundException)
     {
         [StackTraceHidden]
@@ -80,5 +79,4 @@ public static class Guard
             throw new FileNotFoundException(null, directoryInfo.FullName);
         }
     }
-#endif
 }

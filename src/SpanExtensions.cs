@@ -24,9 +24,6 @@ public static class SpanExtensions
         return s.Length;
     }
 
-    public static string ToHexString(this Span<byte> bytes) => Convert.ToHexString(bytes);
     public static string ToHexString(this ReadOnlySpan<byte> bytes) => Convert.ToHexString(bytes);
-
-    public static string ToBase64String(this Span<byte> bytes) => Convert.ToBase64String(bytes);
     public static string ToBase64String(this ReadOnlySpan<byte> bytes) => Convert.ToBase64String(bytes);
 }

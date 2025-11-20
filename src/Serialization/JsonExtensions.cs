@@ -7,106 +7,16 @@ using System.Threading.Tasks;
 
 namespace Ametrin.Serialization;
 
-#if NET10_0_OR_GREATER
-[Obsolete]
-#endif
-
-public static class JsonExtensions
+public static class JsonSerializerExtensions
 {
-    public static readonly JsonSerializerOptions DefaultOptions = new(JsonSerializerOptions.Default) { WriteIndented = true, IncludeFields = true };
+    public static readonly JsonSerializerOptions DefaultOptions = new(JsonSerializerOptions.Default) { WriteIndented = true };
 
-    static JsonExtensions()
+    static JsonSerializerExtensions()
     {
         DefaultOptions.Converters.Add(new DirectoryInfoJsonConverter());
         DefaultOptions.Converters.Add(new FileInfoJsonConverter());
     }
 
-    public static string ConvertToJson<T>(this T data, JsonSerializerOptions? options = null) => JsonSerializer.Serialize(data, options ?? DefaultOptions);
-    public static JsonElement ConvertToJsonElement<T>(this T data, JsonSerializerOptions? options = null) => JsonSerializer.SerializeToElement(data, data!.GetType(), options ?? DefaultOptions);
-
-    public static Task<string> ConvertToJsonAsync<T>(this T data, JsonSerializerOptions? options = null) => Task.Run(() => data.ConvertToJson(options));
-    public static Task<JsonElement> ConvertToJsonElementAsync<T>(this T data, JsonSerializerOptions? options = null) => Task.Run(() => data.ConvertToJsonElement(options));
-
-
-    public static void WriteToJsonFile<T>(this T data, string path, JsonSerializerOptions? options = null)
-    {
-        File.WriteAllText(path, data.ConvertToJson(options));
-    }
-    public static void WriteToStreamAsJson<T>(this T data, Stream stream, JsonSerializerOptions? options = null)
-    {
-        JsonSerializer.Serialize(stream, data, options ?? DefaultOptions);
-    }
-    public static Task WriteToJsonFileAsync<T>(this T data, string path, JsonSerializerOptions? options = null) => data.WriteToJsonFileAsync(path, options);
-
-    public static Result<T> ReadFromJsonFile<T>(string path, JsonSerializerOptions? options = null)
-    {
-        using var stream = File.OpenRead(path);
-        return Deserialize<T>(stream, options ?? DefaultOptions);
-    }
-    public static Task<Result<T>> ReadFromJsonFileAsync<T>(string path, JsonSerializerOptions? options = null) => Task.Run(() => ReadFromJsonFile<T>(path, options));
-
-    public static void WriteToJsonFile<T>(this T data, FileInfo fileInfo, JsonSerializerOptions? options = null)
-    {
-        using var stream = fileInfo.Create();
-        JsonSerializer.Serialize(stream, data, options ?? DefaultOptions);
-    }
-    public static void WriteToJsonFile<T>(this T data, FileInfo fileInfo, JsonTypeInfo<T> typeInfo)
-    {
-        using var stream = fileInfo.Create();
-        JsonSerializer.Serialize(stream, data, typeInfo);
-    }
-    public static Task WriteToJsonFileAsync<T>(this T data, FileInfo fileInfo, JsonSerializerOptions? options = null) => Task.Run(() => data.WriteToJsonFile(fileInfo, options));
-
-    public static Result<T> ReadFromJsonFile<T>(this FileInfo fileInfo, JsonSerializerOptions? options = null)
-    {
-        if (!fileInfo.Exists)
-        {
-            return new FileNotFoundException(null, fileInfo.FullName);
-        }
-        using var stream = fileInfo.OpenRead();
-        return Deserialize<T>(stream, options ?? DefaultOptions);
-    }
-
-    public static Result<T> ReadFromJsonFile<T>(this FileInfo fileInfo, JsonTypeInfo<T> typeInfo, JsonSerializerOptions? options = null)
-    {
-        if (!fileInfo.Exists)
-        {
-            return new FileNotFoundException(null, fileInfo.FullName);
-        }
-        using var stream = fileInfo.OpenRead();
-        return Deserialize<T>(stream, options ?? DefaultOptions);
-    }
-    public static Result<T> Deserialize<T>(Stream stream, JsonSerializerOptions? options = null)
-    {
-        try
-        {
-            return JsonSerializer.Deserialize<T>(stream, options ?? DefaultOptions) ?? Result.Error<T>(new NullReferenceException());
-        }
-        catch (Exception e)
-        {
-            return e;
-        }
-    }
-
-    public static Result<T> Deserialize<T>(Stream stream, JsonTypeInfo<T> typeInfo)
-    {
-        try
-        {
-            return JsonSerializer.Deserialize(stream, typeInfo) ?? Result.Error<T>(new NullReferenceException());
-        }
-        catch (Exception e)
-        {
-            return e;
-        }
-    }
-
-    public static Task<Result<T>> ReadFromJsonFileAsync<T>(this FileInfo fileInfo, JsonSerializerOptions? options = null) => Task.Run(() => ReadFromJsonFile<T>(fileInfo, options));
-}
-
-#if NET10_0_OR_GREATER
-
-public static class JsonSerializerExtensions
-{
     extension(JsonSerializer)
     {
         public static void SerializeToFile<T>(FileInfo fileInfo, T value, JsonSerializerOptions? options = null, bool overwrite = false)
@@ -196,5 +106,3 @@ public static class JsonSerializerExtensions
         }
     }
 }
-
-#endif

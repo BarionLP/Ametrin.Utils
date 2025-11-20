@@ -4,26 +4,29 @@ namespace Ametrin.Utils;
 
 public static class StringBuilderExtensions
 {
-    // Todo Optimize this (prechange capacity)
-    public static StringBuilder AppendRepeated(this StringBuilder builder, string value, int count)
+    extension(StringBuilder builder)
     {
-        for (int i = 0; i < count; i++)
+        // TODO: optimize this (prechange capacity)
+        public StringBuilder AppendRepeated(string value, int count)
         {
-            builder.Append(value);
+            for (int i = 0; i < count; i++)
+            {
+                builder.Append(value);
+            }
+            return builder;
         }
-        return builder;
-    }
 
-    public static StringBuilder AppendRepeated(this StringBuilder builder, char value, int count)
-    {
-        for (int i = 0; i < count; i++)
+        public StringBuilder AppendRepeated(char value, int count)
         {
-            builder.Append(value);
+            for (int i = 0; i < count; i++)
+            {
+                builder.Append(value);
+            }
+            return builder;
         }
-        return builder;
-    }
 
-    public static StringBuilder Indent(this StringBuilder builder, int count) => builder.AppendRepeated('\t', count);
-    public static StringBuilder Append(this StringBuilder builder, string value, int indent) => builder.Indent(indent).Append(value);
-    public static StringBuilder AppendLine(this StringBuilder builder, string value, int indent) => builder.Indent(indent).AppendLine(value);
+        public StringBuilder Indent(int count) => builder.AppendRepeated('\t', count);
+        public StringBuilder Append(string value, int indent) => builder.Indent(indent).Append(value);
+        public StringBuilder AppendLine(string value, int indent) => builder.Indent(indent).AppendLine(value);
+    }
 }

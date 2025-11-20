@@ -2,14 +2,17 @@
 
 public static class RangeExtensions
 {
-    public static bool Contains(this Range range, decimal value) => value >= range.Start.Value && value < range.End.Value;
-    public static bool Contains(this Range range, double value) => value >= range.Start.Value && value < range.End.Value;
-    public static bool Contains(this Range range, float value) => value >= range.Start.Value && value < range.End.Value;
-    public static bool Contains(this Range range, long value) => value >= range.Start.Value && value < range.End.Value;
-    public static bool Contains(this Range range, int value) => value >= range.Start.Value && value < range.End.Value;
-    public static bool Contains(this Range range, short value) => value >= range.Start.Value && value < range.End.Value;
+    extension(Range range)
+    {
+        public bool Contains(decimal value) => value >= range.Start.Value && value < range.End.Value;
+        public bool Contains(double value) => value >= range.Start.Value && value < range.End.Value;
+        public bool Contains(float value) => value >= range.Start.Value && value < range.End.Value;
+        public bool Contains(long value) => value >= range.Start.Value && value < range.End.Value;
+        public bool Contains(int value) => value >= range.Start.Value && value < range.End.Value;
+        public bool Contains(short value) => value >= range.Start.Value && value < range.End.Value;
 
-    public static RangeEnumerator GetEnumerator(this Range range) => new(range);
+        public RangeEnumerator GetEnumerator() => new(range);
+    }
 
     // struct or ref struct (what is the performance impact?)
     // i want this loop in yields
