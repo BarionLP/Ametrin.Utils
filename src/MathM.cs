@@ -347,13 +347,13 @@ public static class MathM
     {
         while (x >= PIx2)
         {
-            var divide = Math.Abs(decimal.ToInt32(x / PIx2));
+            var divide = int.Abs(decimal.ToInt32(x / PIx2));
             x -= divide * PIx2;
         }
 
         while (x <= -PIx2)
         {
-            var divide = Math.Abs(decimal.ToInt32(x / PIx2));
+            var divide = int.Abs(decimal.ToInt32(x / PIx2));
             x += divide * PIx2;
         }
     }
