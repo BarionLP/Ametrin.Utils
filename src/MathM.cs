@@ -338,8 +338,6 @@ public static class MathM
         return sineIsPositive ? moduleOfSin : -moduleOfSin;
     }
 
-
-
     /// <summary>
     /// Truncates to [-2*PI;2*PI]
     /// </summary>

@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Ametrin.Serialization;
+
 public sealed class FileInfoJsonConverter : JsonConverter<FileInfo>
 {
     public override FileInfo? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

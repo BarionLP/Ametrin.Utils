@@ -9,7 +9,7 @@ namespace Ametrin.Serialization;
 
 public static class JsonSerializerExtensions
 {
-    public static readonly JsonSerializerOptions DefaultOptions = new(JsonSerializerOptions.Default) { WriteIndented = true };
+    public static readonly JsonSerializerOptions DefaultOptions = new(JsonSerializerOptions.Default) { WriteIndented = true, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip };
 
     static JsonSerializerExtensions()
     {
@@ -75,7 +75,7 @@ public static class JsonSerializerExtensions
             FileNotFoundException.ExistsOrThrow(fileInfo);
 
             using var stream = fileInfo.OpenRead();
-            return (await JsonSerializer.DeserializeAsync<T>(stream, options, cancellationToken)) ?? throw new Exception();
+            return (await JsonSerializer.DeserializeAsync<T>(stream, options, cancellationToken)) ?? throw new JsonException();
         }
 
         public async static Task<T> DeserializeAsync<T>(FileInfo fileInfo, JsonTypeInfo<T> jsonTypeInfo, CancellationToken cancellationToken = default)
@@ -83,7 +83,7 @@ public static class JsonSerializerExtensions
             FileNotFoundException.ExistsOrThrow(fileInfo);
 
             using var stream = fileInfo.OpenRead();
-            return (await JsonSerializer.DeserializeAsync<T>(stream, jsonTypeInfo, cancellationToken)) ?? throw new Exception();
+            return (await JsonSerializer.DeserializeAsync<T>(stream, jsonTypeInfo, cancellationToken)) ?? throw new JsonException();
         }
     }
 
@@ -96,7 +96,7 @@ public static class JsonSerializerExtensions
             using var stream = fileInfo.OpenRead();
             return JsonNode.Parse(stream, nodeOptions, documentOptions) ?? throw new JsonException();
         }
-        
+
         public static async Task<JsonNode> ParseAsync(FileInfo fileInfo, JsonNodeOptions? nodeOptions = null, JsonDocumentOptions documentOptions = default)
         {
             FileNotFoundException.ExistsOrThrow(fileInfo);
