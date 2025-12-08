@@ -1,5 +1,3 @@
-using Ametrin.Guards;
-
 namespace Ametrin.Utils;
 
 public static class RandomExtensions
@@ -19,5 +17,8 @@ public static class RandomExtensions
 
             return random.NextDouble() * (maxExclusive - minInclusive) + minInclusive;
         }
+
+        public bool Success(double chance) => random.NextDouble() < chance;
+        public bool Success(float chance) => random.NextSingle() < chance;
     }
 }

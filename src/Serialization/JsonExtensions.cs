@@ -83,7 +83,7 @@ public static class JsonSerializerExtensions
             FileNotFoundException.ExistsOrThrow(fileInfo);
 
             using var stream = fileInfo.OpenRead();
-            return (await JsonSerializer.DeserializeAsync<T>(stream, jsonTypeInfo, cancellationToken)) ?? throw new JsonException();
+            return (await JsonSerializer.DeserializeAsync(stream, jsonTypeInfo, cancellationToken)) ?? throw new JsonException();
         }
     }
 

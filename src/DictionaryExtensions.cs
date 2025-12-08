@@ -16,6 +16,7 @@ public static class DictionaryExtensions
             dictionary.Add(key, @default);
             return @default;
         }
+        
         public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
         {
             if (!dictionary.TryGetValue(key, out var value))
