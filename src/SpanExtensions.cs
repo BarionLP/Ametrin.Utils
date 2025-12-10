@@ -25,5 +25,6 @@ public static class SpanExtensions
     }
 
     public static string ToHexString(this ReadOnlySpan<byte> bytes) => Convert.ToHexString(bytes);
+    public static string ToHexStringLower(this ReadOnlySpan<byte> bytes) => Convert.ToHexStringLower(bytes);
     public static string ToBase64String(this ReadOnlySpan<byte> bytes) => Convert.ToBase64String(bytes);
 }

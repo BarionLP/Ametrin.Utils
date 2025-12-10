@@ -7,7 +7,7 @@ public static class LinqExtensions
     extension<T>(IEnumerable<T> source)
     {
         public TimeSpan Sum(Func<T, TimeSpan> selector)
-        => TimeSpan.FromTicks(source.Sum(v => selector(v).Ticks));
+            => TimeSpan.FromTicks(source.Sum(v => selector(v).Ticks));
 
         public string Dump(string separator)
             => string.Join(separator, source);
@@ -79,6 +79,7 @@ public static class LinqExtensions
 
     extension<T>(IEnumerable<IEnumerable<T>> source)
     {
+        [Obsolete]
         public void Consume(Action<T> action, IProgress<float> progress)
         {
             var values = source switch
