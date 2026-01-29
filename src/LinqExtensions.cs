@@ -14,14 +14,14 @@ public static class LinqExtensions
         public string Dump(char separator)
             => string.Join(separator, source);
 
-        public void Consume(Action<T> action)
+        public void ForEach(Action<T> action)
         {
             foreach (var value in source)
             {
                 action(value);
             }
         }
-        public void Consume(Action<int, T> action)
+        public void ForEach(Action<int, T> action)
         {
             var count = 0;
             foreach (var value in source)
@@ -31,9 +31,9 @@ public static class LinqExtensions
             }
         }
 
-        public void Consume(Action<T> action, IProgress<float> progress)
-            => source.Consume((idx, value) => action(value), progress);
-        public void Consume(Action<int, T> action, IProgress<float> progress)
+        public void ForEach(Action<T> action, IProgress<float> progress)
+            => source.ForEach((idx, value) => action(value), progress);
+        public void ForEach(Action<int, T> action, IProgress<float> progress)
         {
             var values = source switch
             {
@@ -49,9 +49,9 @@ public static class LinqExtensions
             }
         }
 
-        public void Consume(Action<T> action, IProgress<int> progress)
-            => source.Consume((idx, value) => action(value), progress);
-        public void Consume(Action<int, T> action, IProgress<int> progress)
+        public void ForEach(Action<T> action, IProgress<int> progress)
+            => source.ForEach((idx, value) => action(value), progress);
+        public void ForEach(Action<int, T> action, IProgress<int> progress)
         {
             var count = 0;
             foreach (var value in source)

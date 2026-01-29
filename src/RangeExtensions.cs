@@ -14,6 +14,11 @@ public static class RangeExtensions
         public RangeEnumerator GetEnumerator() => new(range);
     }
 
+    extension<T>(ICollection<T> source)
+    {
+        public Range IndexRange => ..source.Count;
+    }
+
     // struct or ref struct (what is the performance impact?)
     // i want this loop in yields
     // it is just syntactical sugar...
@@ -39,6 +44,37 @@ public static class RangeExtensions
         public bool MoveNext()
         {
             _current++;
+            return _current < _end;
+        }
+    }
+}
+
+public readonly record struct UInt32Range(uint Start, uint End)
+{
+    public Enumerator GetEnumerator() => new(Start, End);
+
+    public ref struct Enumerator
+    {
+        // start INCLUSIVE - end EXCLUSIVE
+        // we have next separatly because current cannot start as -1
+        private uint _current;
+        private uint _next = 0;
+        private readonly uint _end;
+        public readonly uint Current => _current;
+
+        public Enumerator(uint start, uint end)
+        {
+            if (start > end) throw new ArgumentException();
+
+            _current = start;
+            _next = start;
+            _end = end;
+        }
+
+        public bool MoveNext()
+        {
+            _current = _next;
+            _next++;
             return _current < _end;
         }
     }

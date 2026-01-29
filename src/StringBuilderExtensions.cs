@@ -6,27 +6,26 @@ public static class StringBuilderExtensions
 {
     extension(StringBuilder builder)
     {
-        // TODO: optimize this (prechange capacity)
-        public StringBuilder AppendRepeated(string value, int count)
+        public StringBuilder AppendRepeated(string value, int repeatCount)
         {
-            for (int i = 0; i < count; i++)
+            ArgumentNullException.ThrowIfNull(builder);
+            ArgumentNullException.ThrowIfNull(value);
+            ArgumentOutOfRangeException.ThrowIfNegative(repeatCount);
+
+            builder.EnsureCapacity(builder.Length + (value.Length * repeatCount));
+            foreach (var _ in ..repeatCount)
             {
                 builder.Append(value);
             }
             return builder;
         }
 
-        public StringBuilder AppendRepeated(char value, int count)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                builder.Append(value);
-            }
-            return builder;
-        }
+        // keep it for consistency
+        public StringBuilder AppendRepeated(char value, int repeatCount)
+            => builder.Append(value, repeatCount);
 
-        public StringBuilder Indent(int count) => builder.AppendRepeated('\t', count);
-        public StringBuilder Append(string value, int indent) => builder.Indent(indent).Append(value);
-        public StringBuilder AppendLine(string value, int indent) => builder.Indent(indent).AppendLine(value);
+        public StringBuilder Indent(int count) => builder.Append('\t', count);
+        public StringBuilder AppendIndeted(string value, int indent) => builder.Indent(indent).Append(value);
+        public StringBuilder AppendLineIndeted(string value, int indent) => builder.Indent(indent).AppendLine(value);
     }
 }

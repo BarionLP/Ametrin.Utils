@@ -2,29 +2,38 @@
 
 public static class SpanExtensions
 {
-    public static bool All<T>(this ReadOnlySpan<T> span, Func<T, bool> condition)
+    extension<T>(ReadOnlySpan<T> span)
     {
-        foreach (var element in span)
+        public bool All(Func<T, bool> condition)
         {
-            if (!condition(element))
-                return false;
-        }
-        return true;
-    }
-
-    public static int FirstDigitIndex(this ReadOnlySpan<char> s)
-    {
-        for (int i = 0; i < s.Length; i++)
-        {
-            if (char.IsDigit(s[i]))
+            foreach (var element in span)
             {
-                return i;
+                if (!condition(element))
+                    return false;
             }
+            return true;
         }
-        return s.Length;
     }
 
-    public static string ToHexString(this ReadOnlySpan<byte> bytes) => Convert.ToHexString(bytes);
-    public static string ToHexStringLower(this ReadOnlySpan<byte> bytes) => Convert.ToHexStringLower(bytes);
-    public static string ToBase64String(this ReadOnlySpan<byte> bytes) => Convert.ToBase64String(bytes);
+    extension(ReadOnlySpan<char> s)
+    {
+        public int FirstDigitIndex()
+        {
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (char.IsDigit(s[i]))
+                {
+                    return i;
+                }
+            }
+            return s.Length;
+        }
+    }
+
+    extension(ReadOnlySpan<byte> bytes)
+    {
+        public string ToHexString() => Convert.ToHexString(bytes);
+        public string ToHexStringLower() => Convert.ToHexStringLower(bytes);
+        public string ToBase64String() => Convert.ToBase64String(bytes);
+    }
 }
