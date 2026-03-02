@@ -24,7 +24,7 @@ public static class StringBuilderExtensions
         public StringBuilder AppendRepeated(char value, int repeatCount)
             => builder.Append(value, repeatCount);
 
-        public StringBuilder Indent(int count) => builder.Append('\t', count);
+        public StringBuilder Indent(int count) => builder.Append(' ', count * 4);
         public StringBuilder AppendIndeted(string value, int indent) => builder.Indent(indent).Append(value);
         public StringBuilder AppendLineIndeted(string value, int indent) => builder.Indent(indent).AppendLine(value);
     }
