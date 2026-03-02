@@ -12,6 +12,7 @@ public static class RangeExtensions
         public bool Contains(short value) => value >= range.Start.Value && value < range.End.Value;
 
         public RangeEnumerator GetEnumerator() => new(range);
+        public ReversedRangeEnumerator Reversed() => new(range);
     }
 
     extension<T>(ICollection<T> source)
@@ -32,7 +33,7 @@ public static class RangeExtensions
 
         public RangeEnumerator(Range range)
         {
-            if (range.End.IsFromEnd)
+            if (range.Start.IsFromEnd || range.End.IsFromEnd)
             {
                 throw new NotFiniteNumberException("Can't count to infinity!", range.End.Value);
             }
@@ -45,6 +46,30 @@ public static class RangeExtensions
         {
             _current++;
             return _current < _end;
+        }
+    }
+
+    public struct ReversedRangeEnumerator
+    {
+        private int _current;
+        public readonly int Current => _current;
+
+
+        public ReversedRangeEnumerator(Range range)
+        {
+            if (range.Start.IsFromEnd || range.End.IsFromEnd)
+            {
+                throw new NotFiniteNumberException("Can't count to infinity!", range.End.Value);
+            }
+
+            _current = range.End.Value;
+        }
+
+        public readonly ReversedRangeEnumerator GetEnumerator() => this;
+        public bool MoveNext()
+        {
+            _current--;
+            return _current <= 0;
         }
     }
 }

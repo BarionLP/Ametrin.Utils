@@ -101,4 +101,18 @@ public static class LinqExtensions
             }
         }
     }
+
+    public static ulong Sum<TSource>(this IEnumerable<TSource> source, Func<TSource, ulong> selector)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(selector);
+
+        ulong sum = 0;
+        foreach (var item in source)
+        {
+            checked { sum += selector(item); }
+        }
+
+        return sum;
+    }
 }
