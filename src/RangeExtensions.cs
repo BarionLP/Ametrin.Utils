@@ -69,7 +69,7 @@ public static class RangeExtensions
         public bool MoveNext()
         {
             _current--;
-            return _current <= 0;
+            return _current >= 0;
         }
     }
 }
