@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Security.Cryptography;
 using Microsoft.VisualBasic.FileIO;
 
 namespace Ametrin.Utils;
@@ -8,7 +9,7 @@ public static class FileInfoExtensions
     extension(FileInfo fileInfo)
     {
         public FileInfo GetCopyOfPathIfExists()
-        => fileInfo.Exists ? GetCopyOfPathIfExists(GetCopyOfPath(fileInfo)) : fileInfo;
+            => fileInfo.Exists ? GetCopyOfPathIfExists(GetCopyOfPath(fileInfo)) : fileInfo;
 
         public FileInfo GetCopyOfPath()
         {
@@ -21,15 +22,15 @@ public static class FileInfoExtensions
         public byte[] ComputeSHA256Hash()
         {
             using var stream = fileInfo.OpenRead();
-            return stream.ComputeSHA256Hash();
+            return SHA256.HashData(stream);
         }
 
         public byte[] ComputeMD5Hash()
         {
             using var stream = fileInfo.OpenRead();
-            return stream.ComputeMD5Hash();
+            return MD5.HashData(stream);
         }
-        
+
         public FileInfo CopyTo(DirectoryInfo target, bool overwrite = false) => fileInfo.CopyTo(Path.Join(target.FullName, fileInfo.Name), overwrite);
         public FileInfo CopyTo(FileInfo newFile, bool overwrite = false) => fileInfo.CopyTo(newFile.FullName, overwrite);
         public void MoveTo(FileInfo newFile, bool overwrite = false) => fileInfo.MoveTo(newFile.FullName, overwrite);

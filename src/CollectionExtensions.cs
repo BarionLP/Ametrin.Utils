@@ -80,4 +80,11 @@ public static class CollectionExtensions
         return result;
     }
 
+    public static void UnionWith<T>(this ISet<T> set, ReadOnlySpan<T> values)
+    {
+        foreach(var value in values)
+        {
+            set.Add(value);
+        }
+    }
 }

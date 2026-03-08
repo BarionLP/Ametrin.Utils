@@ -7,16 +7,10 @@ public static class StreamExtensions
 {
     extension(Stream stream)
     {
-        public byte[] ComputeSHA256Hash()
-        {
-            using var hasher = SHA256.Create();
-            return hasher.ComputeHash(stream);
-        }
+        [Obsolete("use SHA256.HashData")]
+        public byte[] ComputeSHA256Hash() => SHA256.HashData(stream);
 
-        public byte[] ComputeMD5Hash()
-        {
-            using var hasher = MD5.Create();
-            return hasher.ComputeHash(stream);
-        }
+        [Obsolete("use MD5.HashData")]
+        public byte[] ComputeMD5Hash() => MD5.HashData(stream);
     }
 }

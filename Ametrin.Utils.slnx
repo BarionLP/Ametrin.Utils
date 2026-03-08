@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="src/Ametrin.Utils.csproj" />
   <Project Path="wpf/Ametrin.Utils.WPF.csproj" />
+  <Project Path="avalonia/Ametrin.Utils.Avalonia.csproj" />
   <Project Path="benchy/Ametrin.Utils.Benchmarks.csproj" />
   <Project Path="test/Ametrin.Utils.Test.csproj" />
 </Solution>
