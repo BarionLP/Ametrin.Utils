@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Buffers.Binary;
+using System.Diagnostics;
 using System.IO;
 
 namespace Ametrin.Utils;
@@ -7,28 +8,23 @@ public static class BinaryWriterExtensions
 {
     extension(BinaryWriter writer)
     {
-        public void WriteBigEndian(float value) => writer.WriteBigEndian(value, sizeof(float), BitConverter.TryWriteBytes);
-        public void WriteBigEndian(double value) => writer.WriteBigEndian(value, sizeof(double), BitConverter.TryWriteBytes);
-        public void WriteBigEndian(short value) => writer.WriteBigEndian(value, sizeof(short), BitConverter.TryWriteBytes);
-        public void WriteBigEndian(ushort value) => writer.WriteBigEndian(value, sizeof(ushort), BitConverter.TryWriteBytes);
-        public void WriteBigEndian(int value) => writer.WriteBigEndian(value, sizeof(int), BitConverter.TryWriteBytes);
-        public void WriteBigEndian(uint value) => writer.WriteBigEndian(value, sizeof(uint), BitConverter.TryWriteBytes);
+        public void WriteBigEndian(float value) => writer.Write(value, sizeof(float), BinaryPrimitives.TryWriteSingleBigEndian);
+        public void WriteBigEndian(double value) => writer.Write(value, sizeof(double), BinaryPrimitives.TryWriteDoubleBigEndian);
 
-        public void WriteBigEndian<T>(T value, int byteSize, Func<Span<byte>, T, bool> converter)
+        public void WriteBigEndian(long value) => writer.Write(value, sizeof(long), BinaryPrimitives.TryWriteInt64BigEndian);
+        public void WriteBigEndian(ulong value) => writer.Write(value, sizeof(ulong), BinaryPrimitives.TryWriteUInt64BigEndian);
+
+        public void WriteBigEndian(int value) => writer.Write(value, sizeof(int), BinaryPrimitives.TryWriteInt32BigEndian);
+        public void WriteBigEndian(uint value) => writer.Write(value, sizeof(uint), BinaryPrimitives.TryWriteUInt32BigEndian);
+        
+        public void WriteBigEndian(short value) => writer.Write(value, sizeof(short), BinaryPrimitives.TryWriteInt16BigEndian);
+        public void WriteBigEndian(ushort value) => writer.Write(value, sizeof(ushort), BinaryPrimitives.TryWriteUInt16BigEndian);
+
+        private void Write<T>(T value, int byteSize, Func<Span<byte>, T, bool> converter)
         {
             Span<byte> buffer = stackalloc byte[byteSize];
             var isSuccess = converter(buffer, value);
             Debug.Assert(isSuccess);
-            writer.WriteBigEndian(buffer);
-        }
-
-        private void WriteBigEndian(Span<byte> buffer)
-        {
-            if (BitConverter.IsLittleEndian)
-            {
-                // for this to be public we can't operate on buffer directly
-                buffer.Reverse();
-            }
             writer.Write(buffer);
         }
     }

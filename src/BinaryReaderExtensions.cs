@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Buffers.Binary;
+using System.IO;
 
 namespace Ametrin.Utils;
 
@@ -6,29 +7,23 @@ public static class BinaryReaderExtensions
 {
     extension(BinaryReader reader)
     {
-        public double ReadDoubleBigEndian() => reader.ReadBigEndian(BitConverter.ToDouble, 8);
-        public float ReadSingleBigEndian() => reader.ReadBigEndian(BitConverter.ToSingle, 4);
+        public double ReadDoubleBigEndian() => reader.Read(BinaryPrimitives.ReadDoubleBigEndian, sizeof(double));
+        public float ReadSingleBigEndian() => reader.Read(BinaryPrimitives.ReadSingleBigEndian, sizeof(float));
 
-        public int ReadInt32BigEndian() => reader.ReadBigEndian(BitConverter.ToInt32, 4);
-        public uint ReadUInt32BigEndian() => reader.ReadBigEndian(BitConverter.ToUInt32, 4);
+        public long ReadInt64BigEndian() => reader.Read(BinaryPrimitives.ReadInt64BigEndian, sizeof(long));
+        public ulong ReadUInt64BigEndian() => reader.Read(BinaryPrimitives.ReadUInt64BigEndian, sizeof(ulong));
 
-        public short ReadInt16BigEndian() => reader.ReadBigEndian(BitConverter.ToInt16, 2);
-        public ushort ReadUInt16BigEndian() => reader.ReadBigEndian(BitConverter.ToUInt16, 2);
+        public int ReadInt32BigEndian() => reader.Read(BinaryPrimitives.ReadInt32BigEndian, sizeof(int));
+        public uint ReadUInt32BigEndian() => reader.Read(BinaryPrimitives.ReadUInt32BigEndian, sizeof(uint));
 
-        public T ReadBigEndian<T>(Func<ReadOnlySpan<byte>, T> converter, int byteSize) where T : struct
+        public short ReadInt16BigEndian() => reader.Read(BinaryPrimitives.ReadInt16BigEndian, sizeof(short));
+        public ushort ReadUInt16BigEndian() => reader.Read(BinaryPrimitives.ReadUInt16BigEndian, sizeof(ushort));
+
+        private T Read<T>(Func<ReadOnlySpan<byte>, T> converter, int byteSize) where T : struct
         {
             Span<byte> buffer = stackalloc byte[byteSize];
-            reader.ReadBigEndian(buffer);
+            reader.ReadExactly(buffer);
             return converter(buffer);
-        }
-
-        public void ReadBigEndian(Span<byte> buffer)
-        {
-            reader.Read(buffer);
-            if (BitConverter.IsLittleEndian)
-            {
-                buffer.Reverse();
-            }
         }
     }
 }
