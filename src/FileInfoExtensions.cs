@@ -17,6 +17,7 @@ public static class FileInfoExtensions
             return new(Path.Join(fileInfo.DirectoryName!, newFileName));
         }
 
+        // might wanna turn back into a method because it is not a cheap call
         public string NameWithoutExtension => Path.GetFileNameWithoutExtension(fileInfo.FullName);
 
         public byte[] ComputeSHA256Hash()
