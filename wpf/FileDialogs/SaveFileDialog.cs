@@ -58,8 +58,8 @@ public sealed class SaveFileDialog : IFileDialog
         return this;
     }
 
-    public Option<FileInfo> GetFileInfo() => GetPath().Map(path => new FileInfo(path));
-    public Option<string> GetPath() => ShowDialog() ? _dialog.FileName : default;
+    public Option<FileInfo> GetFileInfo() => GetPath().Map(static path => new FileInfo(path));
+    public Option<string> GetPath() => ShowDialog() ? _dialog.FileName : Option.Error<string>();
 
     private bool ShowDialog()
     {

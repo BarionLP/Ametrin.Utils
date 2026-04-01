@@ -37,8 +37,8 @@ public sealed class OpenFolderDialog
         init => _dialog.ValidateNames = value;
     }
 
-    public Option<DirectoryInfo> GetDirectoryInfo() => GetPath().Map(path => new DirectoryInfo(path));
-    public Option<string> GetPath() => ShowDialog() ? _dialog.FolderName : default;
+    public Option<DirectoryInfo> GetDirectoryInfo() => GetPath().Map(static path => new DirectoryInfo(path));
+    public Option<string> GetPath() => ShowDialog() ? _dialog.FolderName : Option.Error<string>();
 
     public IEnumerable<DirectoryInfo> GetDirectoryInfos() => GetPaths().Select(path => new DirectoryInfo(path));
     public IEnumerable<string> GetPaths() => ShowDialog() ? _dialog.FolderNames : [];
