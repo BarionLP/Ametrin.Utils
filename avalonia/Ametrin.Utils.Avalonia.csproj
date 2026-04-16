@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);AVLN3001</NoWarn> <!-- AVLN3001: window won't be reachable via runtime loader -->
     <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
 
