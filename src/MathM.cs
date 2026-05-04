@@ -1,26 +1,30 @@
 ﻿using System.Diagnostics;
 
-// from https://github.com/raminrahimzada/CSharp-Helper-Classes/blob/master/Math/DecimalMath/DecimalMath.cs
+// based on https://github.com/raminrahimzada/CSharp-Helper-Classes/blob/master/Math/DecimalMath/DecimalMath.cs
 namespace Ametrin.Utils;
 
 public static class MathM
 {
     public const decimal Half = 0.5M;
-    public const decimal PI = 3.14159265358979323846264338327950288419716939937510M; //output: 3.1415926535897932384626433833
+    // Math.PI but float/double.Pi so i'm going with the newer api naming
+    public const decimal Pi = 3.14159265358979323846264338327950288419716939937510M; // output: 3.1415926535897932384626433833
     /// <summary>
     /// represents a small value
     /// </summary>
     public const decimal Epsilon = 0.0000000000000000001M;
     public const decimal E = 2.7182818284590452353602874713526624977572470936999595749M;
-    private const decimal PIx2 = PI * 2;
-    private const decimal PIdiv2 = PI / 2.0M;
-    private const decimal PIdiv4 = PI / 4.0M;
+    private const decimal PIx2 = Pi * 2;
+    private const decimal PIdiv2 = Pi / 2.0M;
+    private const decimal PIdiv4 = Pi / 4.0M;
     private const decimal Einv = decimal.One / E;
     private const decimal Log10Inv = 0.434294481903251827651128918916605082294397005803666566114M;
     private const int MaxTaylorIteration = 100;
 
     extension(decimal)
     {
+        public static decimal Pi => Pi;
+        public static decimal E => E;
+
         public static decimal Exp(decimal x)
         {
             var count = 0;
@@ -181,13 +185,13 @@ public static class MathM
             TruncateToPeriodicInterval(ref x);
 
             // now x in (-2pi,2pi)
-            if (x >= PI && x <= PIx2)
+            if (x >= Pi && x <= PIx2)
             {
-                return -Cos(x - PI);
+                return -Cos(x - Pi);
             }
-            if (x >= -PIx2 && x <= -PI)
+            if (x >= -PIx2 && x <= -Pi)
             {
-                return -Cos(x + PI);
+                return -Cos(x + Pi);
             }
 
             x *= x;
@@ -316,15 +320,15 @@ public static class MathM
         {
             decimal.Zero => PIdiv2,
             decimal.One => decimal.Zero,
-            < decimal.Zero => PI - Acos(-x),
+            < decimal.Zero => Pi - Acos(-x),
             _ => PIdiv2 - Asin(x)
         };
 
         public static decimal Atan2(decimal y, decimal x) => x switch
         {
             > decimal.Zero => ATan(y / x),
-            < decimal.Zero when y >= decimal.Zero => ATan(y / x) + PI,
-            < decimal.Zero when y < decimal.Zero => ATan(y / x) - PI,
+            < decimal.Zero when y >= decimal.Zero => ATan(y / x) + Pi,
+            < decimal.Zero when y < decimal.Zero => ATan(y / x) - Pi,
             decimal.Zero when y > decimal.Zero => PIdiv2,
             decimal.Zero when y < decimal.Zero => -PIdiv2,
             _ => throw new ArgumentException("invalid atan2 arguments")
@@ -365,10 +369,10 @@ public static class MathM
         //now x in [-2*PI;2*PI]
         return x switch
         {
-            >= -PIx2 and <= -PI => true,
-            >= -PI and <= decimal.Zero => false,
-            >= decimal.Zero and <= PI => true,
-            >= PI and <= PIx2 => false,
+            >= -PIx2 and <= -Pi => true,
+            >= -Pi and <= decimal.Zero => false,
+            >= decimal.Zero and <= Pi => true,
+            >= Pi and <= PIx2 => false,
             _ => throw new UnreachableException(nameof(x))
         };
     }
