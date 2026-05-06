@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 
@@ -64,5 +65,11 @@ public static class AvaloniaExtensions
                 }
             }
         }
+    }
+
+    extension(Window window)
+    {
+        // PlatformImpl becomes null once a window has been closed
+        public bool IsClosed => window.PlatformImpl is null;
     }
 }
