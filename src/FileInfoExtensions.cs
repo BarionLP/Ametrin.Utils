@@ -36,8 +36,7 @@ public static class FileInfoExtensions
         public FileInfo CopyTo(FileInfo newFile, bool overwrite = false) => fileInfo.CopyTo(newFile.FullName, overwrite);
         public void MoveTo(DirectoryInfo target, bool overwrite = false) => fileInfo.MoveTo(Path.Join(target.FullName, fileInfo.Name), overwrite);
         public void MoveTo(FileInfo newFile, bool overwrite = false) => fileInfo.MoveTo(newFile.FullName, overwrite);
-        public void Trash(UIOption options = UIOption.OnlyErrorDialogs) => FileSystem.DeleteFile(fileInfo.FullName, options, RecycleOption.SendToRecycleBin);
+        public void ToRecycleBin(UIOption options = UIOption.OnlyErrorDialogs) => FileSystem.DeleteFile(fileInfo.FullName, options, RecycleOption.SendToRecycleBin);
         public bool CompareHash(FileInfo other) => fileInfo.ComputeMD5Hash().SequenceEqual(other.ComputeMD5Hash());
     }
-
 }
