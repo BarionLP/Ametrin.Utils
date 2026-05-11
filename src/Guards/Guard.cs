@@ -1,11 +1,11 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace Ametrin.Guards;
 
+[Obsolete]
 public static class Guard
 {
     [StackTraceHidden]
@@ -57,34 +57,4 @@ public static class Guard
     public static T GreaterThanOrEqual<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
         where T : notnull, IComparisonOperators<T, T, bool>
         => value >= min ? value : throw new ArgumentOutOfRangeException(valueExpression, $"{valueExpression} must be greater than or equal to {minExpression}.");
-
-    extension(FileNotFoundException)
-    {
-        [StackTraceHidden]
-        public static FileInfo ExistsOrThrow(FileInfo fileInfo, [CallerArgumentExpression(nameof(fileInfo))] string paramName = "")
-        {
-            ArgumentNullException.ThrowIfNull(fileInfo, paramName);
-            if (fileInfo.Exists) return fileInfo;
-            throw new FileNotFoundException(null, fileInfo.FullName);
-        }
-
-        [StackTraceHidden]
-        public static string ExistsOrThrow(string filePath, [CallerArgumentExpression(nameof(filePath))] string paramName = "")
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(filePath, paramName);
-            if (File.Exists(filePath)) return filePath;
-            throw new FileNotFoundException(null, filePath);
-        }
-    }
-
-    extension(DirectoryNotFoundException)
-    {
-        [StackTraceHidden]
-        public static DirectoryInfo ExistsOrThrow(DirectoryInfo directoryInfo, [CallerArgumentExpression(nameof(directoryInfo))] string paramName = "")
-        {
-            ArgumentNullException.ThrowIfNull(directoryInfo, paramName);
-            if (directoryInfo.Exists) return directoryInfo;
-            throw new FileNotFoundException(null, directoryInfo.FullName);
-        }
-    }
 }

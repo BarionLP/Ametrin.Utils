@@ -15,7 +15,7 @@ public static class ArrayPoolExtensions
     // a class would solve this but introduce another allocation (except .NET 10 stack allocates the instance where possible)
     public ref struct ArrayPoolHandle<T>(ArrayPool<T> arrayPool, int requestedLength, bool clearOnReturn) : IDisposable
     {
-        public ArrayPool<T> ArrayPool { get; } = Guard.ThrowIfNull(arrayPool);
+        public ArrayPool<T> ArrayPool { get; } = ThrowIf.Null(arrayPool);
         public int RequestedLength { get; } = requestedLength;
         public T[] Array { get; private set; } = arrayPool.Rent(requestedLength);
         private bool isDisposed = false;
