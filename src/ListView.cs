@@ -10,33 +10,22 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
     private List<int>? itemIndices;
     [MemberNotNullWhen(false, nameof(itemIndices))]
     private bool IsPassthrough => itemIndices is null;
-    private Func<T?, bool>? activeFilter;
+    private Func<T, bool>? activeFilter;
+    // TODO adjust usage of BinarySearch when adding comparers
 
     public int Count => itemIndices?.Count ?? source.Count;
     public bool IsReadOnly => source.IsReadOnly;
     public T this[int index]
     {
-        get => source[index];
+        get => source[ViewToSourceIndex(index)];
         set
         {
-            if (IsPassthrough)
-            {
-                var oldItem = source[index];
-                source[index] = value;
+            var sourceIndex = ViewToSourceIndex(index);
+            var oldItem = source[sourceIndex];
+            source[sourceIndex] = value;
 
-                if (isSourceObservable) return;
-                Source_ListChanged(source, ListChangedEventArgs.ReplaceSingle(index, value, oldItem));
-            }
-            else
-            {
-                Debug.Assert(IsFiltered);
-                var sourceIndex = itemIndices[index];
-                var oldItem = source[sourceIndex];
-                source[sourceIndex] = value;
-
-                if (isSourceObservable) return;
-                Source_ListChanged(source, ListChangedEventArgs.ReplaceSingle(sourceIndex, value, oldItem));
-            }
+            if (isSourceObservable) return;
+            Source_ListChanged(source, ListChangedEventArgs.ReplaceSingle(sourceIndex, value, oldItem));
         }
     }
 
@@ -48,7 +37,8 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
 
     public ListView(IList<T> source)
     {
-        this.source = source;
+        this.source = ThrowIf.Null(source);
+        // subscribe only to one, prefer modern variant
         if (source is INotifyListChanged<T> observable)
         {
             isSourceObservable = true;
@@ -84,7 +74,7 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
     {
         if (IsPassthrough)
         {
-            RaiseChanged(args);
+            RaiseViewChanged(args);
             return;
         }
 
@@ -95,12 +85,6 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
             case ListChangedEventArgs<T>.Add added:
                 {
                     var sourceIndex = added.StartIndex;
-                    var filteredIndex = itemIndices.BinarySearch(sourceIndex);
-                    // BinarySearch returns the bitwise complement of the index of the next element that is larger than startIndex
-                    if (filteredIndex < 0)
-                    {
-                        filteredIndex = ~filteredIndex;
-                    }
 
                     // shift existing indices if not added at the end
                     if (source.Count - added.Items.Count != sourceIndex)
@@ -110,27 +94,32 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
                             var index = itemIndices[i];
                             if (index >= sourceIndex)
                             {
-                                itemIndices[i] = index + sourceIndex;
+                                itemIndices[i] = index + added.Items.Count;
                             }
                         }
                     }
 
+                    var filteredIndex = GetInsertIndex(sourceIndex);
+
                     var newItems = new List<T>();
                     var insertAt = filteredIndex;
+                    var batchIndex = filteredIndex;
                     foreach (var item in added.Items)
                     {
+                        Debug.Assert(EqualityComparer<T>.Default.Equals(source[sourceIndex], item));
                         if (activeFilter(item))
                         {
                             itemIndices.Insert(insertAt, sourceIndex);
-                            newItems.Add(source[sourceIndex]);
+                            newItems.Add(item);
                             insertAt++;
                         }
                         else
                         {
                             if (newItems.Count > 0)
                             {
-                                RaiseChanged(ListChangedEventArgs.AddMany(filteredIndex, newItems));
+                                RaiseViewChanged(ListChangedEventArgs.AddMany(batchIndex, newItems));
                                 newItems = [];
+                                batchIndex = insertAt;
                             }
                         }
                         sourceIndex++;
@@ -138,7 +127,7 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
 
                     if (newItems.Count > 0)
                     {
-                        RaiseChanged(ListChangedEventArgs.AddMany(filteredIndex, newItems));
+                        RaiseViewChanged(ListChangedEventArgs.AddMany(batchIndex, newItems));
                     }
                 }
                 break;
@@ -150,14 +139,29 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
                     foreach (var (@new, old) in replace.NewItems.Zip(replace.OldItems))
                     {
                         Debug.Assert(EqualityComparer<T>.Default.Equals(source[sourceIndex], @new));
-                        if (activeFilter(@new))
+
+                        var viewIndex = SourceToViewIndex(sourceIndex);
+
+                        if (viewIndex > -1)
                         {
-                            RaiseChanged(ListChangedEventArgs.ReplaceSingle(sourceIndex, @new, old));
+                            if (activeFilter(@new))
+                            {
+                                RaiseViewChanged(ListChangedEventArgs.ReplaceSingle(viewIndex, @new, old));
+                            }
+                            else
+                            {
+                                itemIndices.RemoveAt(viewIndex);
+                                RaiseViewChanged(ListChangedEventArgs.RemoveSingle(viewIndex, old));
+                            }
                         }
                         else
                         {
-                            itemIndices.Remove(sourceIndex);
-                            RaiseChanged(ListChangedEventArgs.RemoveSingle(sourceIndex, old));
+                            if (activeFilter(@new))
+                            {
+                                viewIndex = GetInsertIndex(sourceIndex);
+                                itemIndices.Insert(viewIndex, sourceIndex);
+                                RaiseViewChanged(ListChangedEventArgs.AddSingle(viewIndex, @new));
+                            }
                         }
 
                         sourceIndex++;
@@ -172,24 +176,24 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
                     var workingIndex = sourceIndex;
                     foreach (var item in remove.Items)
                     {
-                        var itemIndex = itemIndices.IndexOf(workingIndex);
+                        var itemIndex = SourceToViewIndex(workingIndex);
                         if (itemIndex > -1)
                         {
                             itemIndices.RemoveAt(itemIndex);
-                            RaiseChanged(ListChangedEventArgs.RemoveSingle(itemIndex, item));
+                            RaiseViewChanged(ListChangedEventArgs.RemoveSingle(itemIndex, item));
                         }
                         workingIndex++;
                     }
 
                     // shift existing indices if not removed from end
-                    if (source.Count - remove.Items.Count != sourceIndex)
+                    if (source.Count != sourceIndex)
                     {
                         foreach (var i in itemIndices.IndexRange)
                         {
                             var index = itemIndices[i];
                             if (index >= sourceIndex)
                             {
-                                itemIndices[i] = index - sourceIndex;
+                                itemIndices[i] = index - remove.Items.Count;
                             }
                         }
                     }
@@ -205,15 +209,31 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
         }
     }
 
-    private void RaiseChanged(ListChangedEventArgs<T> args)
+    private void RaiseViewChanged(ListChangedEventArgs<T> args)
     {
         ListChanged?.Invoke(this, args);
         CollectionChanged?.Invoke(this, args.ToLegacy());
     }
 
-    public bool Contains(T item) => source.Contains(item);
+    public bool Contains(T item) => IndexOf(item) > -1;
 
-    public int IndexOf(T item) => source.IndexOf(item);
+    public int IndexOf(T item)
+    {
+        if (IsPassthrough)
+        {
+            return source.IndexOf(item);
+        }
+
+        foreach (var (i, sourceIndex) in itemIndices.Index())
+        {
+            if (EqualityComparer<T>.Default.Equals(item, source[sourceIndex]))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
 
     public void Add(T item)
     {
@@ -224,9 +244,16 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
 
     public void Insert(int index, T item)
     {
-        source.Insert(index, item);
+        if(index == Count)
+        {
+            Add(item);
+            return;
+        }
+
+        var sourceIndex = ViewToSourceIndex(index);
+        source.Insert(sourceIndex, item);
         if (isSourceObservable) return;
-        Source_ListChanged(source, ListChangedEventArgs.AddSingle(index, item));
+        Source_ListChanged(source, ListChangedEventArgs.AddSingle(sourceIndex, item));
     }
 
     public bool Remove(T item)
@@ -245,7 +272,7 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
 
     public void RemoveAt(int index)
     {
-        var sourceIndex = IsPassthrough ? index : itemIndices[index];
+        var sourceIndex = ViewToSourceIndex(index);
         var item = source[sourceIndex];
         source.RemoveAt(sourceIndex);
         if (isSourceObservable) return;
@@ -254,20 +281,36 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
 
     public void Clear()
     {
-        var wasEmpty = source.Count is 0;
         source.Clear();
         if (isSourceObservable) return;
-        if (!wasEmpty) Source_ListChanged(source, ListChangedEventArgs.Reset<T>());
+        // trigger even when source was already empty because ObservableCollection does so too
+        Source_ListChanged(source, ListChangedEventArgs.Reset<T>());
     }
 
-    public void SetFilter(Func<T?, bool> newFilter)
+    public void SetFilter(Func<T, bool>? newFilter)
     {
         if (activeFilter == newFilter) return;
         activeFilter = newFilter;
         RebuildItems();
     }
 
-    public void CopyTo(T[] array, int arrayIndex) => source.CopyTo(array, arrayIndex);
+    public void CopyTo(T[] array, int arrayIndex)
+    {
+        if (IsPassthrough)
+        {
+            source.CopyTo(array, arrayIndex);
+            return;
+        }
+
+        ThrowIf.Null(array);
+        if ((uint)arrayIndex > (uint)array.Length) throw new ArgumentOutOfRangeException(nameof(arrayIndex), arrayIndex, null);
+        if (array.Length - arrayIndex < Count) throw new ArgumentException("Destination array is not long enough.", nameof(array));
+
+        foreach (var sourceIndex in itemIndices)
+        {
+            array[arrayIndex++] = source[sourceIndex];
+        }
+    }
 
     public IEnumerator<T> GetEnumerator() => IsPassthrough ? source.GetEnumerator() : itemIndices.Select(i => source[i]).GetEnumerator();
 
@@ -278,32 +321,40 @@ public sealed class ListView<T> : IList<T>, INotifyListChanged<T>, INotifyCollec
             if (!IsPassthrough)
             {
                 itemIndices = null;
-                RaiseChanged(ListChangedEventArgs.Reset<T>());
+                RaiseViewChanged(ListChangedEventArgs.Reset<T>());
             }
             return;
         }
 
-        var olditemIndices = itemIndices;
         itemIndices = new(capacity: source.Count);
 
         foreach (var i in source.IndexRange)
         {
-            if (FilterByIndex(i))
+            if (FilterBySourceIndex(i))
             {
                 itemIndices.Add(i);
             }
         }
 
-        if (olditemIndices is null || !itemIndices.SequenceEqual(olditemIndices))
-        {
-            RaiseChanged(ListChangedEventArgs.Reset<T>());
-        }
+        // we cannot compare with olditemIndices because a reset might end up with the same indices but different elements
+        RaiseViewChanged(ListChangedEventArgs.Reset<T>());
     }
 
-    private bool FilterByIndex(int index)
+    private bool FilterBySourceIndex(int sourceIndex)
     {
         Debug.Assert(IsFiltered);
-        return activeFilter(this[index]);
+        return activeFilter(source[sourceIndex]);
+    }
+
+    private int SourceToViewIndex(int sourceIndex) => IsPassthrough ? sourceIndex : itemIndices.BinarySearch(sourceIndex);
+    private int ViewToSourceIndex(int viewIndex) => IsPassthrough ? viewIndex : itemIndices[viewIndex];
+    private int GetInsertIndex(int sourceIndex)
+    {
+        Debug.Assert(!IsPassthrough);
+
+        var viewIndex = itemIndices.BinarySearch(sourceIndex);
+        // BinarySearch returns the bitwise complement of the index of the next element that is larger than startIndex
+        return viewIndex < 0 ? ~viewIndex : viewIndex;
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
