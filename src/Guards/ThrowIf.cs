@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using static Ametrin.Guards.ExceptionMessages;
 using static Ametrin.Guards.GuardConditions;
 
 namespace Ametrin.Guards;
@@ -23,7 +24,7 @@ public static class ThrowIf
     public static T NullOrEmpty<T>([NotNull] T? sequence, [CallerArgumentExpression(nameof(sequence))] string expression = "") where T : IEnumerable
     {
         ArgumentNullException.ThrowIfNull(sequence, expression);
-        return IsEmpty(sequence) ? throw new ArgumentException("Collection was empty.", expression) : sequence;
+        return IsEmpty(sequence) ? throw new ArgumentException(COLLECTION_EMPTY, expression) : sequence;
     }
 
     [StackTraceHidden]
@@ -42,11 +43,11 @@ public static class ThrowIf
 
     [StackTraceHidden]
     public static ReadOnlySpan<T> Empty<T>(ReadOnlySpan<T> value, [CallerArgumentExpression(nameof(value))] string expression = "")
-        => value.IsEmpty ? throw new ArgumentException("Span cannot be empty.", expression) : value;
+        => value.IsEmpty ? throw new ArgumentException(SPAN_EMPTY, expression) : value;
 
     [StackTraceHidden]
     public static ReadOnlySpan<char> EmptyOrWhiteSpace(ReadOnlySpan<char> value, [CallerArgumentExpression(nameof(value))] string expression = "")
-        => value.IsWhiteSpace() ? throw new ArgumentException("Span cannot be empty or only white spaces.", expression) : value;
+        => value.IsWhiteSpace() ? throw new ArgumentException(SPAN_WHITESPACE, expression) : value;
 
     [StackTraceHidden]
     public static T InRange<T>(T value, T minInclusive, T maxExclusive, [CallerArgumentExpression(nameof(value))] string expression = "")
