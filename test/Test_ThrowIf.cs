@@ -59,6 +59,16 @@ public sealed class Test_ThrowIf
     }
 
     [Test]
+    public async Task Test_InRange()
+    {
+        await Assert.That(() => ThrowIf.InRange(0, 0, 2)).Throws<ArgumentOutOfRangeException>();
+        await Assert.That(() => ThrowIf.InRange(1, 0, 2)).Throws<ArgumentOutOfRangeException>();
+        await Assert.That(() => ThrowIf.InRange(2, 0, 2)).ThrowsNothing();
+        await Assert.That(() => ThrowIf.InRange(3, 0, 2)).ThrowsNothing();
+        await Assert.That(() => ThrowIf.InRange(-1, 0, 2)).ThrowsNothing();
+    }
+
+    [Test]
     public async Task Test_GreaterThanOrEqual()
     {
         await Assert.That(() => ThrowIf.GreaterThanOrEqual(0, 1)).ThrowsNothing();

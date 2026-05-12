@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using static Ametrin.Guards.GuardConditions;
 
 namespace Ametrin.Guards;
 
@@ -8,7 +9,7 @@ public static class ThrowIf
 {
     [StackTraceHidden]
     public static T Null<T>([NotNull] T? value, [CallerArgumentExpression(nameof(value))] string expression = "") where T : class
-     => value ?? throw new ArgumentNullException(expression);
+        => value ?? throw new ArgumentNullException(expression);
 
     [StackTraceHidden]
     public static T Null<T>([NotNull] T? value, [CallerArgumentExpression(nameof(value))] string expression = "") where T : struct
@@ -16,29 +17,13 @@ public static class ThrowIf
 
     [StackTraceHidden]
     public static T Not<T>([NotNull] object? value, [CallerArgumentExpression(nameof(value))] string expression = "")
-        => value is null ? throw new ArgumentNullException(expression) : value is T t ? t : throw new ArgumentException($"Unable to cast object of type '{value.GetType().FullName}' to type '{typeof(T).FullName}'", expression);
+        => Null(value) is T t ? t : throw new ArgumentException($"Unable to cast object of type '{value.GetType().FullName}' to type '{typeof(T).FullName}'", expression);
 
     [StackTraceHidden]
     public static T NullOrEmpty<T>([NotNull] T? sequence, [CallerArgumentExpression(nameof(sequence))] string expression = "") where T : IEnumerable
     {
-        const string EMPTY_EXCEPTION_MESSAGE = "Collection was empty.";
-        if (sequence is null) throw new ArgumentNullException(expression);
-        if (sequence is ICollection collection)
-        {
-            return collection.Count > 0 ? sequence : throw new ArgumentException(EMPTY_EXCEPTION_MESSAGE, expression);
-        }
-
-        var enumerator = sequence.GetEnumerator();
-        try
-        {
-            if (!enumerator.MoveNext()) throw new ArgumentException(EMPTY_EXCEPTION_MESSAGE, expression);
-        }
-        finally
-        {
-            (enumerator as IDisposable)?.Dispose();
-        }
-
-        return sequence;
+        ArgumentNullException.ThrowIfNull(sequence, expression);
+        return IsEmpty(sequence) ? throw new ArgumentException("Collection was empty.", expression) : sequence;
     }
 
     [StackTraceHidden]
@@ -64,29 +49,34 @@ public static class ThrowIf
         => value.IsWhiteSpace() ? throw new ArgumentException("Span cannot be empty or only white spaces.", expression) : value;
 
     [StackTraceHidden]
+    public static T InRange<T>(T value, T minInclusive, T maxExclusive, [CallerArgumentExpression(nameof(value))] string expression = "")
+        where T : notnull, IComparable<T>
+        => GuardConditions.InRange(value, minInclusive, maxExclusive) ? throw new ArgumentOutOfRangeException(expression, value, $"cannot be in [{minInclusive}, {maxExclusive}).") : value;
+
+    [StackTraceHidden]
     public static T OutOfRange<T>(T value, T minInclusive, T maxExclusive, [CallerArgumentExpression(nameof(value))] string expression = "")
         where T : notnull, IComparable<T>
-        => value.CompareTo(minInclusive) < 0 || value.CompareTo(maxExclusive) >= 0 ? throw new ArgumentOutOfRangeException(expression, value, $"must be in [{minInclusive}, {maxExclusive}).") : value;
+        => !GuardConditions.InRange(value, minInclusive, maxExclusive) ? throw new ArgumentOutOfRangeException(expression, value, $"must be in [{minInclusive}, {maxExclusive}).") : value;
 
     [StackTraceHidden]
     public static T LessThan<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
         where T : notnull, IComparable<T>
-        => value.CompareTo(min) < 0 ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be less than {minExpression}.") : value;
+        => IsLessThan(value, min) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be less than {minExpression}.") : value;
 
     [StackTraceHidden]
     public static T LessThanOrEqual<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
         where T : notnull, IComparable<T>
-        => value.CompareTo(min) <= 0 ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be less than or equal to {minExpression}.") : value;
+        => IsLessThanOrEqual(value, min) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be less than or equal to {minExpression}.") : value;
 
     [StackTraceHidden]
     public static T GreaterThan<T>(T value, T max, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
         where T : notnull, IComparable<T>
-        => value.CompareTo(max) > 0 ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be greater than {maxExpression}.") : value;
+        => IsGreaterThan(value, max) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be greater than {maxExpression}.") : value;
 
     [StackTraceHidden]
     public static T GreaterThanOrEqual<T>(T value, T max, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
-        where T : notnull, IComparable<T> 
-        => value.CompareTo(max) >= 0 ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be greater than or equal to {maxExpression}.") : value;
+        where T : notnull, IComparable<T>
+        => IsGreaterThanOrEqual(value, max) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be greater than or equal to {maxExpression}.") : value;
 
     [StackTraceHidden]
     public static T Positive<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")
