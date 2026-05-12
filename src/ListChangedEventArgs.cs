@@ -15,10 +15,19 @@ public static class ListChangedEventArgs
     public static ListChangedEventArgs<T> MoveSingle<T>(int newIndex, int oldIndex, T item) => new ListChangedEventArgs<T>.Move(newIndex, oldIndex, new SingleItemReadOnlyList<T>(item));
     // public static ListChangedEventArgs<T> ModifySingle<T>(int index, T item) => new ListChangedEventArgs<T>.Modify(index, new SingleItemReadOnlyList<T>(item));
 
-    public static ListChangedEventArgs<T> AddMany<T>(int index, params IReadOnlyList<T> newItems) => new ListChangedEventArgs<T>.Add(index, newItems);
-    public static ListChangedEventArgs<T> RemoveMany<T>(int index, params IReadOnlyList<T> oldItems) => new ListChangedEventArgs<T>.Remove(index, oldItems);
-    public static ListChangedEventArgs<T> ReplaceMany<T>(int index, IReadOnlyList<T> newItems, IReadOnlyList<T> oldItems) => new ListChangedEventArgs<T>.Replace(index, newItems, oldItems);
-    public static ListChangedEventArgs<T> MoveMany<T>(int newIndex, int oldIndex, params IReadOnlyList<T> items) => new ListChangedEventArgs<T>.Move(newIndex, oldIndex, items);
+    public static ListChangedEventArgs<T> AddMany<T>(int index, params IReadOnlyList<T> newItems) => new ListChangedEventArgs<T>.Add(index, ThrowIf.NullOrEmpty(newItems));
+    public static ListChangedEventArgs<T> RemoveMany<T>(int index, params IReadOnlyList<T> oldItems) => new ListChangedEventArgs<T>.Remove(index, ThrowIf.NullOrEmpty(oldItems));
+    public static ListChangedEventArgs<T> ReplaceMany<T>(int index, IReadOnlyList<T> newItems, IReadOnlyList<T> oldItems)
+    {
+        ThrowIf.NullOrEmpty(newItems);
+        if (newItems.Count != oldItems.Count)
+        {
+            throw new ArgumentException("newItems.Count != oldItems.Count");
+        }
+        return new ListChangedEventArgs<T>.Replace(index, newItems, oldItems);
+    }
+
+    public static ListChangedEventArgs<T> MoveMany<T>(int newIndex, int oldIndex, params IReadOnlyList<T> items) => new ListChangedEventArgs<T>.Move(newIndex, oldIndex, ThrowIf.NullOrEmpty(items));
     // public static ListChangedEventArgs<T> ModifyMany<T>(int index, params IReadOnlyList<T> items) => new ListChangedEventArgs<T>.Modify(index, items);
 
     public static ListChangedEventArgs<T> Reset<T>() => ListChangedEventArgs<T>.Reset.Instance;

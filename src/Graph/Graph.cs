@@ -7,19 +7,16 @@ public sealed class Graph<TNode> where TNode : notnull
     public IEnumerable<TNode> Nodes => _nodes;
     public int Count => _nodes.Count;
 
-    public ErrorState TryAdd(TNode node)
+    public Option TryAdd(TNode node)
     {
-        if (node is null)
-        {
-            return new ArgumentNullException(nameof(node));
-        }
+        ArgumentNullException.ThrowIfNull(node);
 
         if (_nodes.Add(node))
         {
-            return default;
+            return true;
         }
 
-        return new ArgumentException("Duplicate Node", nameof(node));
+        return false;
     }
 
     public bool Link(TNode a, TNode b)
