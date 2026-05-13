@@ -50,41 +50,40 @@ public static class ThrowIf
         => value.IsWhiteSpace() ? throw new ArgumentException(SPAN_WHITESPACE, expression) : value;
 
     [StackTraceHidden]
-    public static T InRange<T>(T value, T minInclusive, T maxExclusive, [CallerArgumentExpression(nameof(value))] string expression = "")
+    public static T InRange<T>(T value, T minInclusive, T maxExclusive, [CallerArgumentExpression(nameof(value))] string expression = "", [CallerArgumentExpression(nameof(minInclusive))] string minExpression = "", [CallerArgumentExpression(nameof(maxExclusive))] string maxExpression = "")
         where T : notnull, IComparable<T>
-        => GuardConditions.InRange(value, minInclusive, maxExclusive) ? throw new ArgumentOutOfRangeException(expression, value, $"cannot be in [{minInclusive}, {maxExclusive}).") : value;
+        => IsInRange(value, minInclusive, maxExclusive) ? throw ExceptionFactory.InRange(expression, value, minExpression, maxExpression) : value;
 
     [StackTraceHidden]
-    public static T OutOfRange<T>(T value, T minInclusive, T maxExclusive, [CallerArgumentExpression(nameof(value))] string expression = "")
+    public static T OutOfRange<T>(T value, T minInclusive, T maxExclusive, [CallerArgumentExpression(nameof(value))] string expression = "", [CallerArgumentExpression(nameof(minInclusive))] string minExpression = "", [CallerArgumentExpression(nameof(maxExclusive))] string maxExpression = "")
         where T : notnull, IComparable<T>
-        => !GuardConditions.InRange(value, minInclusive, maxExclusive) ? throw new ArgumentOutOfRangeException(expression, value, $"must be in [{minInclusive}, {maxExclusive}).") : value;
+        => !IsInRange(value, minInclusive, maxExclusive) ? throw ExceptionFactory.OutOfRange(expression, value, minExpression, maxExpression) : value;
 
     [StackTraceHidden]
-    public static T LessThan<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
+    public static T LessThan<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string expression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
         where T : notnull, IComparable<T>
-        => IsLessThan(value, min) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be less than {minExpression}.") : value;
+        => IsLessThan(value, min) ? throw ExceptionFactory.LessThan(expression, value, minExpression) : value;
 
     [StackTraceHidden]
-    public static T LessThanOrEqual<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
+    public static T LessThanOrEqual<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string expression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
         where T : notnull, IComparable<T>
-        => IsLessThanOrEqual(value, min) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be less than or equal to {minExpression}.") : value;
+        => IsLessThanOrEqual(value, min) ? throw ExceptionFactory.LessThanOrEqual(expression, value, minExpression) : value;
 
     [StackTraceHidden]
-    public static T GreaterThan<T>(T value, T max, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
+    public static T GreaterThan<T>(T value, T max, [CallerArgumentExpression(nameof(value))] string expression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
         where T : notnull, IComparable<T>
-        => IsGreaterThan(value, max) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be greater than {maxExpression}.") : value;
+        => IsGreaterThan(value, max) ? throw ExceptionFactory.GreaterThan(expression, value, maxExpression) : value;
 
     [StackTraceHidden]
-    public static T GreaterThanOrEqual<T>(T value, T max, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
+    public static T GreaterThanOrEqual<T>(T value, T max, [CallerArgumentExpression(nameof(value))] string expression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
         where T : notnull, IComparable<T>
-        => IsGreaterThanOrEqual(value, max) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be greater than or equal to {maxExpression}.") : value;
+        => IsGreaterThanOrEqual(value, max) ? throw ExceptionFactory.GreaterThanOrEqual(expression, value, maxExpression) : value;
 
+    /// <inheritdoc cref="IsPositive{T}(T)"/>
     [StackTraceHidden]
     public static T Positive<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")
         where T : INumber<T>
-    {
-        return T.IsPositive(value) ? throw new ArgumentOutOfRangeException(expression, value, "cannot be positive.") : value;
-    }
+        => IsPositive(value) ? throw new ArgumentOutOfRangeException(expression, value, VALUE_POSITIVE) : value;
 
     [StackTraceHidden]
     public static T Zero<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")

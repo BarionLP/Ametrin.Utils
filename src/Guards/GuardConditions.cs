@@ -33,7 +33,7 @@ public static class GuardConditions
     public static bool IsEmpty<T>(ReadOnlySpan<T> span) => span.IsEmpty;
     public static bool IsWhiteSpace<T>(ReadOnlySpan<char> span) => span.IsWhiteSpace();
 
-    public static bool InRange<T>(T value, T minInclusive, T maxExclusive)
+    public static bool IsInRange<T>(T value, T minInclusive, T maxExclusive)
         where T : notnull, IComparable<T>
         => value.CompareTo(minInclusive) >= 0 && value.CompareTo(maxExclusive) < 0;
 
@@ -53,14 +53,26 @@ public static class GuardConditions
         where T : notnull, IComparable<T>
         => value.CompareTo(max) >= 0;
 
+    /// <summary>
+    /// 0.0 and -0.0 return false (because 0 should be considered neutral)
+    /// </summary>
+    /// <remarks>
+    /// this is different from <see cref="INumberBase{T}.IsPositive(T)"/>
+    /// </remarks>
     public static bool IsPositive<T>(T value)
         where T : INumber<T>
-        => T.IsPositive(value);
+        => T.Sign(value) is 1; // T.IsPositive treats 0 as true
 
+    /// <summary>
+    /// -0.0 and 0.0 return true
+    /// </summary>
     public static bool IsZero<T>(T value)
         where T : INumber<T>
         => T.IsZero(value);
 
+    /// <summary>
+    /// -0.0 returns true but 0.0 returns false
+    /// </summary>
     public static bool IsNegative<T>(T value)
         where T : INumber<T>
         => T.IsNegative(value);

@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using static Ametrin.Guards.ExceptionMessages;
 using static Ametrin.Guards.GuardConditions;
@@ -7,56 +8,67 @@ namespace Ametrin.Guards;
 // experimenting with the idea for an actual Ametrin.Optional implementation
 public static class ErrorIf
 {
-    public static Result<T> Empty<T>(Result<T> sequence, [CallerArgumentExpression(nameof(sequence))] string expression = "") where T : IEnumerable
-        => sequence.Reject(expression, static (value, _) => IsEmpty(value), static (_, expression) => new ArgumentException(COLLECTION_EMPTY, expression));
+    public static Result<T> Empty<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "") 
+        where T : IEnumerable
+        => !IsEmpty(value) ? value : new ArgumentException(COLLECTION_EMPTY, expression);
+    public static Result<T> Empty<T>(Result<T> result, [CallerArgumentExpression(nameof(result))] string expression = "") 
+        where T : IEnumerable
+        => result.Branch(out var value, out var error) ? Empty(value, expression) : error;
 
-    public static Result<string> NullOrEmpty(Result<string> value, [CallerArgumentExpression(nameof(value))] string expression = "")
-        => value.Reject(expression, static (value, _) => string.IsNullOrEmpty(value), static (_, expression) => new ArgumentException(STRING_EMPTY, expression));
+    public static Result<string> Empty(Result<string> result, [CallerArgumentExpression(nameof(result))] string expression = "")
+        => result.Branch(out var value, out var error) ? !string.IsNullOrEmpty(value) ? value : new ArgumentException(STRING_EMPTY, expression) : error;
 
-    public static Result<string> NullOrWhiteSpace(Result<string> value, [CallerArgumentExpression(nameof(value))] string expression = "")
-        => value.Reject(expression, static (value, _) => string.IsNullOrWhiteSpace(value), static (_, expression) => new ArgumentException(STRING_WHITESPACE, expression));
+    public static Result<string> WhiteSpace(Result<string> result, [CallerArgumentExpression(nameof(result))] string expression = "")
+        => result.Branch(out var value, out var error) ? !string.IsNullOrWhiteSpace(value) ? value : new ArgumentException(STRING_WHITESPACE, expression) : error;
 
-    // public static T InRange<T>(T value, T minInclusive, T maxExclusive, [CallerArgumentExpression(nameof(value))] string expression = "")
-    //     where T : notnull, IComparable<T>
-    //     => GuardConditions.InRange(value, minInclusive, maxExclusive) ? throw new ArgumentOutOfRangeException(expression, value, $"cannot be in [{minInclusive}, {maxExclusive}).") : value;
+    public static Result<T> InRange<T>(Result<T> result, T minInclusive, T maxExclusive, [CallerArgumentExpression(nameof(result))] string expression = "", [CallerArgumentExpression(nameof(minInclusive))] string minExpression = "", [CallerArgumentExpression(nameof(maxExclusive))] string maxExpression = "")
+        where T : notnull, IComparable<T>
+        => result.Branch(out var value, out var error) ? !IsInRange(value, minInclusive, maxExclusive) ? value : ExceptionFactory.InRange(expression, value, minExpression, maxExpression) : error;
 
-    // public static T OutOfRange<T>(T value, T minInclusive, T maxExclusive, [CallerArgumentExpression(nameof(value))] string expression = "")
-    //     where T : notnull, IComparable<T>
-    //     => !GuardConditions.InRange(value, minInclusive, maxExclusive) ? throw new ArgumentOutOfRangeException(expression, value, $"must be in [{minInclusive}, {maxExclusive}).") : value;
+    public static Result<T> OutOfRange<T>(Result<T> result, T minInclusive, T maxExclusive, [CallerArgumentExpression(nameof(result))] string expression = "", [CallerArgumentExpression(nameof(minInclusive))] string minExpression = "", [CallerArgumentExpression(nameof(maxExclusive))] string maxExpression = "")
+        where T : notnull, IComparable<T>
+        => result.Branch(out var value, out var error) ? IsInRange(value, minInclusive, maxExclusive) ? value : ExceptionFactory.OutOfRange(expression, value, minExpression, maxExpression) : error;
 
-    // public static T LessThan<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
-    //     where T : notnull, IComparable<T>
-    //     => IsLessThan(value, min) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be less than {minExpression}.") : value;
+    public static Result<T> LessThan<T>(Result<T> result, T min, [CallerArgumentExpression(nameof(result))] string expression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
+        where T : notnull, IComparable<T>
+        => result.Branch(out var value, out var error) ? !IsLessThan(value, min) ? value : ExceptionFactory.LessThan(expression, value, minExpression) : error;
 
-    // public static T LessThanOrEqual<T>(T value, T min, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
-    //     where T : notnull, IComparable<T>
-    //     => IsLessThanOrEqual(value, min) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be less than or equal to {minExpression}.") : value;
+    public static Result<T> LessThanOrEqual<T>(Result<T> result, T min, [CallerArgumentExpression(nameof(result))] string expression = "", [CallerArgumentExpression(nameof(min))] string minExpression = "")
+        where T : notnull, IComparable<T>
+        => result.Branch(out var value, out var error) ? !IsLessThanOrEqual(value, min) ? value : ExceptionFactory.LessThanOrEqual(expression, value, minExpression) : error;
 
-    // public static T GreaterThan<T>(T value, T max, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
-    //     where T : notnull, IComparable<T>
-    //     => IsGreaterThan(value, max) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be greater than {maxExpression}.") : value;
+    public static Result<T> GreaterThan<T>(Result<T> result, T max, [CallerArgumentExpression(nameof(result))] string expression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
+        where T : notnull, IComparable<T>
+        => result.Branch(out var value, out var error) ? !IsGreaterThan(value, max) ? value : ExceptionFactory.GreaterThan(expression, value, maxExpression) : error;
 
-    // public static T GreaterThanOrEqual<T>(T value, T max, [CallerArgumentExpression(nameof(value))] string valueExpression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
-    //     where T : notnull, IComparable<T>
-    //     => IsGreaterThanOrEqual(value, max) ? throw new ArgumentOutOfRangeException(valueExpression, value, $"cannot be greater than or equal to {maxExpression}.") : value;
+    public static Result<T> GreaterThanOrEqual<T>(Result<T> result, T max, [CallerArgumentExpression(nameof(result))] string expression = "", [CallerArgumentExpression(nameof(max))] string maxExpression = "")
+        where T : notnull, IComparable<T>
+        => result.Branch(out var value, out var error) ? !IsGreaterThanOrEqual(value, max) ? value : ExceptionFactory.GreaterThanOrEqual(expression, value, maxExpression) : error;
 
-    // public static T Positive<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")
-    //     where T : INumber<T>
-    // {
-    //     return T.IsPositive(value) ? throw new ArgumentOutOfRangeException(expression, value, "cannot be positive.") : value;
-    // }
+    /// <inheritdoc cref="IsPositive{T}(T)"/>
+    public static Result<T> Positive<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")
+        where T : INumber<T>
+        => IsPositive(value) ? new ArgumentOutOfRangeException(expression, value, VALUE_POSITIVE) : value;
+    /// <inheritdoc cref="Positive{T}(T, string)"/>
+    public static Result<T> Positive<T>(Result<T> result, [CallerArgumentExpression(nameof(result))] string expression = "")
+        where T : INumber<T>
+        => result.Branch(out var value, out var error) ? Positive(value, expression) : error;
 
-    // public static T Zero<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")
-    //     where T : INumber<T>
-    // {
-    //     ArgumentOutOfRangeException.ThrowIfZero(value, expression);
-    //     return value;
-    // }
+    /// <inheritdoc cref="IsZero{T}(T)"/>
+    public static Result<T> Zero<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")
+        where T : INumber<T>
+        => IsZero(value) ? new ArgumentOutOfRangeException(expression, value, VALUE_ZERO) : value;
+    /// <inheritdoc cref="Zero{T}(T, string)"/>
+    public static Result<T> Zero<T>(Result<T> result, [CallerArgumentExpression(nameof(result))] string expression = "")
+        where T : INumber<T>
+        => result.Branch(out var value, out var error) ? Zero(value, expression) : error;
 
-    // public static T Negative<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")
-    //     where T : INumber<T>
-    // {
-    //     ArgumentOutOfRangeException.ThrowIfNegative(value, expression);
-    //     return value;
-    // }
+    /// <inheritdoc cref="IsNegative{T}(T)"/>
+    public static Result<T> Negative<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")
+        where T : INumber<T>
+        => IsNegative(value) ? new ArgumentOutOfRangeException(expression, value, VALUE_NEGATIVE) : value;
+    /// <inheritdoc cref="Negative{T}(T, string)"/>
+    public static Result<T> Negative<T>(Result<T> result, [CallerArgumentExpression(nameof(result))] string expression = "")
+        where T : INumber<T>
+        => result.Branch(out var value, out var error) ? Negative(value, expression) : error;
 }

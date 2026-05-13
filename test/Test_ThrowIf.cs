@@ -5,7 +5,7 @@ namespace Ametrin.Utils.Test;
 public sealed class Test_ThrowIf
 {
     [Test]
-    public async Task Test_ThrowIfNull()
+    public async Task Test_Null()
     {
         await Assert.That(() => ThrowIf.Null((string?)null)).Throws<ArgumentNullException>();
         await Assert.That(() => ThrowIf.Null(new int?())).Throws<ArgumentNullException>();
@@ -14,7 +14,7 @@ public sealed class Test_ThrowIf
     }
 
     [Test]
-    public async Task Test_Is()
+    public async Task Test_Not()
     {
         await Assert.That(() => ThrowIf.Not<B>(new A())).Throws<ArgumentException>();
         await Assert.That(() => ThrowIf.Not<A>(new A())).ThrowsNothing();
