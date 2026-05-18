@@ -8,7 +8,7 @@ namespace Ametrin.Utils.Avalonia;
 
 public static class AvaloniaExtensions
 {
-    public static FilePickerFileType ZipFilePickerFileType { get; } = new("Zip Archive")
+    public static FilePickerFileType ZipFilePickerFileType => field ??= new("Zip Archive")
     {
         Patterns = ["*.zip"],
         AppleUniformTypeIdentifiers = ["public.zip-archive"],
@@ -26,8 +26,9 @@ public static class AvaloniaExtensions
         {
             await foreach (var file in args.ExtractStorageFiles(token))
             {
-                yield return new(file.TryGetLocalPath() ?? throw new PlatformNotSupportedException("files have no path on this system"));
-                file.Dispose();
+                var fileInfo = new FileInfo(file.TryGetLocalPath() ?? throw new PlatformNotSupportedException("files have no path on this system"));
+                file.Dispose(); // dispose before yielding so the state machine does not have to remember
+                yield return fileInfo;
             }
         }
 
