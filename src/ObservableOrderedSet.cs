@@ -23,7 +23,7 @@ public sealed class ObservableOrderedSet<T>(IEqualityComparer<T> comparer) : Obs
         base.SetItem(index, item);
     }
 
-    private int IndexOf(T item, IEqualityComparer<T> comparer)
+    public int IndexOf(T item, IEqualityComparer<T> comparer)
     {
         foreach (var i in Items.IndexRange)
         {
