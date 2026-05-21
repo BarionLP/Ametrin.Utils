@@ -47,28 +47,28 @@ public static class ErrorIf
 
     /// <inheritdoc cref="IsPositive{T}(T)"/>
     public static Result<T> Positive<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")
-        where T : INumber<T>
+        where T : notnull, INumber<T>
         => IsPositive(value) ? new ArgumentOutOfRangeException(expression, value, VALUE_POSITIVE) : value;
     /// <inheritdoc cref="Positive{T}(T, string)"/>
     public static Result<T> Positive<T>(Result<T> result, [CallerArgumentExpression(nameof(result))] string expression = "")
-        where T : INumber<T>
+        where T : notnull, INumber<T>
         => result.Branch(out var value, out var error) ? Positive(value, expression) : error;
 
     /// <inheritdoc cref="IsZero{T}(T)"/>
     public static Result<T> Zero<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")
-        where T : INumber<T>
+        where T : notnull, INumber<T>
         => IsZero(value) ? new ArgumentOutOfRangeException(expression, value, VALUE_ZERO) : value;
     /// <inheritdoc cref="Zero{T}(T, string)"/>
     public static Result<T> Zero<T>(Result<T> result, [CallerArgumentExpression(nameof(result))] string expression = "")
-        where T : INumber<T>
+        where T : notnull, INumber<T>
         => result.Branch(out var value, out var error) ? Zero(value, expression) : error;
 
     /// <inheritdoc cref="IsNegative{T}(T)"/>
     public static Result<T> Negative<T>(T value, [CallerArgumentExpression(nameof(value))] string expression = "")
-        where T : INumber<T>
+        where T : notnull, INumber<T>
         => IsNegative(value) ? new ArgumentOutOfRangeException(expression, value, VALUE_NEGATIVE) : value;
     /// <inheritdoc cref="Negative{T}(T, string)"/>
     public static Result<T> Negative<T>(Result<T> result, [CallerArgumentExpression(nameof(result))] string expression = "")
-        where T : INumber<T>
+        where T : notnull, INumber<T>
         => result.Branch(out var value, out var error) ? Negative(value, expression) : error;
 }
