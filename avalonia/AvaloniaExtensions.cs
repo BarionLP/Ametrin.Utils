@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
@@ -72,5 +73,20 @@ public static class AvaloniaExtensions
     {
         // PlatformImpl becomes null once a window has been closed
         public bool IsClosed => window.PlatformImpl is null;
+    }
+
+    extension(Point point)
+    {
+        public double SqrLength => point.X * point.X + point.Y + point.Y;
+        public double Length => double.Sqrt(point.SqrLength);
+    }
+
+    extension(Visual visual)
+    {
+        public bool IsClientPointInside(Point point, double margin = 0)
+            => point.X >= -margin && point.Y >= -margin && point.X < (visual.Bounds.Width + margin) && point.Y < (visual.Bounds.Height + margin);
+
+        public bool IsScreenPointInside(PixelPoint point, double margin = 0)
+            => visual.IsClientPointInside(visual.PointToClient(point), margin);
     }
 }
