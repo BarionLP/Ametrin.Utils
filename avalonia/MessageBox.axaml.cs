@@ -76,6 +76,7 @@ public sealed class MessageBoxBuilder
     public void Show(object option) => Build([option]).Show();
 }
 
+// TODO: make closed in .NET 11
 public enum MessageBoxResult
 {
     Ok,

@@ -4,26 +4,67 @@ namespace Ametrin.Utils;
 
 // based on https://stackoverflow.com/a/527000
 // TODO: properly do this
-public sealed class ObservableOrderedSet<T>(IEqualityComparer<T> comparer) : ObservableCollection<T>
+public sealed class ObservableOrderedSet<T> : ObservableCollection<T>
 {
-    private readonly IEqualityComparer<T> comparer = comparer;
+    private readonly IEqualityComparer<T> comparer;
+    private readonly HashSet<T> set;
+
+    public ObservableOrderedSet(IEqualityComparer<T> comparer)
+    {
+        this.comparer = comparer;
+        set = new(comparer);
+    }
+
+    public ObservableOrderedSet(IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        this.comparer = comparer;
+        set = new(comparer);
+        foreach (var v in values)
+        {
+            // each item must go through InsertItem
+            Add(v);
+        }
+    }
 
     protected override void InsertItem(int index, T item)
     {
-        if (this.Contains(item, comparer)) return;
+        if (Contains(item)) return;
 
+        set.Add(item);
         base.InsertItem(index, item);
     }
 
     protected override void SetItem(int index, T item)
     {
-        int i = IndexOf(item, comparer);
+        int i = IndexOf(item);
         if (i >= 0 && i != index) return;
 
+        set.Remove(this[index]);
+        set.Add(item);
         base.SetItem(index, item);
     }
 
-    public int IndexOf(T item, IEqualityComparer<T> comparer)
+    protected override void RemoveItem(int index)
+    {
+        set.Remove(this[index]);
+        base.RemoveItem(index);
+    }
+
+    protected override void ClearItems()
+    {
+        set.Clear();
+        base.ClearItems();
+    }
+
+    public new bool Remove(T item)
+    {
+        var index = IndexOf(item);
+        if (index < 0) return false;
+        RemoveItem(index);
+        return true;
+    }
+
+    public new int IndexOf(T item)
     {
         foreach (var i in Items.IndexRange)
         {
@@ -35,4 +76,6 @@ public sealed class ObservableOrderedSet<T>(IEqualityComparer<T> comparer) : Obs
 
         return -1;
     }
+
+    public new bool Contains(T item) => set.Contains(item);
 }
