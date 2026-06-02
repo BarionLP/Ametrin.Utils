@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 namespace Ametrin.Utils;
 
 // based on https://stackoverflow.com/a/527000
+// only works on the concrete type
 // TODO: properly do this
 public sealed class ObservableOrderedSet<T> : ObservableCollection<T>
 {
