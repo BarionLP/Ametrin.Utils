@@ -1,6 +1,4 @@
-﻿using System.Collections.Frozen;
-
-namespace Ametrin.Utils;
+﻿namespace Ametrin.Utils;
 
 public static class LinqExtensions
 {
@@ -13,6 +11,29 @@ public static class LinqExtensions
             => string.Join(separator, source);
         public string Dump(char separator)
             => string.Join(separator, source);
+
+        /// <summary>
+        /// empty sequence returns true
+        /// </summary>
+        public bool AreAllSame(IEqualityComparer<T>? comparer = null)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            comparer ??= EqualityComparer<T>.Default;
+
+            using var enumerator = source.GetEnumerator();
+            if (!enumerator.MoveNext()) return true;
+
+            var first = enumerator.Current;
+            while (enumerator.MoveNext())
+            {
+                if (!comparer.Equals(first, enumerator.Current))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         public void ForEach(Action<T> action)
         {

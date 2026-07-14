@@ -17,11 +17,11 @@ public static class DictionaryExtensions
             return @default;
         }
         
-        public TValue GetOrAdd(TKey key, Func<TKey, TValue> valueFactory)
+        public TValue GetOrAdd(TKey key, Func<TKey, TValue> factory)
         {
             if (!dictionary.TryGetValue(key, out var value))
             {
-                value = valueFactory(key);
+                value = factory(key);
                 dictionary.Add(key, value);
             }
 
@@ -48,12 +48,12 @@ public static class DictionaryExtensions
             }
             return value!;
         }
-        public TValue GetOrAdd(TKey key, Func<TKey, TValue> facotry)
+        public TValue GetOrAdd(TKey key, Func<TKey, TValue> factory)
         {
             ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out var exists);
             if (!exists)
             {
-                value = facotry(key);
+                value = factory(key);
             }
             return value!;
         }
