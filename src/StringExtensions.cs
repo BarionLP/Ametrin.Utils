@@ -49,6 +49,8 @@ public static partial class StringExtensions
 
         public T ParseOrDefault<T>(IFormatProvider? provider = null, T defaultValue = default!) where T : IParsable<T>
             => input.TryParse(out T result, provider) ? result : defaultValue;
+
+        public string? TrimToNull() => string.IsNullOrWhiteSpace(input) ? null : input.Trim();
     }
 
     extension(string value)
