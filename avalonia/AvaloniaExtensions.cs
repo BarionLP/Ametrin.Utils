@@ -24,13 +24,21 @@ public static class AvaloniaExtensions
 
     extension(DragEventArgs args)
     {
-        public async IAsyncEnumerable<FileInfo> ExtractFileInfos([EnumeratorCancellation] CancellationToken token = default)
+        public IAsyncEnumerable<FileInfo> ExtractFileInfos(CancellationToken token = default)
         {
-            await foreach (var file in args.ExtractStorageFiles(token))
+            return Impl(args.ExtractStorageFiles(token), token);
+
+            static async IAsyncEnumerable<FileInfo> Impl(IAsyncEnumerable<IStorageFile> files, [EnumeratorCancellation] CancellationToken token)
             {
-                var fileInfo = new FileInfo(file.TryGetLocalPath() ?? throw new PlatformNotSupportedException("files have no path on this system"));
-                file.Dispose(); // dispose before yielding so the state machine does not have to remember
-                yield return fileInfo;
+                await foreach (var file in files.WithCancellation(token))
+                {
+                    string? path;
+                    using (file)
+                    {
+                        path = file.TryGetLocalPath();
+                    }
+                    yield return new FileInfo(path ?? throw new PlatformNotSupportedException("files have no path on this system"));
+                }
             }
         }
 
@@ -54,11 +62,13 @@ public static class AvaloniaExtensions
                             break;
 
                         case IStorageFolder folder:
-                            await foreach (var sub in ProcessItems(folder.GetItemsAsync(), token))
+                            using (folder)
                             {
-                                yield return sub;
+                                await foreach (var sub in ProcessItems(folder.GetItemsAsync(), token))
+                                {
+                                    yield return sub;
+                                }
                             }
-                            folder.Dispose();
                             break;
 
                         default:
