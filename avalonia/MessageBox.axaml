@@ -8,9 +8,14 @@
         Width="512"
         Title="Message Box"
         WindowStartupLocation="CenterOwner">
-    <Grid RowDefinitions="Auto Auto" ColumnDefinitions="Auto *">
+    <Grid RowDefinitions="* Auto" ColumnDefinitions="Auto *">
         <TextBlock Grid.Row="0" Grid.Column="0" Name="IconLabel" FontFamily="Segoe UI" Text="⚠️" FontSize="80"/>
-        <SelectableTextBlock Grid.Row="0" Grid.Column="1" Name="MessageLabel" Margin="16" TextWrapping="Wrap" VerticalAlignment="Center"/>
+
+        <ScrollViewer Grid.Row="0" Grid.Column="1"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+            <SelectableTextBlock Name="MessageLabel" Margin="16" TextWrapping="Wrap" VerticalAlignment="Center"/>
+        </ScrollViewer>
 
         <StackPanel Grid.Row="1" Grid.Column="0"  Grid.ColumnSpan="2" Name="ButtonPanel" Margin="16 0 16 16" FlowDirection="RightToLeft" Orientation="Horizontal" Spacing="4"/>
     </Grid>

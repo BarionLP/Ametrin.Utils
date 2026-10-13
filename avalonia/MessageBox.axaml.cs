@@ -32,8 +32,15 @@ public sealed partial class MessageBox : Window
 
     public async Task<T> ShowDialog<T>(Window owner, T defaultOption)
     {
+        this.SetMaxHeightToScreenHeight(owner, 0.75f);
         var result = await ShowDialog<object>(owner);
         return result is T t ? t : defaultOption;
+    }
+
+    public override void Show()
+    {
+        this.SetMaxHeightToScreenHeight(0.75f);
+        base.Show();
     }
 
     public static MessageBoxBuilder Info(string message, string title = "Info", string icon = "ℹ️")
@@ -70,7 +77,7 @@ public sealed class MessageBoxBuilder
         where T : notnull
         => ShowDialog((Window)TopLevel.GetTopLevel(owner)!, defaultOption, options);
     public Task<T> ShowDialog<T>(Window owner, T defaultOption, params ReadOnlySpan<T> options)
-        where T : notnull 
+        where T : notnull
         => Build([defaultOption, .. options]).ShowDialog(owner, defaultOption);
 
     public void Show(object option) => Build([option]).Show();

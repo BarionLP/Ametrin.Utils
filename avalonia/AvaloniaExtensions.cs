@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 
 namespace Ametrin.Utils.Avalonia;
@@ -73,6 +74,27 @@ public static class AvaloniaExtensions
     {
         // PlatformImpl becomes null once a window has been closed
         public bool IsClosed => window.PlatformImpl is null;
+
+        public void SetMaxHeightToScreenHeight(float factor = 0.9f)
+        {
+            var screen = window.Screens.ScreenFromWindow(window) ?? window.Screens.Primary;
+            if (screen is null) return;
+
+            window.SetMaxHeightToScreenHeight(screen, factor);
+        }
+
+        public void SetMaxHeightToScreenHeight(Window owner, float factor = 0.9f)
+        {
+            var screen = owner.Screens.ScreenFromWindow(owner) ?? owner.Screens.Primary;
+            if (screen is null) return;
+
+            window.SetMaxHeightToScreenHeight(screen, factor);
+        }
+
+        public void SetMaxHeightToScreenHeight(Screen screen, float factor = 0.9f)
+        {
+            window.MaxHeight = screen.WorkingArea.Height / screen.Scaling * factor; // leave some margin
+        }
     }
 
     extension(Point point)
